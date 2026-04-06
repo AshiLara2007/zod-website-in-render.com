@@ -2,15 +2,15 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: "ZOD MANPOWER | Qatar's Leading Recruitment Agency",
+  title: 'ZOD MANPOWER | Qatar\'s Leading Recruitment Agency',
   description: 'Expertly connecting world-class human resources to the ambitious vision of Qatar.',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -19,9 +19,7 @@ export default function RootLayout({
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         />
       </head>
-      <body className="bg-gray-50 text-gray-800" suppressHydrationWarning>
-        {children}
-      </body>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }
