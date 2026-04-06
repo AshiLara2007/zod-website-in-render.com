@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">zodmanpower</string>
+    <string name="title_activity_main">zodmanpower</string>
+    <string name="package_name">info.zodmanpower.app</string>
+    <string name="custom_url_scheme">info.zodmanpower.app</string>
+</resources>
