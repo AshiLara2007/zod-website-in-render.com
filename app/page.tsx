@@ -43,7 +43,7 @@ const countryOptions = [
 
 // FIXED: Use the correct API key (starts with AIza)
 // If this key doesn't work, get a new one from https://aistudio.google.com/apikey
-const GEMINI_API_KEY = '###########################################';
+const GEMINI_API_KEY = 'AIzaSyBaKCGCTPEQLoiQ9EBd93sYLPSNA3GyZpc';
 
 const translations = {
   en: {
