@@ -82,7 +82,7 @@ const translations = {
     faqQ4: 'How do employers request candidates?', faqA4: 'Employers can browse our pre-vetted talent on this website and contact us directly via WhatsApp to request CVs or arrange interviews.',
     footerText: "Qatar's leading licensed manpower recruitment agency. Connecting global talent to the heart of the Middle East.",
     quickLinks: 'Quick Links', aboutDoha: 'About Doha Agency', clientServices: 'Client Services', browseCVs: 'Browse CVs',
-    internal: 'Internal', copyright: '© 2026 ZOD MANPOWER. LICENSED BY QATAR MINISTRY OF LABOR.',
+    internal: 'Internal', copyright: '© 2026 ZOD MANPOWER.',
     privacyPolicy: 'Privacy Policy', terms: 'Terms of Service',
     staffAuth: 'Staff Authentication', restricted: 'Restricted access for ZOD Manpower Admins',
     username: 'Username', password: 'Password', enterAdmin: 'Enter admin', authorizedOnly: 'Authorized Access Only',
