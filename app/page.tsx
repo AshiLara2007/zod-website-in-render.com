@@ -34,15 +34,11 @@ const jobOptions = [
   'Cleaner', 'Caregiver', 'Sales', 'Cashier', 'Waiter', 'hospitality', 'Technical'
 ];
 
+// UPDATED: Only these countries
 const countryOptions = [
-  'Burundi', 'Ghana', "Côte d'Ivoire", 'Madagascar', 'Myanmar', 'Nepal',
-  'Nigeria', 'Philippines', 'Rwanda', 'Sri Lanka', 'Tanzania', 'Ethiopia',
-  'Kenya', 'Indonesia', 'Bangladesh', 'India', 'Eritrea', 'Uganda',
-  'Sierra leone', 'Gambia'
+  'Indonesia', 'Sri Lanka', 'Philippines', 'Bangladesh', 'India', 'Ethiopia', 'Kenya', 'Uganda'
 ];
 
-// FIXED: Use the correct API key (starts with AIza)
-// If this key doesn't work, get a new one from https://aistudio.google.com/apikey
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
 const translations = {
@@ -96,11 +92,7 @@ const translations = {
     trafficSource: 'Traffic Source', actionTaken: 'Action Taken', timeLocal: 'Time (Local)',
     confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate? This action cannot be undone.',
     cancel: 'Cancel', yesDelete: 'Yes, Delete', english: 'English', arabic: 'العربية',
-    // New button texts
-    houseMaids: 'House Maids',
-    drivers: 'Drivers',
-    nurses: 'Nurses',
-    monthlyCleaners: 'Monthly Cleaners',
+    houseMaids: 'House Maids', drivers: 'Drivers', nurses: 'Nurses', monthlyCleaners: 'Monthly Cleaners',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور',
@@ -153,11 +145,7 @@ const translations = {
     trafficSource: 'مصدر الزيارة', actionTaken: 'الإجراء المتخذ', timeLocal: 'الوقت (محلي)',
     confirmDelete: 'تأكيد الحذف', deleteMsg: 'هل أنت متأكد من حذف هذا المرشح؟',
     cancel: 'إلغاء', yesDelete: 'نعم، احذف', english: 'English', arabic: 'العربية',
-    // New button texts
-    houseMaids: 'خادمات منازل',
-    drivers: 'سائقين',
-    nurses: 'ممرضين',
-    monthlyCleaners: 'عمال نظافة شهري',
+    houseMaids: 'خادمات منازل', drivers: 'سائقين', nurses: 'ممرضين', monthlyCleaners: 'عمال نظافة شهري',
   }
 };
 
@@ -293,14 +281,14 @@ export default function Home() {
     } else { alert('Invalid credentials. Use admin / 1978'); }
   };
 
-  // Quick hire buttons handler
+  // NEW: Quick hire function - filters candidates and navigates to hire page
   const handleQuickHire = (category: string) => {
     trackLead('Quick Hire', category);
-    const message = `I'm interested in hiring ${category}. Please share available candidates.`;
-    window.location.href = `https://wa.me/94729204485?text=${encodeURIComponent(message)}`;
+    setShowHirePage(true);
+    // Set search query to filter by job category
+    setSearchQuery(category.toLowerCase());
   };
 
-  // ========== GEMINI CHATBOT WITH LANGUAGE SELECTION ==========
   const startChat = (lang: 'en' | 'ar') => {
     setChatLanguageSelected(lang);
     const welcomeMsg = lang === 'en'
@@ -435,7 +423,7 @@ User question: ${msg}`
   const escapeHtml = (str: string) => str.replace(/[&<>]/g, (m) => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'));
 
   const filteredTalents = talents.filter((tal) => {
-    const matchSearch = tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
     const matchCountry = !countryFilter || tal.country === countryFilter;
     return matchSearch && matchCountry;
   });
@@ -666,31 +654,36 @@ User question: ${msg}`
                     <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/20 animate-pulse">{t.certified}</span>
                     <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
                     <p className="text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
-                    {/* NEW BUTTONS - House Maids, Drivers, Nurses, Monthly Cleaners */}
+                    
+                    {/* NEW BEAUTIFUL BUTTONS - Auto filter candidates */}
                     <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                       <button 
                         onClick={() => handleQuickHire('House Maids')}
-                        className="bg-white text-[#002F66] px-5 py-3 rounded-xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm flex items-center gap-2"
+                        className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]"
                       >
-                        <span>🏠</span> {t.houseMaids}
+                        <span className="relative z-10 flex items-center gap-2 text-sm">🏠 {t.houseMaids}</span>
+                        <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
                       <button 
                         onClick={() => handleQuickHire('Drivers')}
-                        className="bg-white text-[#002F66] px-5 py-3 rounded-xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm flex items-center gap-2"
+                        className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]"
                       >
-                        <span>🚗</span> {t.drivers}
+                        <span className="relative z-10 flex items-center gap-2 text-sm">🚗 {t.drivers}</span>
+                        <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
                       <button 
                         onClick={() => handleQuickHire('Nurses')}
-                        className="bg-white text-[#002F66] px-5 py-3 rounded-xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm flex items-center gap-2"
+                        className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]"
                       >
-                        <span>🏥</span> {t.nurses}
+                        <span className="relative z-10 flex items-center gap-2 text-sm">🏥 {t.nurses}</span>
+                        <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
                       <button 
                         onClick={() => handleQuickHire('Monthly Cleaners')}
-                        className="bg-white text-[#002F66] px-5 py-3 rounded-xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm flex items-center gap-2"
+                        className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]"
                       >
-                        <span>🧹</span> {t.monthlyCleaners}
+                        <span className="relative z-10 flex items-center gap-2 text-sm">🧹 {t.monthlyCleaners}</span>
+                        <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
                     </div>
                   </div>
