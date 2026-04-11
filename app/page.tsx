@@ -15,6 +15,15 @@ interface Talent {
   cv: string;
 }
 
+interface Employer {
+  id: string;
+  name: string;
+  age: number;
+  position: string;
+  photo: string;
+  company: string;
+}
+
 interface Lead {
   id: number;
   source: string;
@@ -40,10 +49,20 @@ const countryOptions = [
 
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
+// Sample employers data
+const sampleEmployers: Employer[] = [
+  { id: '1', name: 'Ahmed Al Mansouri', age: 45, position: 'HR Director', photo: 'https://randomuser.me/api/portraits/men/1.jpg', company: 'Qatar National Bank' },
+  { id: '2', name: 'Fatima Al Thani', age: 38, position: 'Operations Manager', photo: 'https://randomuser.me/api/portraits/women/2.jpg', company: 'Ooredoo Qatar' },
+  { id: '3', name: 'Mohammed Al Kuwari', age: 52, position: 'CEO', photo: 'https://randomuser.me/api/portraits/men/3.jpg', company: 'Qatar Airways' },
+  { id: '4', name: 'Noora Al Sada', age: 41, position: 'Talent Acquisition Head', photo: 'https://randomuser.me/api/portraits/women/4.jpg', company: 'Sidra Medicine' },
+  { id: '5', name: 'Khalid Al Emadi', age: 35, position: 'Facility Manager', photo: 'https://randomuser.me/api/portraits/men/5.jpg', company: 'Msheireb Properties' },
+  { id: '6', name: 'Layla Al Hitmi', age: 44, position: 'HR Business Partner', photo: 'https://randomuser.me/api/portraits/women/6.jpg', company: 'Qatar Petroleum' },
+];
+
 const translations = {
   en: {
     welcome: 'Welcome To Doha, Qatar', brandLoading: 'ZOD MANPOWER',
-    home: 'Home', about: 'About', services: 'Services', vacancies: 'Vacancies',
+    home: 'Home', about: 'About', services: 'Services',
     hireNav: 'Hire Talent', applyNow: 'Apply Now', adminPortal: 'Admin Portal',
     certified: 'ISO 9001:2015 Certified Agency', heroTitle: 'The Gateway to',
     heroTitleSpan: 'Premium Talent', heroTitleEnd: 'in Doha.',
@@ -59,7 +78,6 @@ const translations = {
     visaTitle: 'Visa & Documentation', visaDesc: 'End-to-end handling of Qatar work permits, QID processing, and professional licensing for international talent.',
     techTitle: 'Technical Screening', techDesc: "Rigorous multi-stage skill testing and background checks to ensure every candidate is ready for Doha's competitive market.",
     projectsTitle: 'Lusail & Doha Projects', projectsDesc: 'Specialized large-scale staffing solutions for major national infrastructure, hospitality, and oil & gas sectors.',
-    currentOpenings: 'Current Openings in Qatar', openingsDesc: 'Join our network and work with top-tier companies in Doha, Al Khor, and Al Wakrah.',
     applyViaWhatsapp: 'APPLY VIA WHATSAPP',
     hireTitle: 'Hire Top Talent Instantly', hireDesc: 'Employers can browse our pre-vetted candidates and request CVs directly.',
     searchPlaceholder: 'Search Skill (e.g. Driver, Nurse)...', refresh: 'Refresh', ready: 'Ready', viewCV: 'View CV', hireBtn: 'Hire',
@@ -92,10 +110,11 @@ const translations = {
     confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate? This action cannot be undone.',
     cancel: 'Cancel', yesDelete: 'Yes, Delete', english: 'English', arabic: 'العربية',
     houseMaids: 'House Maids', drivers: 'Drivers', nurses: 'Nurses', monthlyCleaners: 'Monthly Cleaners',
+    ourEmployers: 'Our Employers', employersTitle: 'Our Trusted Employers', employersDesc: 'Meet our valued employer partners who trust ZOD Manpower for their recruitment needs.',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور',
-    home: 'الرئيسية', about: 'من نحن', services: 'خدماتنا', vacancies: 'الوظائف الشاغرة',
+    home: 'الرئيسية', about: 'من نحن', services: 'خدماتنا',
     hireNav: 'توظيف', applyNow: 'قدم الآن', adminPortal: 'بوابة المشرفين',
     certified: 'وكالة معتمدة ISO 9001:2015', heroTitle: 'البوابة إلى',
     heroTitleSpan: 'المواهب المتميزة', heroTitleEnd: 'في الدوحة.',
@@ -111,7 +130,6 @@ const translations = {
     visaTitle: 'التأشيرات والوثائق', visaDesc: 'معالجة شاملة لتصاريح العمل القطرية ومعالجة QID.',
     techTitle: 'الفحص التقني', techDesc: 'اختبارات مهارات متعددة لضمان جاهزية كل مرشح.',
     projectsTitle: 'مشاريع لوسيل والدوحة', projectsDesc: 'حلول توظيف واسعة النطاق.',
-    currentOpenings: 'الوظائف الشاغرة حالياً في قطر', openingsDesc: 'انضم إلى شبكتنا.',
     applyViaWhatsapp: 'قدم عبر واتساب',
     hireTitle: 'وظف أفضل المواهب فوراً', hireDesc: 'تصفح مرشحينا المعتمدين مسبقاً.',
     searchPlaceholder: 'ابحث عن مهارة...', refresh: 'تحديث', ready: 'جاهز', viewCV: 'عرض السيرة', hireBtn: 'توظيف',
@@ -145,6 +163,7 @@ const translations = {
     confirmDelete: 'تأكيد الحذف', deleteMsg: 'هل أنت متأكد من حذف هذا المرشح؟',
     cancel: 'إلغاء', yesDelete: 'نعم، احذف', english: 'English', arabic: 'العربية',
     houseMaids: 'خادمات منازل', drivers: 'سائقين', nurses: 'ممرضين', monthlyCleaners: 'عمال نظافة شهري',
+    ourEmployers: 'أصحاب العمل', employersTitle: 'أصحاب العمل الموثوقون', employersDesc: 'تعرف على شركائنا من أصحاب العمل الذين يثقون في زود مان باور لتلبية احتياجات التوظيف.',
   }
 };
 
@@ -165,6 +184,8 @@ export default function Home() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [showHirePage, setShowHirePage] = useState(false);
+  const [showEmployersPage, setShowEmployersPage] = useState(false);
+  const [employers] = useState<Employer[]>(sampleEmployers);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -282,6 +303,7 @@ export default function Home() {
   const handleQuickHire = (category: string) => {
     trackLead('Quick Hire', category);
     setShowHirePage(true);
+    setShowEmployersPage(false);
     setSearchQuery(category.toLowerCase());
   };
 
@@ -558,16 +580,16 @@ User question: ${msg}`
         <div className="public-section">
           <nav className="fixed w-full z-50 glass-nav">
             <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-              <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); window.scrollTo(0, 0); }}>
+              <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); window.scrollTo(0, 0); }}>
                 <img src="/logo/logo.jpeg" alt="ZOD MANPOWER Logo" className="w-10 h-10 rounded-xl object-cover shadow-lg transition-transform duration-300 group-hover:scale-110" />
                 <div className="text-xl font-extrabold tracking-tighter uppercase">ZOD<span className="text-[#002F66]"> MANPOWER</span></div>
               </div>
               <div className="hidden lg:flex items-center space-x-8 font-semibold text-xs uppercase tracking-widest">
-                <a href="#home" onClick={() => setShowHirePage(false)} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.home}</a>
-                <a href="#about" className="nav-link hover:text-[#002F66] transition-all duration-300">{t.about}</a>
-                <a href="#services" className="nav-link hover:text-[#002F66] transition-all duration-300">{t.services}</a>
-                <a href="#vacancies" className="nav-link hover:text-[#002F66] transition-all duration-300">{t.vacancies}</a>
-                <button onClick={() => setShowHirePage(true)} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.hireNav}</button>
+                <a href="#home" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.home}</a>
+                <a href="#about" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.about}</a>
+                <a href="#services" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.services}</a>
+                <button onClick={() => { setShowEmployersPage(true); setShowHirePage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.ourEmployers}</button>
+                <button onClick={() => { setShowHirePage(true); setShowEmployersPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.hireNav}</button>
                 <a href="https://wa.me/94729204485" onClick={() => trackLead('Nav Apply', 'Global Apply')} target="_blank" className="bg-[#002F66] text-white px-6 py-2.5 rounded-full shadow-md hover:bg-[#002060] transition-all hover:scale-105 active:scale-95">{t.applyNow}</a>
                 <button onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')} className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-gray-100 text-[#002F66] hover:bg-gray-200 transition-all"><i className="fa-solid fa-globe text-[10px]"></i><span>{language === 'en' ? 'العربية' : 'English'}</span></button>
               </div>
@@ -578,18 +600,54 @@ User question: ${msg}`
           <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`}>
             <div className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fa-solid fa-xmark text-[#002F66]"></i></div>
             <div className="sidebar-nav mt-8">
-              <a href="#home" onClick={() => { setShowHirePage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.home}</a>
-              <a href="#about" onClick={() => setSidebarOpen(false)} className="transition-all hover:translate-x-2">{t.about}</a>
-              <a href="#services" onClick={() => setSidebarOpen(false)} className="transition-all hover:translate-x-2">{t.services}</a>
-              <a href="#vacancies" onClick={() => setSidebarOpen(false)} className="transition-all hover:translate-x-2">{t.vacancies}</a>
-              <button onClick={() => { setShowHirePage(true); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.hireNav}</button>
+              <a href="#home" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.home}</a>
+              <a href="#about" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.about}</a>
+              <a href="#services" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.services}</a>
+              <button onClick={() => { setShowEmployersPage(true); setShowHirePage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.ourEmployers}</button>
+              <button onClick={() => { setShowHirePage(true); setShowEmployersPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.hireNav}</button>
               <a href="https://wa.me/94729204485" onClick={() => { trackLead('Mobile Nav Apply', 'Global Apply'); setSidebarOpen(false); }} target="_blank" className="sidebar-apply" style={{ backgroundColor: '#002F66' }}>{t.applyNow}</a>
               <button onClick={() => { setLanguage(language === 'en' ? 'ar' : 'en'); setSidebarOpen(false); }} className="mt-4 w-full py-2 bg-gray-100 rounded-full text-sm font-bold text-[#002F66] hover:bg-gray-200 transition-all flex items-center justify-center gap-2"><i className="fa-solid fa-globe text-xs"></i>{language === 'en' ? 'العربية' : 'English'}</button>
             </div>
           </div>
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
-          {showHirePage ? (
+          {showEmployersPage ? (
+            <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
+              <div className="max-w-7xl mx-auto">
+                <button onClick={() => setShowEmployersPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> Back to Home</button>
+                <div className="text-center mb-12">
+                  <h3 className="text-4xl font-bold text-slate-900 mb-4">{t.employersTitle}</h3>
+                  <p className="text-gray-500 max-w-2xl mx-auto">{t.employersDesc}</p>
+                </div>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {employers.map((employer) => (
+                    <div key={employer.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100">
+                      <div className="relative h-48 bg-gradient-to-r from-[#002F66] to-[#0040aa] flex items-center justify-center">
+                        <img src={employer.photo} alt={employer.name} className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg" onError={(e) => (e.currentTarget.src = 'https://placehold.co/150x150?text=User')} />
+                      </div>
+                      <div className="p-6 text-center">
+                        <h4 className="text-xl font-bold text-slate-800 mb-1">{escapeHtml(employer.name)}</h4>
+                        <p className="text-[#002F66] font-semibold text-sm mb-3">{escapeHtml(employer.position)}</p>
+                        <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
+                          <i className="fa-solid fa-building"></i>
+                          <span>{escapeHtml(employer.company)}</span>
+                        </div>
+                        <div className="flex items-center justify-center gap-2 text-gray-500 text-sm mt-1">
+                          <i className="fa-solid fa-calendar"></i>
+                          <span>{employer.age} Years Old</span>
+                        </div>
+                        <div className="mt-6 pt-4 border-t border-gray-100">
+                          <a href={`https://wa.me/94729204485?text=I'm interested in working with ${encodeURIComponent(employer.company)}`} target="_blank" onClick={() => trackLead('Employer Contact', employer.name)} className="inline-flex items-center gap-2 bg-[#002F66] text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-[#002060] transition-all hover:scale-105">
+                            <i className="fa-brands fa-whatsapp"></i> Contact Company
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : showHirePage ? (
             <div className="min-h-screen pt-28 pb-20 px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowHirePage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> Back to Home</button>
@@ -753,8 +811,6 @@ User question: ${msg}`
                 </div>
               </section>
 
-              {/* Current Openings in Qatar section - REMOVED */}
-
               <section className="py-24 bg-gray-50 px-6 reveal">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12">
                   {[{ text: t.testimonial1, author: t.author1 }, { text: t.testimonial2, author: t.author2 }, { text: t.testimonial3, author: t.author3 }].map((item, i) => (
@@ -855,7 +911,7 @@ User question: ${msg}`
               <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
                 <div className="p-8 border-b flex justify-between items-center"><h4 className="font-bold text-xs uppercase tracking-widest text-indigo-600">{t.realtimeLogs}</h4><button onClick={clearLeads} className="text-[10px] font-bold text-red-500 uppercase hover:underline transition-all">{t.clearLogs}</button></div>
                 <table className="w-full text-left"><thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest"><tr><th className="p-8">{t.trafficSource}</th><th className="p-8">{t.actionTaken}</th><th className="p-8 text-right">{t.timeLocal}</th></tr></thead>
-                  <tbody className="divide-y divide-gray-100">{leads.map((lead) => (<tr key={lead.id}><td className="p-8 text-xs font-bold">{escapeHtml(lead.source)}</td><td className="p-8 text-xs text-indigo-600 font-bold">{escapeHtml(lead.action)}</td><td className="p-8 text-right text-[10px] text-gray-400">{lead.time}</td></tr>))}</tbody>
+                  <tbody className="divide-y divide-gray-100">{leads.map((lead) => (<tr key={lead.id}><td className="p-8 text-xs font-bold">{escapeHtml(lead.source)}</td><td className="p-8 text-xs text-indigo-600 font-bold">{escapeHtml(lead.action)}</td><td className="p-8 text-right text-[10px] text-gray-400">{lead.time}</td></td>))}</tbody>
                 </table>
               </div>
             )}
