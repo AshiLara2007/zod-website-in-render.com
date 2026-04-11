@@ -43,11 +43,11 @@ const countryOptions = [
 
 // FIXED: Use the correct API key (starts with AIza)
 // If this key doesn't work, get a new one from https://aistudio.google.com/apikey
-const GEMINI_API_KEY = 'AIzaSyBaKCGCTPEQLoiQ9EBd93sYLPSNA3GyZpc';
+const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
 const translations = {
   en: {
-    welcome: 'Welcome To Doha', brandLoading: 'ZOD MANPOWER',
+    welcome: 'Welcome To Doha, Qatar', brandLoading: 'ZOD MANPOWER',
     home: 'Home', about: 'About', services: 'Services', vacancies: 'Vacancies',
     hireNav: 'Hire Talent', applyNow: 'Apply Now', adminPortal: 'Admin Portal',
     certified: 'ISO 9001:2015 Certified Agency', heroTitle: 'The Gateway to',
@@ -133,7 +133,7 @@ const translations = {
     faqQ4: 'كيف يطلب أصحاب العمل المرشحين؟', faqA4: 'عبر واتساب أو من خلال الموقع مباشرة.',
     footerText: 'وكالة التوظيف المرخصة الرائدة في قطر.',
     quickLinks: 'روابط سريعة', aboutDoha: 'عن وكالة الدوحة', clientServices: 'خدمات العملاء', browseCVs: 'تصفح السير الذاتية',
-    internal: 'داخلي', copyright: '© 2026 زود مان باور. مرخصة من وزارة العمل القطرية.',
+    internal: 'داخلي', copyright: '© 2026 زود مانباور.',
     privacyPolicy: 'سياسة الخصوصية', terms: 'شروط الخدمة',
     staffAuth: 'مصادقة الموظفين', restricted: 'دخول مقيد لمشرفي زود مان باور',
     username: 'اسم المستخدم', password: 'كلمة المرور', enterAdmin: 'أدخل اسم المستخدم', authorizedOnly: 'دخول مصرح به فقط',
