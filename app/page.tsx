@@ -617,17 +617,44 @@ User question: ${msg}`
                   <div className="grid md:grid-cols-3 gap-8">
                     {filteredTalents.map((talent) => (
                       <div key={talent.id} className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
-                        <div className="flex justify-between items-start mb-6">
-                          <img src={talent.pic} className="w-20 h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
-                          <span className="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
-                        </div>
-                        <div className="flex-grow">
-                          <h4 className="font-bold text-slate-800 text-xl leading-tight">{escapeHtml(talent.name)}</h4>
-                          <p className="text-[#002F66] font-bold text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
-                          <div className="mt-6 pt-6 border-t border-gray-100 space-y-3 mb-8">
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
+                        <div className="flex flex-wrap gap-4 justify-center">
+  <button 
+    onClick={() => {
+      trackLead('Quick Hire', 'House Maids');
+      window.location.href = `https://wa.me/94729204485?text=I'm interested in hiring House Maids. Please share available candidates.`;
+    }} 
+    className="bg-white text-[#002F66] px-6 py-4 rounded-2xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm"
+  >
+    🏠 House Maids
+  </button>
+  <button 
+    onClick={() => {
+      trackLead('Quick Hire', 'Drivers');
+      window.location.href = `https://wa.me/94729204485?text=I'm interested in hiring Drivers. Please share available candidates.`;
+    }} 
+    className="bg-white text-[#002F66] px-6 py-4 rounded-2xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm"
+  >
+    🚗 Drivers
+  </button>
+  <button 
+    onClick={() => {
+      trackLead('Quick Hire', 'Nurses');
+      window.location.href = `https://wa.me/94729204485?text=I'm interested in hiring Nurses. Please share available candidates.`;
+    }} 
+    className="bg-white text-[#002F66] px-6 py-4 rounded-2xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm"
+  >
+    🏥 Nurses
+  </button>
+  <button 
+    onClick={() => {
+      trackLead('Quick Hire', 'Monthly Cleaners');
+      window.location.href = `https://wa.me/94729204485?text=I'm interested in hiring Monthly Cleaners. Please share available candidates.`;
+    }} 
+    className="bg-white text-[#002F66] px-6 py-4 rounded-2xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm"
+  >
+    🧹 Monthly Cleaners
+  </button>
+</div>
                           </div>
                         </div>
                         <div className="flex gap-3 mt-auto">
