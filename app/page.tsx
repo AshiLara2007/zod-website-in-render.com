@@ -34,7 +34,6 @@ const jobOptions = [
   'Cleaner', 'Caregiver', 'Sales', 'Cashier', 'Waiter', 'hospitality', 'Technical'
 ];
 
-// UPDATED: Only these countries
 const countryOptions = [
   'Indonesia', 'Sri Lanka', 'Philippines', 'Bangladesh', 'India', 'Ethiopia', 'Kenya', 'Uganda'
 ];
@@ -167,7 +166,6 @@ export default function Home() {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [showHirePage, setShowHirePage] = useState(false);
 
-  // Chatbot states
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
@@ -281,11 +279,9 @@ export default function Home() {
     } else { alert('Invalid credentials. Use admin / 1978'); }
   };
 
-  // NEW: Quick hire function - filters candidates and navigates to hire page
   const handleQuickHire = (category: string) => {
     trackLead('Quick Hire', category);
     setShowHirePage(true);
-    // Set search query to filter by job category
     setSearchQuery(category.toLowerCase());
   };
 
@@ -449,7 +445,6 @@ User question: ${msg}`
 
   return (
     <>
-      {/* ========== GEMINI CHATBOT ========== */}
       <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-3">
         {chatOpen && (
           <div className="w-80 sm:w-96 bg-white rounded-[2rem] shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '520px' }}>
@@ -525,7 +520,6 @@ User question: ${msg}`
         </button>
       </div>
 
-      {/* Login Modal */}
       {loginModalOpen && (
         <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center backdrop-blur-sm">
           <div className="bg-white p-10 rounded-[2.5rem] w-full max-w-md shadow-2xl relative border border-gray-100">
@@ -544,7 +538,6 @@ User question: ${msg}`
         </div>
       )}
 
-      {/* Delete Modal */}
       {deleteModalOpen && (
         <div className="fixed inset-0 bg-black/70 z-[150] flex items-center justify-center backdrop-blur-sm">
           <div className="bg-white p-8 rounded-2xl max-w-md w-full shadow-2xl">
@@ -655,7 +648,6 @@ User question: ${msg}`
                     <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
                     <p className="text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
                     
-                    {/* NEW BEAUTIFUL BUTTONS - Auto filter candidates */}
                     <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                       <button 
                         onClick={() => handleQuickHire('House Maids')}
@@ -705,7 +697,6 @@ User question: ${msg}`
                 </div>
               </section>
 
-              {/* Featured CV Preview - 2 lines */}
               <section className="py-16 bg-gray-50 px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-8">
@@ -762,22 +753,7 @@ User question: ${msg}`
                 </div>
               </section>
 
-              <section id="vacancies" className="py-24 px-6 bg-slate-900 text-white relative reveal">
-                <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden"><i className="fa-solid fa-briefcase text-[50rem] absolute -bottom-40 -left-40 animate-spin-slow"></i></div>
-                <div className="max-w-7xl mx-auto relative z-10">
-                  <div className="text-center mb-16"><h3 className="text-4xl font-bold mb-4">{t.currentOpenings}</h3><p className="text-slate-400">{t.openingsDesc}</p></div>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {[{ name: 'Hospitality Waiters', count: 12, area: '5-Star Hotels, West Bay', link: 'Waiter position' }, { name: 'Security Guards', count: 25, area: 'Retail & Malls Sector', link: 'Security position' }, { name: 'Cleaning Staff', count: 40, area: 'Corporate Offices', link: 'Cleaning position' }, { name: 'Office Assistants', count: 8, area: 'Lusail Business District', link: 'Office Assistant position' }].map((v, i) => (
-                      <div key={i} className="p-8 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 transition-all duration-500 cursor-pointer group hover:scale-105 hover:shadow-xl" onClick={() => { trackLead('Vacancy', v.name); window.location.href = `https://wa.me/94729204485?text=Apply for ${v.link}`; }}>
-                        <div className="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center text-[#002F66] mb-6 font-bold group-hover:scale-110 transition-transform">{v.count}</div>
-                        <h5 className="font-bold text-lg mb-2 group-hover:text-amber-400 transition-colors">{v.name}</h5>
-                        <p className="text-xs text-slate-500 mb-4 italic">{v.area}</p>
-                        <div className="flex items-center text-[10px] font-bold text-amber-400 gap-2 group-hover:gap-3 transition-all">{t.applyViaWhatsapp} <i className="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </section>
+              {/* Current Openings in Qatar section - REMOVED */}
 
               <section className="py-24 bg-gray-50 px-6 reveal">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12">
