@@ -49,7 +49,6 @@ const countryOptions = [
 
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
-// Sample employers data
 const sampleEmployers: Employer[] = [
   { id: '1', name: 'Ahmed Al Mansouri', age: 45, position: 'HR Director', photo: 'https://randomuser.me/api/portraits/men/1.jpg', company: 'Qatar National Bank' },
   { id: '2', name: 'Fatima Al Thani', age: 38, position: 'Operations Manager', photo: 'https://randomuser.me/api/portraits/women/2.jpg', company: 'Ooredoo Qatar' },
@@ -911,7 +910,7 @@ User question: ${msg}`
               <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
                 <div className="p-8 border-b flex justify-between items-center"><h4 className="font-bold text-xs uppercase tracking-widest text-indigo-600">{t.realtimeLogs}</h4><button onClick={clearLeads} className="text-[10px] font-bold text-red-500 uppercase hover:underline transition-all">{t.clearLogs}</button></div>
                 <table className="w-full text-left"><thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest"><tr><th className="p-8">{t.trafficSource}</th><th className="p-8">{t.actionTaken}</th><th className="p-8 text-right">{t.timeLocal}</th></tr></thead>
-                  <tbody className="divide-y divide-gray-100">{leads.map((lead) => (<tr key={lead.id}><td className="p-8 text-xs font-bold">{escapeHtml(lead.source)}</td><td className="p-8 text-xs text-indigo-600 font-bold">{escapeHtml(lead.action)}</td><td className="p-8 text-right text-[10px] text-gray-400">{lead.time}</td></td>))}</tbody>
+                  <tbody className="divide-y divide-gray-100">{leads.map((lead) => (<tr key={lead.id}><td className="p-8 text-xs font-bold">{escapeHtml(lead.source)}</td><td className="p-8 text-xs text-indigo-600 font-bold">{escapeHtml(lead.action)}</td><td className="p-8 text-right text-[10px] text-gray-400">{lead.time}</td></tr>))}</tbody>
                 </table>
               </div>
             )}
