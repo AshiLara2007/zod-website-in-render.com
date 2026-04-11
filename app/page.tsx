@@ -53,7 +53,7 @@ const translations = {
     certified: 'ISO 9001:2015 Certified Agency', heroTitle: 'The Gateway to',
     heroTitleSpan: 'Premium Talent', heroTitleEnd: 'in Doha.',
     heroDesc: 'Expertly connecting world-class human resources to the ambitious vision of Qatar.',
-    forEmployers: 'For Employers', forJobSeekers: 'For Job Seekers', yearsLabel: 'Years in Doha Market',
+    yearsLabel: 'Years in Doha Market',
     successfulPlacements: 'Successful Placements', corporateClients: 'Corporate Clients',
     responseTime: 'Candidate Response Time', complianceRate: 'Compliance Rate',
     ourLegacy: 'Our Legacy', aboutTitle: "Leading Doha's Recruitment Evolution for Over a Decade.",
@@ -96,6 +96,11 @@ const translations = {
     trafficSource: 'Traffic Source', actionTaken: 'Action Taken', timeLocal: 'Time (Local)',
     confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate? This action cannot be undone.',
     cancel: 'Cancel', yesDelete: 'Yes, Delete', english: 'English', arabic: 'العربية',
+    // New button texts
+    houseMaids: 'House Maids',
+    drivers: 'Drivers',
+    nurses: 'Nurses',
+    monthlyCleaners: 'Monthly Cleaners',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور',
@@ -104,7 +109,7 @@ const translations = {
     certified: 'وكالة معتمدة ISO 9001:2015', heroTitle: 'البوابة إلى',
     heroTitleSpan: 'المواهب المتميزة', heroTitleEnd: 'في الدوحة.',
     heroDesc: 'نربط بخبرة الموارد البشرية العالمية برؤية قطر الطموحة.',
-    forEmployers: 'لأصحاب العمل', forJobSeekers: 'للباحثين عن عمل', yearsLabel: 'سنة في سوق الدوحة',
+    yearsLabel: 'سنة في سوق الدوحة',
     successfulPlacements: 'تعيين ناجح', corporateClients: 'عميل من الشركات',
     responseTime: 'وقت الاستجابة للمرشح', complianceRate: 'معدل الامتثال',
     ourLegacy: 'إرثنا', aboutTitle: 'ريادة تطور التوظيف في الدوحة لأكثر من عقد.',
@@ -148,6 +153,11 @@ const translations = {
     trafficSource: 'مصدر الزيارة', actionTaken: 'الإجراء المتخذ', timeLocal: 'الوقت (محلي)',
     confirmDelete: 'تأكيد الحذف', deleteMsg: 'هل أنت متأكد من حذف هذا المرشح؟',
     cancel: 'إلغاء', yesDelete: 'نعم، احذف', english: 'English', arabic: 'العربية',
+    // New button texts
+    houseMaids: 'خادمات منازل',
+    drivers: 'سائقين',
+    nurses: 'ممرضين',
+    monthlyCleaners: 'عمال نظافة شهري',
   }
 };
 
@@ -281,6 +291,13 @@ export default function Home() {
     if (u.value === 'admin' && p.value === '1978') {
       setAdminActive(true); setLoginModalOpen(false); u.value = ''; p.value = '';
     } else { alert('Invalid credentials. Use admin / 1978'); }
+  };
+
+  // Quick hire buttons handler
+  const handleQuickHire = (category: string) => {
+    trackLead('Quick Hire', category);
+    const message = `I'm interested in hiring ${category}. Please share available candidates.`;
+    window.location.href = `https://wa.me/94729204485?text=${encodeURIComponent(message)}`;
   };
 
   // ========== GEMINI CHATBOT WITH LANGUAGE SELECTION ==========
@@ -617,44 +634,17 @@ User question: ${msg}`
                   <div className="grid md:grid-cols-3 gap-8">
                     {filteredTalents.map((talent) => (
                       <div key={talent.id} className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
-                        <div className="flex flex-wrap gap-4 justify-center">
-  <button 
-    onClick={() => {
-      trackLead('Quick Hire', 'House Maids');
-      window.location.href = `https://wa.me/94729204485?text=I'm interested in hiring House Maids. Please share available candidates.`;
-    }} 
-    className="bg-white text-[#002F66] px-6 py-4 rounded-2xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm"
-  >
-    🏠 House Maids
-  </button>
-  <button 
-    onClick={() => {
-      trackLead('Quick Hire', 'Drivers');
-      window.location.href = `https://wa.me/94729204485?text=I'm interested in hiring Drivers. Please share available candidates.`;
-    }} 
-    className="bg-white text-[#002F66] px-6 py-4 rounded-2xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm"
-  >
-    🚗 Drivers
-  </button>
-  <button 
-    onClick={() => {
-      trackLead('Quick Hire', 'Nurses');
-      window.location.href = `https://wa.me/94729204485?text=I'm interested in hiring Nurses. Please share available candidates.`;
-    }} 
-    className="bg-white text-[#002F66] px-6 py-4 rounded-2xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm"
-  >
-    🏥 Nurses
-  </button>
-  <button 
-    onClick={() => {
-      trackLead('Quick Hire', 'Monthly Cleaners');
-      window.location.href = `https://wa.me/94729204485?text=I'm interested in hiring Monthly Cleaners. Please share available candidates.`;
-    }} 
-    className="bg-white text-[#002F66] px-6 py-4 rounded-2xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm"
-  >
-    🧹 Monthly Cleaners
-  </button>
-</div>
+                        <div className="flex justify-between items-start mb-6">
+                          <img src={talent.pic} className="w-20 h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
+                          <span className="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
+                        </div>
+                        <div className="flex-grow">
+                          <h4 className="font-bold text-slate-800 text-xl leading-tight">{escapeHtml(talent.name)}</h4>
+                          <p className="text-[#002F66] font-bold text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
+                          <div className="mt-6 pt-6 border-t border-gray-100 space-y-3 mb-8">
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
                           </div>
                         </div>
                         <div className="flex gap-3 mt-auto">
@@ -676,9 +666,32 @@ User question: ${msg}`
                     <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/20 animate-pulse">{t.certified}</span>
                     <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
                     <p className="text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
-                    <div className="flex flex-wrap gap-4">
-                      <button onClick={() => setShowHirePage(true)} className="bg-white text-[#002F66] px-10 py-5 rounded-2xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300">{t.forEmployers}</button>
-                      <a href="#vacancies" className="bg-transparent border-2 border-white/30 px-10 py-5 rounded-2xl font-bold hover:bg-white/10 transition-all hover:scale-105 duration-300">{t.forJobSeekers}</a>
+                    {/* NEW BUTTONS - House Maids, Drivers, Nurses, Monthly Cleaners */}
+                    <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                      <button 
+                        onClick={() => handleQuickHire('House Maids')}
+                        className="bg-white text-[#002F66] px-5 py-3 rounded-xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm flex items-center gap-2"
+                      >
+                        <span>🏠</span> {t.houseMaids}
+                      </button>
+                      <button 
+                        onClick={() => handleQuickHire('Drivers')}
+                        className="bg-white text-[#002F66] px-5 py-3 rounded-xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm flex items-center gap-2"
+                      >
+                        <span>🚗</span> {t.drivers}
+                      </button>
+                      <button 
+                        onClick={() => handleQuickHire('Nurses')}
+                        className="bg-white text-[#002F66] px-5 py-3 rounded-xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm flex items-center gap-2"
+                      >
+                        <span>🏥</span> {t.nurses}
+                      </button>
+                      <button 
+                        onClick={() => handleQuickHire('Monthly Cleaners')}
+                        className="bg-white text-[#002F66] px-5 py-3 rounded-xl font-bold shadow-2xl hover:scale-105 transition-transform duration-300 text-sm flex items-center gap-2"
+                      >
+                        <span>🧹</span> {t.monthlyCleaners}
+                      </button>
                     </div>
                   </div>
                   <div className="hidden md:flex justify-center relative">
