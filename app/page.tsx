@@ -663,7 +663,7 @@ User question: ${msg}`
 
               <section className="py-16 bg-white border-b reveal">
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-10">
-                  {[{ num: '5.2K', label: t.successfulPlacements }, { num: '180+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '100%', label: t.complianceRate }].map((s, i) => (
+                  {[{ num: '5.2K', label: t.successfulPlacements }, { num: '180+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '98%', label: t.complianceRate }].map((s, i) => (
                     <div key={i} className="flex items-center space-x-4 border-r border-gray-100 last:border-0 hover:translate-x-2 transition-all duration-300 group">
                       <div className="text-4xl text-[#002F66] font-black group-hover:scale-110 transition-transform">{s.num}</div>
                       <div className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">{s.label}</div>
