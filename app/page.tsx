@@ -40,7 +40,6 @@ interface ChatMessage {
   cvCards?: Talent[];
 }
 
-// Only these 6 jobs for Manpower Services
 const jobOptions = [
   'Driver', 'Baby sitting', 'Nurse', 'Cook', 'Domestic Worker', 'Teacher'
 ];
@@ -57,7 +56,6 @@ const maritalStatusOptions = ['Single', 'Married', 'Divorced', 'Widowed'];
 
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
-// Team Members Data
 const teamMembers: TeamMember[] = [
   { id: '1', name: 'Mr. Ahmed Al Thani', position: 'CEO & Founder', photo: 'https://randomuser.me/api/portraits/men/1.jpg', phone: '+97455355206', isTopManagement: true },
   { id: '2', name: 'Ms. Fatima Al Saeed', position: 'Operations Director', photo: 'https://randomuser.me/api/portraits/women/2.jpg', phone: '+97455355206', isTopManagement: true },
@@ -215,7 +213,6 @@ export default function Home() {
   const [showReturnedHousemaids, setShowReturnedHousemaids] = useState(false);
   const [jobFilter, setJobFilter] = useState('');
   
-  // Form fields for admin panel
   const [calculatedAge, setCalculatedAge] = useState<number | null>(null);
 
   const [chatOpen, setChatOpen] = useState(false);
@@ -246,7 +243,6 @@ export default function Home() {
     { key: 'Teacher', label: t.teacher, icon: 'fa-solid fa-chalkboard-user', color: 'from-red-500 to-red-700' },
   ];
 
-  // Calculate age from Date of Birth
   const calculateAge = (dob: string) => {
     if (!dob) return null;
     const birthDate = new Date(dob);
@@ -554,7 +550,6 @@ User question: ${msg}`
   const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
   const regularTeam = teamMembers.filter(member => !member.isTopManagement);
 
-  // RTL direction for Arabic
   const isRTL = language === 'ar';
   const dir = isRTL ? 'rtl' : 'ltr';
 
@@ -562,15 +557,7 @@ User question: ${msg}`
     return (
       <div dir={dir} className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">
         <div className="text-center">
-          <div className="w-24 h-24 mx-auto mb-8 relative">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[#002F66] to-[#0040aa] flex items-center justify-center shadow-lg animate-pulse">
-              <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-[#002F66] flex items-center justify-center">
-                  <i className="fa-solid fa-globe text-white text-3xl"></i>
-                </div>
-              </div>
-            </div>
-          </div>
+          <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-24 h-24 rounded-full mx-auto mb-8 object-cover shadow-lg animate-pulse" onError={(e) => (e.currentTarget.style.display = 'none')} />
           <h1 className="text-4xl md:text-5xl font-bold text-[#002F66] mb-4 animate-bounce">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-8">{t.brandLoading}</p>
           <div className="flex gap-4 justify-center">
@@ -585,7 +572,6 @@ User question: ${msg}`
 
   return (
     <div dir={dir} className={isRTL ? 'rtl' : 'ltr'}>
-      {/* Global RTL Style */}
       <style jsx global>{`
         .rtl {
           direction: rtl;
@@ -609,10 +595,17 @@ User question: ${msg}`
           0% { transform: translateX(100%); }
           100% { transform: translateX(-100%); }
         }
+        @keyframes marquee-rtl {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
         .animate-marquee {
           animation: marquee 15s linear infinite;
         }
-        .animate-marquee:hover {
+        .animate-marquee-rtl {
+          animation: marquee-rtl 15s linear infinite;
+        }
+        .animate-marquee:hover, .animate-marquee-rtl:hover {
           animation-play-state: paused;
         }
         @keyframes spin-slow {
@@ -854,11 +847,11 @@ User question: ${msg}`
 
       {!adminActive && (
         <div className="public-section">
-          {/* Discount Banner - Animated Marquee Style */}
+          {/* Discount Banner - Animated Marquee Style with RTL support */}
           <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-24 pb-3 px-6">
             <div className="max-w-7xl mx-auto">
               <div className="overflow-hidden whitespace-nowrap">
-                <div className="inline-flex animate-marquee gap-8">
+                <div className={`inline-flex gap-8 ${isRTL ? 'animate-marquee-rtl' : 'animate-marquee'}`}>
                   <div onClick={() => handleDiscountClick('20% OFF on First Placement')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
                     <span className="text-white font-bold text-sm">🎉 20% OFF on First Placement</span>
                   </div>
@@ -881,27 +874,17 @@ User question: ${msg}`
                 </div>
               </div>
             </div>
-            {/* Animated background effect */}
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
             </div>
           </div>
 
-          {/* Navigation Bar */}
+          {/* Navigation Bar - Original Logo */}
           <nav className="fixed w-full z-50 glass-nav" style={{ top: '0' }}>
             <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
               <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); window.scrollTo(0, 0); }}>
-                {/* Globe Logo */}
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#002F66] to-[#0040aa] flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110">
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                    <div className="w-8 h-8 rounded-full bg-[#002F66] flex items-center justify-center">
-                      <i className="fa-solid fa-globe text-white text-sm"></i>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-2xl font-extrabold tracking-tighter uppercase">
-                  <span className="text-[#002F66]">ZOD</span> MANPOWER RECRUITMENT
-                </div>
+                <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-12 h-12 rounded-xl object-cover shadow-lg transition-transform duration-300 group-hover:scale-110" />
+                <div className="text-2xl font-extrabold tracking-tighter uppercase">ZOD<span className="text-[#002F66]"> MANPOWER RECRUITMENT</span></div>
               </div>
               <div className="hidden lg:flex items-center space-x-8 font-semibold text-xs uppercase tracking-widest">
                 <a href="#home" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.home}</a>
@@ -931,6 +914,7 @@ User question: ${msg}`
           </div>
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
+          {/* Rest of the content remains EXACTLY THE SAME as before - no changes to content sections */}
           {/* Our Team Page */}
           {showOurTeamPage ? (
             <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
@@ -942,7 +926,6 @@ User question: ${msg}`
                   <p className="text-gray-500 max-w-2xl mx-auto">{t.teamDesc}</p>
                 </div>
 
-                {/* Top Management Team Section */}
                 <div className="mb-16">
                   <h4 className="text-2xl font-bold text-[#002F66] text-center mb-10">{t.topManagementTitle}</h4>
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -965,7 +948,6 @@ User question: ${msg}`
                   </div>
                 </div>
 
-                {/* Regular Team Members */}
                 <div>
                   <h4 className="text-xl font-bold text-slate-700 text-center mb-8">Our Dedicated Team</h4>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1117,7 +1099,6 @@ User question: ${msg}`
                     <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
                     <p className="text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
                     
-                    {/* Quick Action Buttons */}
                     <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                       <button onClick={() => handleQuickHire('House Maids')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-2 text-sm">🏠 {t.houseMaids}</span>
@@ -1281,13 +1262,7 @@ User question: ${msg}`
                 <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 border-b border-white/5 pb-16">
                   <div className="col-span-2">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#002F66] to-[#0040aa] flex items-center justify-center shadow-lg">
-                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                          <div className="w-8 h-8 rounded-full bg-[#002F66] flex items-center justify-center">
-                            <i className="fa-solid fa-globe text-white text-sm"></i>
-                          </div>
-                        </div>
-                      </div>
+                      <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-12 h-12 rounded-xl object-cover shadow-lg" />
                       <div className="text-2xl font-black uppercase tracking-tighter">ZOD<span className="text-[#002F66]"> MANPOWER RECRUITMENT</span></div>
                     </div>
                     <p className="text-slate-500 text-sm leading-relaxed max-w-sm mb-6">{t.footerText}</p>
@@ -1381,7 +1356,7 @@ User question: ${msg}`
               <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
                 <div className="p-8 border-b flex justify-between items-center"><h4 className="font-bold text-xs uppercase tracking-widest text-indigo-600">{t.realtimeLogs}</h4><button onClick={clearLeads} className="text-[10px] font-bold text-red-500 uppercase hover:underline transition-all">{t.clearLogs}</button></div>
                 <table className="w-full text-left"><thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest"><tr><th className="p-8">{t.trafficSource}</th><th className="p-8">{t.actionTaken}</th><th className="p-8 text-right">{t.timeLocal}</th></tr></thead>
-                  <tbody className="divide-y divide-gray-100">{leads.map((lead) => (<tr key={lead.id}><td className="p-8 text-xs font-bold">{escapeHtml(lead.source)}</td><td className="p-8 text-xs text-indigo-600 font-bold">{escapeHtml(lead.action)}</td><td className="p-8 text-right text-[10px] text-gray-400">{lead.time}</td></tr>))}</tbody>
+                  <tbody className="divide-y divide-gray-100">{leads.map((lead) => (<tr key={lead.id}><td className="p-8 text-xs font-bold">{escapeHtml(lead.source)}</td><td className="p-8 text-xs text-indigo-600 font-bold">{escapeHtml(lead.action)}</td><td className="p-8 text-right text-[10px] text-gray-400">{lead.time}</td> hilab))}</tbody>
                 </table>
               </div>
             )}
