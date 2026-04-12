@@ -6,11 +6,14 @@ interface Talent {
   id: string;
   name: string;
   age: number;
+  dob: string;
   gender: string;
   job: string;
   country: string;
   religion: string;
   salary: number;
+  experience: string;
+  maritalStatus: string;
   pic: string;
   cv: string;
 }
@@ -45,6 +48,12 @@ const jobOptions = [
 const countryOptions = [
   'Indonesia', 'Sri Lanka', 'Philippines', 'Bangladesh', 'India', 'Ethiopia', 'Kenya', 'Uganda'
 ];
+
+const experienceOptions = [
+  '0-1 Year', '1-2 Years', '2-3 Years', '3-4 Years', '4-5 Years', '5-7 Years', '7-10 Years', '10+ Years'
+];
+
+const maritalStatusOptions = ['Single', 'Married', 'Divorced', 'Widowed'];
 
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
@@ -100,7 +109,7 @@ const translations = {
     username: 'Username', password: 'Password', enterAdmin: 'Enter admin', authorizedOnly: 'Authorized Access Only',
     staffPortal: 'Staff Portal', logout: 'Logout', totalCandidates: 'Total Candidates', webLeads: 'Web Leads',
     activeVacancies: 'Active Vacancies', inventoryManagement: 'Inventory Management', visitorLogs: 'Visitor Logs',
-    newCandidate: 'New Candidate', editCandidate: 'Edit:', fullName: 'Full Name', age: 'Age', gender: 'Gender',
+    newCandidate: 'New Candidate', editCandidate: 'Edit:', fullName: 'Full Name', age: 'Age', dob: 'Date of Birth', gender: 'Gender',
     jobDesignation: 'Job Designation', country: 'Country', religion: 'Religion', salaryQAR: 'Salary (QAR)',
     photo: 'Photo', cvUpload: 'CV (PDF/Image)', saveRecord: 'Save Candidate Record',
     candidateDetails: 'Candidate Details', position: 'Position', salary: 'Salary', actions: 'Actions',
@@ -118,7 +127,7 @@ const translations = {
     ourServicesTitle: 'Our Expertise', ourServicesDesc: 'Specialized recruitment solutions tailored to Qatar\'s diverse needs.',
     viewCandidates: 'View Candidates',
     discount1: '20% OFF on First Placement', discount2: 'Free Visa Processing for Group Hiring (10+)', discount3: '15% Discount for Annual Contracts', discountOffer: '🔥 LIMITED OFFER',
-    backToHome: 'Back to Home',
+    backToHome: 'Back to Home', maritalStatus: 'Marital Status', single: 'Single', married: 'Married', divorced: 'Divorced', widowed: 'Widowed',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
@@ -162,7 +171,7 @@ const translations = {
     staffPortal: 'بوابة الموظفين', logout: 'تسجيل الخروج', totalCandidates: 'إجمالي المرشحين',
     webLeads: 'طلبات الويب', activeVacancies: 'الوظائف النشطة',
     inventoryManagement: 'إدارة المخزون', visitorLogs: 'سجلات الزوار',
-    newCandidate: 'مرشح جديد', editCandidate: 'تعديل:', fullName: 'الاسم الكامل', age: 'العمر', gender: 'الجنس',
+    newCandidate: 'مرشح جديد', editCandidate: 'تعديل:', fullName: 'الاسم الكامل', age: 'العمر', dob: 'تاريخ الميلاد', gender: 'الجنس',
     jobDesignation: 'المسمى الوظيفي', country: 'البلد', religion: 'الدين', salaryQAR: 'الراتب (ريال قطري)',
     photo: 'الصورة', cvUpload: 'السيرة الذاتية (PDF/صورة)', saveRecord: 'حفظ بيانات المرشح',
     candidateDetails: 'تفاصيل المرشح', position: 'الوظيفة', salary: 'الراتب', actions: 'إجراءات',
@@ -180,7 +189,7 @@ const translations = {
     ourServicesTitle: 'خبراتنا', ourServicesDesc: 'حلول توظيف متخصصة مصممة خصيصاً لتلبية احتياجات قطر المتنوعة.',
     viewCandidates: 'عرض المرشحين',
     discount1: 'خصم 20% على أول تعيين', discount2: 'معالجة تأشيرة مجانية للتعيين الجماعي (10+)', discount3: 'خصم 15% على العقود السنوية', discountOffer: '🔥 عرض محدود',
-    backToHome: 'العودة إلى الرئيسية',
+    backToHome: 'العودة إلى الرئيسية', maritalStatus: 'الحالة الاجتماعية', single: 'أعزب', married: 'متزوج', divorced: 'مطلق', widowed: 'أرمل',
   }
 };
 
@@ -205,6 +214,9 @@ export default function Home() {
   const [showAboutPage, setShowAboutPage] = useState(false);
   const [showReturnedHousemaids, setShowReturnedHousemaids] = useState(false);
   const [jobFilter, setJobFilter] = useState('');
+  
+  // Form fields for admin panel
+  const [calculatedAge, setCalculatedAge] = useState<number | null>(null);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -214,12 +226,14 @@ export default function Home() {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const nameRef = useRef<HTMLInputElement>(null);
-  const ageRef = useRef<HTMLInputElement>(null);
+  const dobRef = useRef<HTMLInputElement>(null);
   const genderRef = useRef<HTMLSelectElement>(null);
   const jobRef = useRef<HTMLSelectElement>(null);
   const countryRef = useRef<HTMLSelectElement>(null);
   const religionRef = useRef<HTMLSelectElement>(null);
   const salaryRef = useRef<HTMLInputElement>(null);
+  const experienceRef = useRef<HTMLSelectElement>(null);
+  const maritalStatusRef = useRef<HTMLSelectElement>(null);
   const picRef = useRef<HTMLInputElement>(null);
   const cvRef = useRef<HTMLInputElement>(null);
 
@@ -231,6 +245,24 @@ export default function Home() {
     { key: 'Domestic Worker', label: t.domesticWorker, icon: 'fa-solid fa-broom', color: 'from-purple-500 to-purple-700' },
     { key: 'Teacher', label: t.teacher, icon: 'fa-solid fa-chalkboard-user', color: 'from-red-500 to-red-700' },
   ];
+
+  // Calculate age from Date of Birth
+  const calculateAge = (dob: string) => {
+    if (!dob) return null;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const handleDobChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const age = calculateAge(e.target.value);
+    setCalculatedAge(age);
+  };
 
   const fetchTalents = useCallback(async () => {
     setLoading(true);
@@ -263,17 +295,27 @@ export default function Home() {
     if (confirm(t.clearLogs)) { setLeads([]); localStorage.setItem('zod_activity_leads', '[]'); }
   };
 
+  const handleDiscountClick = (discountText: string) => {
+    const whatsappNumber = '94729204485';
+    const message = `Hi! I'm interested in the offer: ${discountText}. Can you please provide more details?`;
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    trackLead('Discount Banner', discountText);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData();
     if (editTalent) formData.append('id', editTalent.id);
     formData.append('name', nameRef.current!.value);
-    formData.append('age', ageRef.current!.value);
+    formData.append('dob', dobRef.current!.value);
+    formData.append('age', String(calculatedAge || 0));
     formData.append('gender', genderRef.current!.value);
     formData.append('job', jobRef.current!.value);
     formData.append('country', countryRef.current!.value);
     formData.append('religion', religionRef.current!.value);
     formData.append('salary', salaryRef.current!.value);
+    formData.append('experience', experienceRef.current!.value);
+    formData.append('maritalStatus', maritalStatusRef.current!.value);
     if (picRef.current?.files?.[0]) formData.append('tPic', picRef.current.files[0]);
     if (cvRef.current?.files?.[0]) formData.append('tCv', cvRef.current.files[0]);
     try {
@@ -285,26 +327,32 @@ export default function Home() {
 
   const resetForm = () => {
     setEditTalent(null);
+    setCalculatedAge(null);
     if (nameRef.current) nameRef.current.value = '';
-    if (ageRef.current) ageRef.current.value = '';
+    if (dobRef.current) dobRef.current.value = '';
     if (genderRef.current) genderRef.current.value = 'Male';
     if (jobRef.current) jobRef.current.value = jobOptions[0];
     if (countryRef.current) countryRef.current.value = countryOptions[0];
     if (religionRef.current) religionRef.current.value = 'Muslim';
     if (salaryRef.current) salaryRef.current.value = '0';
+    if (experienceRef.current) experienceRef.current.value = experienceOptions[0];
+    if (maritalStatusRef.current) maritalStatusRef.current.value = maritalStatusOptions[0];
     if (picRef.current) picRef.current.value = '';
     if (cvRef.current) cvRef.current.value = '';
   };
 
   const editHandler = (talent: Talent) => {
     setEditTalent(talent);
+    setCalculatedAge(talent.age);
     if (nameRef.current) nameRef.current.value = talent.name;
-    if (ageRef.current) ageRef.current.value = String(talent.age);
+    if (dobRef.current) dobRef.current.value = talent.dob || '';
     if (genderRef.current) genderRef.current.value = talent.gender;
     if (jobRef.current) jobRef.current.value = talent.job;
     if (countryRef.current) countryRef.current.value = talent.country;
     if (religionRef.current) religionRef.current.value = talent.religion || 'Muslim';
     if (salaryRef.current) salaryRef.current.value = String(talent.salary || 0);
+    if (experienceRef.current) experienceRef.current.value = talent.experience || experienceOptions[0];
+    if (maritalStatusRef.current) maritalStatusRef.current.value = talent.maritalStatus || maritalStatusOptions[0];
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -542,6 +590,16 @@ User question: ${msg}`
         .rtl .text-left-rtl {
           text-align: right;
         }
+        @keyframes marquee {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+          animation: marquee 15s linear infinite;
+        }
+        .animate-marquee:hover {
+          animation-play-state: paused;
+        }
       `}</style>
 
       {/* WhatsApp Chat Button */}
@@ -658,22 +716,29 @@ User question: ${msg}`
 
       {!adminActive && (
         <div className="public-section">
-          {/* Discount Banner - Eye-catching animated banner */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-24 pb-3 px-6 animate-gradient-x">
+          {/* Discount Banner - Animated Marquee Style */}
+          <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-24 pb-3 px-6">
             <div className="max-w-7xl mx-auto">
-              <div className="flex flex-wrap justify-center items-center gap-4 md:gap-8">
-                <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                  <span className="text-white font-bold text-sm animate-pulse">{t.discountOffer}</span>
-                </div>
-                <div className="flex flex-wrap gap-3 justify-center">
-                  <div className="bg-white/95 backdrop-blur-sm px-5 py-2 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 cursor-pointer">
-                    <span className="text-red-600 font-bold text-sm flex items-center gap-2">🎉 {t.discount1}</span>
+              <div className="overflow-hidden whitespace-nowrap">
+                <div className="inline-flex animate-marquee gap-8">
+                  <div onClick={() => handleDiscountClick('20% OFF on First Placement')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
+                    <span className="text-white font-bold text-sm">🎉 20% OFF on First Placement</span>
                   </div>
-                  <div className="bg-white/95 backdrop-blur-sm px-5 py-2 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 cursor-pointer">
-                    <span className="text-red-600 font-bold text-sm flex items-center gap-2">✨ {t.discount2}</span>
+                  <div onClick={() => handleDiscountClick('Free Visa Processing for Group Hiring (10+)')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
+                    <span className="text-white font-bold text-sm">✨ Free Visa Processing for Group Hiring (10+)</span>
                   </div>
-                  <div className="bg-white/95 backdrop-blur-sm px-5 py-2 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 cursor-pointer">
-                    <span className="text-red-600 font-bold text-sm flex items-center gap-2">💎 {t.discount3}</span>
+                  <div onClick={() => handleDiscountClick('15% Discount for Annual Contracts')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
+                    <span className="text-white font-bold text-sm">💎 15% Discount for Annual Contracts</span>
+                  </div>
+                  {/* Repeat for seamless loop */}
+                  <div onClick={() => handleDiscountClick('20% OFF on First Placement')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
+                    <span className="text-white font-bold text-sm">🎉 20% OFF on First Placement</span>
+                  </div>
+                  <div onClick={() => handleDiscountClick('Free Visa Processing for Group Hiring (10+)')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
+                    <span className="text-white font-bold text-sm">✨ Free Visa Processing for Group Hiring (10+)</span>
+                  </div>
+                  <div onClick={() => handleDiscountClick('15% Discount for Annual Contracts')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
+                    <span className="text-white font-bold text-sm">💎 15% Discount for Annual Contracts</span>
                   </div>
                 </div>
               </div>
@@ -830,7 +895,7 @@ User question: ${msg}`
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-briefcase w-5 text-[#002F66]"></i><span>5+ Years Experience</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-briefcase w-5 text-[#002F66]"></i><span>{talent.experience || '5+ Years'} Experience</span></div>
                           </div>
                         </div>
                         <div className="flex gap-3 mt-auto">
@@ -880,7 +945,8 @@ User question: ${msg}`
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-5 text-[#002F66]"></i><span>2-5 Years Exp</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-5 text-[#002F66]"></i><span>{talent.experience || '2-5 Years'} Exp</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-heart w-5 text-[#002F66]"></i><span>{talent.maritalStatus || 'Single'}</span></div>
                           </div>
                         </div>
                         <div className="flex gap-3 mt-auto">
@@ -904,7 +970,7 @@ User question: ${msg}`
                     <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
                     <p className="text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
                     
-                    {/* Quick Action Buttons - Including Returned Housemaids as normal button */}
+                    {/* Quick Action Buttons */}
                     <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                       <button onClick={() => handleQuickHire('House Maids')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-2 text-sm">🏠 {t.houseMaids}</span>
@@ -964,7 +1030,7 @@ User question: ${msg}`
                           <div className="flex-1 min-w-0">
                             <div className="font-bold text-slate-800 text-base truncate">{escapeHtml(talent.name)}</div>
                             <div className="text-[#002F66] font-bold text-[11px] uppercase tracking-widest">{escapeHtml(talent.job)} · {escapeHtml(talent.country)}</div>
-                            <div className="text-[10px] text-gray-400 mt-1">Experience: 3-5 Years</div>
+                            <div className="text-[10px] text-gray-400 mt-1">Experience: {talent.experience || '3-5 Years'}</div>
                           </div>
                           <div className="flex gap-3 items-center shrink-0">
                             <span className="text-xs font-bold text-gray-500 hidden sm:block">{talent.salary || 0} QAR</span>
@@ -1019,7 +1085,7 @@ User question: ${msg}`
                   </div>
                   <div className="w-full h-[400px] rounded-2xl overflow-hidden shadow-xl border-4 border-white">
                     <iframe 
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3608.756850059207!2d51.451755486019955!3d25.24511337222303!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e45da725e22a337%3A0xbea50deacb9863fc!2sZOD%20MANPOWER%20RECRUITMENT!5e0!3m2!1sen!2sqa!4v1776003663917!5m2!1sen!2sqa" 
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3608.756850059207!2d51.451755486019955!3d25.24511337222303!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e45da725e22a337%3A0xbea50deacb9863fc!2sZOD%20MANPOWER%20RECRUITMENT!5e0!3m2!1sen!2sqa!4v1776005672076!5m2!1sen!2sqa" 
                       width="100%" 
                       height="100%" 
                       style={{ border: 0 }} 
@@ -1103,18 +1169,32 @@ User question: ${msg}`
                   <div className="flex justify-between items-center mb-8 border-b pb-4"><h4 className="font-bold uppercase text-xs text-[#002F66] tracking-widest">{editTalent ? `${t.editCandidate} ${editTalent.name}` : t.newCandidate}</h4><button onClick={resetForm} className="text-[10px] text-gray-400 hover:text-red-600 transition-all hover:rotate-12"><i className="fa-solid fa-rotate-left"></i></button></div>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.fullName}</label><input ref={nameRef} type="text" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
+                    
+                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.dob}</label><input ref={dobRef} type="date" onChange={handleDobChange} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
+                    
+                    {calculatedAge !== null && (
+                      <div className="bg-blue-50 p-3 rounded-xl"><span className="text-[10px] font-bold text-blue-600">Age: {calculatedAge} years</span></div>
+                    )}
+                    
                     <div className="grid grid-cols-2 gap-4">
-                      <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.age}</label><input ref={ageRef} type="number" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
                       <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.gender}</label><select ref={genderRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option>Male</option><option>Female</option></select></div>
+                      <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.maritalStatus}</label><select ref={maritalStatusRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{maritalStatusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div>
                     </div>
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">
-                      {jobOptions.map(job => <option key={job} value={job}>{job}</option>)}
-                    </select></div>
+                    
+                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{jobOptions.map(job => <option key={job} value={job}>{job}</option>)}</select></div>
+                    
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.country}</label><select ref={countryRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Muslim">Muslim</option><option value="Christian">Christian</option></select></div>
+                    
+                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Muslim">Muslim</option><option value="Christian">Christian</option><option value="Hindu">Hindu</option><option value="Buddhist">Buddhist</option></select></div>
+                    
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
+                    
+                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.experience}</label><select ref={experienceRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{experienceOptions.map(exp => <option key={exp} value={exp}>{exp}</option>)}</select></div>
+                    
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-2">{t.photo}</label><input ref={picRef} type="file" accept="image/*" className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 transition-all" /></div>
+                    
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-2">{t.cvUpload}</label><input ref={cvRef} type="file" accept=".pdf,image/*" className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all" /></div>
+                    
                     <button type="submit" className="w-full py-4 bg-[#002F66] text-white rounded-xl font-bold uppercase text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105">{t.saveRecord}</button>
                   </form>
                 </div>
