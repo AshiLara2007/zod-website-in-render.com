@@ -2,8 +2,12 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'ZOD MANPOWER | Qatar\'s Leading Recruitment Agency',
-  description: 'Expertly connecting world-class human resources to the ambitious vision of Qatar.',
+  title: 'ZOD MANPOWER | Doha, Qatar.',
+  description: 'Welcome To Doha, Qatar | ZOD MANPOWER.',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({
