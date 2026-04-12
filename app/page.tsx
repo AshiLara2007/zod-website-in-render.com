@@ -63,7 +63,7 @@ const translations = {
     welcome: 'Welcome To Doha, Qatar', brandLoading: 'ZOD MANPOWER',
     home: 'Home', about: 'About', services: 'Services',
     hireNav: 'Hire Talent', applyNow: 'Apply Now', adminPortal: 'Admin Portal',
-    certified: 'Doha, Qatar', heroTitle: 'The Gateway to',
+    certified: 'Welcome To Doha, Qatar', heroTitle: 'The Gateway to',
     heroTitleSpan: 'Premium Talent', heroTitleEnd: 'in Doha.',
     heroDesc: 'Expertly connecting world-class human resources to the ambitious vision of Qatar.',
     yearsLabel: 'Years in Doha Market',
