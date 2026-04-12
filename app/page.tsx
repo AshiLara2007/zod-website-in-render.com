@@ -809,19 +809,7 @@ User question: ${msg}`
                   ))}
                 </div>
               </section>
-
-              <section className="py-24 bg-gray-50 px-6 reveal">
-                <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12">
-                  {[{ text: t.testimonial1, author: t.author1 }, { text: t.testimonial2, author: t.author2 }, { text: t.testimonial3, author: t.author3 }].map((item, i) => (
-                    <div key={i} className="space-y-6 p-6 rounded-2xl bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2 cursor-pointer">
-                      <div className="flex text-amber-400 text-xs gap-1">{[...Array(5)].map((_, j) => <i key={j} className="fa-solid fa-star"></i>)}</div>
-                      <p className="text-gray-600 italic">{item.text}</p>
-                      <div className="font-bold text-sm uppercase tracking-widest text-slate-900">{item.author}</div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
+              
               <section className="py-24 bg-white px-6 reveal">
                 <div className="max-w-5xl mx-auto">
                   <h3 className="text-3xl font-bold text-center mb-12">{t.faqTitle}</h3>
