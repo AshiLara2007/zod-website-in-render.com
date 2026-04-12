@@ -60,7 +60,7 @@ const teamMembers: TeamMember[] = [
 
 const translations = {
   en: {
-    welcome: 'Welcome To Doha, Qatar', brandLoading: 'ZOD MANPOWER RECRUITMENT',
+    welcome: 'Welcome To Doha, Qatar', brandLoading: 'ZOD  MANPOWER  RECRUITMENT',
     home: 'Home', about: 'About', services: 'Services',
     hireNav: 'Hire Talent', contactUs: 'Contact Us', adminPortal: 'Admin Portal',
     certified: 'Welcome To Doha, Qatar', heroTitle: 'The Gateway to',
