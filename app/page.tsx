@@ -50,12 +50,12 @@ const countryOptions = [
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
 const sampleEmployers: Employer[] = [
-  { id: '1', name: 'Ahmed Al Mansouri', age: 45, position: 'HR Director', photo: 'https://randomuser.me/api/portraits/men/1.jpg', company: 'Qatar National Bank' },
-  { id: '2', name: 'Fatima Al Thani', age: 38, position: 'Operations Manager', photo: 'https://randomuser.me/api/portraits/women/2.jpg', company: 'Ooredoo Qatar' },
-  { id: '3', name: 'Mohammed Al Kuwari', age: 52, position: 'CEO', photo: 'https://randomuser.me/api/portraits/men/3.jpg', company: 'Qatar Airways' },
-  { id: '4', name: 'Noora Al Sada', age: 41, position: 'Talent Acquisition Head', photo: 'https://randomuser.me/api/portraits/women/4.jpg', company: 'Sidra Medicine' },
-  { id: '5', name: 'Khalid Al Emadi', age: 35, position: 'Facility Manager', photo: 'https://randomuser.me/api/portraits/men/5.jpg', company: 'Msheireb Properties' },
-  { id: '6', name: 'Layla Al Hitmi', age: 44, position: 'HR Business Partner', photo: 'https://randomuser.me/api/portraits/women/6.jpg', company: 'Qatar Petroleum' },
+  { id: '1', name: 'Unknown', age: ##, position: 'HR Director', photo: 'https://randomuser.me/api/portraits/men/1.jpg', company: 'Qatar National Bank' },
+  { id: '2', name: 'Unknown', age: ##, position: 'Operations Manager', photo: 'https://randomuser.me/api/portraits/women/2.jpg', company: 'Ooredoo Qatar' },
+  { id: '3', name: 'Unknown', age: ##, position: 'CEO', photo: 'https://randomuser.me/api/portraits/men/3.jpg', company: 'Qatar Airways' },
+  { id: '4', name: 'Unknown', age: ##, position: 'Talent Acquisition Head', photo: 'https://randomuser.me/api/portraits/women/4.jpg', company: 'Sidra Medicine' },
+  { id: '5', name: 'Unknown', age: ##, position: 'Facility Manager', photo: 'https://randomuser.me/api/portraits/men/5.jpg', company: 'Msheireb Properties' },
+  { id: '6', name: 'Unknown', age: ##, position: 'HR Business Partner', photo: 'https://randomuser.me/api/portraits/women/6.jpg', company: 'Qatar Petroleum' },
 ];
 
 const translations = {
@@ -745,7 +745,7 @@ User question: ${msg}`
 
               <section className="py-16 bg-white border-b reveal">
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-10">
-                  {[{ num: '5.2K', label: t.successfulPlacements }, { num: '180+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '98%', label: t.complianceRate }].map((s, i) => (
+                  {[{ num: '9.2K', label: t.successfulPlacements }, { num: '1.8+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '98.2%', label: t.complianceRate }].map((s, i) => (
                     <div key={i} className="flex items-center space-x-4 border-r border-gray-100 last:border-0 hover:translate-x-2 transition-all duration-300 group">
                       <div className="text-4xl text-[#002F66] font-black group-hover:scale-110 transition-transform">{s.num}</div>
                       <div className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">{s.label}</div>
