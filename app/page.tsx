@@ -50,12 +50,12 @@ const countryOptions = [
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
 const sampleEmployers: Employer[] = [
-  { id: '1', name: 'Unknown', age: ##, position: 'HR Director', photo: 'https://randomuser.me/api/portraits/men/1.jpg', company: 'Qatar National Bank' },
-  { id: '2', name: 'Unknown', age: ##, position: 'Operations Manager', photo: 'https://randomuser.me/api/portraits/women/2.jpg', company: 'Ooredoo Qatar' },
-  { id: '3', name: 'Unknown', age: ##, position: 'CEO', photo: 'https://randomuser.me/api/portraits/men/3.jpg', company: 'Qatar Airways' },
-  { id: '4', name: 'Unknown', age: ##, position: 'Talent Acquisition Head', photo: 'https://randomuser.me/api/portraits/women/4.jpg', company: 'Sidra Medicine' },
-  { id: '5', name: 'Unknown', age: ##, position: 'Facility Manager', photo: 'https://randomuser.me/api/portraits/men/5.jpg', company: 'Msheireb Properties' },
-  { id: '6', name: 'Unknown', age: ##, position: 'HR Business Partner', photo: 'https://randomuser.me/api/portraits/women/6.jpg', company: 'Qatar Petroleum' },
+  { id: '1', name: 'Unknown', age: 25, position: '##', photo: 'https://randomuser.me/api/portraits/men/1.jpg', company: 'ZOD MANPOWER' },
+  { id: '2', name: 'Unknown', age: 25, position: '##', photo: 'https://randomuser.me/api/portraits/women/2.jpg', company: 'ZOD MANPOWER' },
+  { id: '3', name: 'Unknown', age: 25, position: '##', photo: 'https://randomuser.me/api/portraits/men/3.jpg', company: 'ZOD MANPOWER' },
+  { id: '4', name: 'Unknown', age: 25, position: '##', photo: 'https://randomuser.me/api/portraits/women/4.jpg', company: 'ZOD MANPOWER' },
+  { id: '5', name: 'Unknown', age: 25, position: '##', photo: 'https://randomuser.me/api/portraits/men/5.jpg', company: 'ZOD MANPOWER' },
+  { id: '6', name: 'Unknown', age: 25, position: '##', photo: 'https://randomuser.me/api/portraits/women/6.jpg', company: 'ZOD MANPOWER' },
 ];
 
 const translations = {
