@@ -785,7 +785,7 @@ User question: ${msg}`
               <section id="about" className="py-24 px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
                   <div className="relative group">
-                    <div className="aspect-square bg-gray-200 rounded-[4rem] overflow-hidden shadow-inner"><img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="About" /></div>
+                    <div className="aspect-square bg-gray-200 rounded-[4rem] overflow-hidden shadow-inner"><img src="https://drive.google.com/file/d/1rExLFBwBzPYJ7T4Nhdx3UstCD_qYQE1j/view?usp=sharing" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="About" /></div>
                     <div className="absolute -bottom-8 -right-8 p-10 bg-[#002F66] rounded-[3rem] text-white shadow-2xl hidden md:block transition-all duration-300 hover:scale-105"><i className="fa-solid fa-quote-left text-4xl opacity-20 mb-4 block"></i><p className="font-bold text-lg italic">"Connecting People, <br />Empowering Visions."</p></div>
                   </div>
                   <div className="space-y-8">
