@@ -59,12 +59,12 @@ const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
 // Team Members Data
 const teamMembers: TeamMember[] = [
-  { id: '1', name: 'Mr. Ahmed Al Thani', position: 'CEO & Founder', photo: 'https://randomuser.me/api/portraits/men/1.jpg', phone: '+97455355206', isTopManagement: true },
-  { id: '2', name: 'Ms. Fatima Al Saeed', position: 'Operations Director', photo: 'https://randomuser.me/api/portraits/women/2.jpg', phone: '+97455355206', isTopManagement: true },
-  { id: '3', name: 'Mr. Khalid Al Mansouri', position: 'Recruitment Manager', photo: 'https://randomuser.me/api/portraits/men/3.jpg', phone: '+97455355206', isTopManagement: true },
-  { id: '4', name: 'Ms. Noor Al Emadi', position: 'Client Relations Head', photo: 'https://randomuser.me/api/portraits/women/4.jpg', phone: '+97455355206', isTopManagement: true },
-  { id: '5', name: 'Mr. Youssef Hassan', position: 'Visa Processing Officer', photo: 'https://randomuser.me/api/portraits/men/5.jpg', phone: '+97455355206', isTopManagement: false },
-  { id: '6', name: 'Ms. Lina Al Kuwari', position: 'Marketing Specialist', photo: 'https://randomuser.me/api/portraits/women/6.jpg', phone: '+97455355206', isTopManagement: false },
+  { id: '1', name: 'Mr. Ahmed Al Thani', position: 'CEO & Founder', photo: 'https://randomuser.me/api/portraits/men/1.jpg', phone: '+97412345678', isTopManagement: true },
+  { id: '2', name: 'Ms. Fatima Al Saeed', position: 'Operations Director', photo: 'https://randomuser.me/api/portraits/women/2.jpg', phone: '+97412345679', isTopManagement: true },
+  { id: '3', name: 'Mr. Khalid Al Mansouri', position: 'Recruitment Manager', photo: 'https://randomuser.me/api/portraits/men/3.jpg', phone: '+97412345680', isTopManagement: true },
+  { id: '4', name: 'Ms. Noor Al Emadi', position: 'Client Relations Head', photo: 'https://randomuser.me/api/portraits/women/4.jpg', phone: '+97412345681', isTopManagement: true },
+  { id: '5', name: 'Mr. Youssef Hassan', position: 'Visa Processing Officer', photo: 'https://randomuser.me/api/portraits/men/5.jpg', phone: '+97412345682', isTopManagement: false },
+  { id: '6', name: 'Ms. Lina Al Kuwari', position: 'Marketing Specialist', photo: 'https://randomuser.me/api/portraits/women/6.jpg', phone: '+97412345683', isTopManagement: false },
 ];
 
 const translations = {
@@ -133,7 +133,7 @@ const translations = {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
     home: 'الرئيسية', about: 'من نحن', services: 'خدماتنا',
     hireNav: 'توظيف', contactUs: 'اتصل بنا', adminPortal: 'بوابة المشرفين',
-    certified: 'مرحباً بكم في الدوحة', heroTitle: 'البوابة إلى',
+    certified: 'وكالة معتمدة ISO 9001:2015', heroTitle: 'البوابة إلى',
     heroTitleSpan: 'المواهب المتميزة', heroTitleEnd: 'في الدوحة.',
     heroDesc: 'نربط بخبرة الموارد البشرية العالمية برؤية قطر الطموحة.',
     yearsLabel: 'سنة في سوق الدوحة',
@@ -296,17 +296,10 @@ export default function Home() {
   };
 
   const handleDiscountClick = (discountText: string) => {
-    const whatsappNumber = '97455355206';
+    const whatsappNumber = '94729204485';
     const message = `Hi! I'm interested in the offer: ${discountText}. Can you please provide more details?`;
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
     trackLead('Discount Banner', discountText);
-  };
-
-  const handleHireClick = (talentName: string, source: string) => {
-    const whatsappNumber = '97455355206';
-    const message = `Hi! I'm interested in hiring ${talentName}. Can you please provide more details?`;
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-    trackLead(source, `Hire: ${talentName}`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -452,7 +445,7 @@ export default function Home() {
 Key facts:
 - We recruit from: ${countryOptions.join(', ')}
 - Job categories: ${jobOptions.join(', ')}
-- WhatsApp contact: +97455355206
+- WhatsApp contact: +94729204485
 - Visa processing: 15-45 business days
 - Zero fees for candidates (Qatar Labor Law compliant)
 - Salary range: 800-3000 QAR/month
@@ -466,7 +459,7 @@ User question: ${msg}`
 حقائق رئيسية:
 - نوظف من: ${countryOptions.join(', ')}
 - فئات الوظائف: ${jobOptions.join(', ')}
-- واتساب: +97455355206
+- واتساب: +94729204485
 - معالجة التأشيرة: 15-45 يوم عمل
 - لا توجد رسوم للمرشحين (وفقاً لقانون العمل القطري)
 - نطاق الرواتب: 800-3000 ريال قطري/شهر
@@ -497,15 +490,15 @@ User question: ${msg}`
       const data = await response.json();
       const botText = data?.candidates?.[0]?.content?.parts?.[0]?.text ||
         (chatLanguageSelected === 'en'
-          ? "I'm not sure how to answer that. Please contact us via WhatsApp at +97455355206."
-          : "لست متأكداً من الإجابة. يرجى الاتصال بنا عبر واتساب +97455355206.");
+          ? "I'm not sure how to answer that. Please contact us via WhatsApp at +94729204485."
+          : "لست متأكداً من الإجابة. يرجى الاتصال بنا عبر واتساب +94729204485.");
 
       setChatMessages((prev) => [...prev, { role: 'bot', text: botText, cvCards: cvCards.length > 0 ? cvCards : undefined }]);
     } catch (err) {
       console.error('Chatbot error:', err);
       let fallbackText = chatLanguageSelected === 'en'
-        ? "Sorry, I'm having trouble connecting to my AI brain right now. Please contact us directly on WhatsApp at +97455355206 or use the 'Contact Us' button. 😊"
-        : "عذراً، أواجه مشكلة في الاتصال بالذكاء الاصطناعي حالياً. يرجى الاتصال بنا مباشرة على واتساب +97455355206 أو استخدام زر 'اتصل بنا'. 😊";
+        ? "Sorry, I'm having trouble connecting to my AI brain right now. Please contact us directly on WhatsApp at +94729204485 or use the 'Contact Us' button. 😊"
+        : "عذراً، أواجه مشكلة في الاتصال بالذكاء الاصطناعي حالياً. يرجى الاتصال بنا مباشرة على واتساب +94729204485 أو استخدام زر 'اتصل بنا'. 😊";
       if (detectedCountry) {
         fallbackText = chatLanguageSelected === 'en'
           ? `We have ${cvCards.length} candidate(s) from ${detectedCountry} in our database! You can browse them below or contact us on WhatsApp.`
@@ -562,15 +555,7 @@ User question: ${msg}`
     return (
       <div dir={dir} className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">
         <div className="text-center">
-          <div className="w-24 h-24 mx-auto mb-8 relative">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[#002F66] to-[#0040aa] flex items-center justify-center shadow-lg animate-pulse">
-              <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-[#002F66] flex items-center justify-center">
-                  <i className="fa-solid fa-globe text-white text-3xl"></i>
-                </div>
-              </div>
-            </div>
-          </div>
+          <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-24 h-24 rounded-full mx-auto mb-8 object-cover shadow-lg animate-pulse" onError={(e) => (e.currentTarget.style.display = 'none')} />
           <h1 className="text-4xl md:text-5xl font-bold text-[#002F66] mb-4 animate-bounce">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-8">{t.brandLoading}</p>
           <div className="flex gap-4 justify-center">
@@ -614,129 +599,6 @@ User question: ${msg}`
         }
         .animate-marquee:hover {
           animation-play-state: paused;
-        }
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow {
-          animation: spin-slow 20s linear infinite;
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        @keyframes shimmer {
-          0% { transform: translateX(-100%) skewX(-12deg); }
-          100% { transform: translateX(200%) skewX(-12deg); }
-        }
-        .animate-shimmer {
-          animation: shimmer 2s infinite;
-        }
-        .reveal {
-          opacity: 0;
-          transform: translateY(30px);
-          transition: all 0.8s ease-out;
-        }
-        .reveal.active {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        .glass-nav {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(10px);
-          box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
-        }
-        .nav-link {
-          position: relative;
-        }
-        .nav-link::after {
-          content: '';
-          position: absolute;
-          bottom: -5px;
-          left: 0;
-          width: 0;
-          height: 2px;
-          background: #002F66;
-          transition: width 0.3s ease;
-        }
-        .nav-link:hover::after {
-          width: 100%;
-        }
-        .qatar-gradient {
-          background: linear-gradient(135deg, #002F66 0%, #0040aa 50%, #002F66 100%);
-        }
-        .mobile-sidebar {
-          position: fixed;
-          top: 0;
-          right: -280px;
-          width: 280px;
-          height: 100vh;
-          background: white;
-          z-index: 1000;
-          transition: right 0.3s ease;
-          box-shadow: -2px 0 20px rgba(0, 0, 0, 0.1);
-          padding: 20px;
-          overflow-y: auto;
-        }
-        .mobile-sidebar.active {
-          right: 0;
-        }
-        .sidebar-close {
-          position: absolute;
-          top: 20px;
-          right: 20px;
-          font-size: 24px;
-          cursor: pointer;
-        }
-        .sidebar-nav {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-          margin-top: 60px;
-        }
-        .sidebar-nav a, .sidebar-nav button {
-          font-size: 16px;
-          font-weight: 600;
-          text-transform: uppercase;
-          color: #333;
-          padding: 10px 0;
-          border-bottom: 1px solid #eee;
-        }
-        .sidebar-apply {
-          background: #002F66;
-          color: white;
-          padding: 12px;
-          border-radius: 30px;
-          text-align: center;
-          margin-top: 20px;
-        }
-        .sidebar-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          z-index: 999;
-          opacity: 0;
-          visibility: hidden;
-          transition: all 0.3s ease;
-        }
-        .sidebar-overlay.active {
-          opacity: 1;
-          visibility: visible;
-        }
-        .faq-answer {
-          max-height: 0;
-          overflow: hidden;
-          transition: max-height 0.3s ease;
-        }
-        .faq-item.active .fa-plus {
-          transform: rotate(45deg);
         }
       `}</style>
 
@@ -783,7 +645,7 @@ User question: ${msg}`
                                 <div className="text-[10px] text-[#002F66] font-bold">{escapeHtml(talent.job)}</div>
                                 <div className="text-[10px] text-gray-400">{talent.salary} QAR · {talent.gender}, {talent.age}y</div>
                               </div>
-                              <button onClick={() => handleHireClick(talent.name, 'Chatbot CV')} className="shrink-0 bg-[#002F66] text-white text-[9px] font-bold px-2 py-1.5 rounded-lg hover:bg-[#002060] transition-all">Hire</button>
+                              <a href={`https://wa.me/94729204485?text=Interested in ${encodeURIComponent(talent.name)}`} target="_blank" onClick={() => trackLead('Chatbot CV', talent.name)} className="shrink-0 bg-[#002F66] text-white text-[9px] font-bold px-2 py-1.5 rounded-lg hover:bg-[#002060] transition-all">Hire</a>
                             </div>
                           ))}
                         </div>
@@ -891,17 +753,8 @@ User question: ${msg}`
           <nav className="fixed w-full z-50 glass-nav" style={{ top: '0' }}>
             <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
               <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); window.scrollTo(0, 0); }}>
-                {/* Globe Logo */}
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#002F66] to-[#0040aa] flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110">
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                    <div className="w-8 h-8 rounded-full bg-[#002F66] flex items-center justify-center">
-                      <i className="fa-solid fa-globe text-white text-sm"></i>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-2xl font-extrabold tracking-tighter uppercase">
-                  <span className="text-[#002F66]">ZOD</span> MANPOWER RECRUITMENT
-                </div>
+                <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-12 h-12 rounded-xl object-cover shadow-lg transition-transform duration-300 group-hover:scale-110" />
+                <div className="text-2xl font-extrabold tracking-tighter uppercase">ZOD<span className="text-[#002F66]"> MANPOWER RECRUITMENT</span></div>
               </div>
               <div className="hidden lg:flex items-center space-x-8 font-semibold text-xs uppercase tracking-widest">
                 <a href="#home" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.home}</a>
@@ -909,7 +762,7 @@ User question: ${msg}`
                 <a href="#services" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.services}</a>
                 <button onClick={() => { setShowOurTeamPage(true); setShowHirePage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.ourTeam}</button>
                 <button onClick={() => { setShowHirePage(true); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.hireNav}</button>
-                <a href="https://wa.me/97455355206" onClick={() => trackLead('Nav Apply', 'Global Apply')} target="_blank" className="bg-[#002F66] text-white px-6 py-2.5 rounded-full shadow-md hover:bg-[#002060] transition-all hover:scale-105 active:scale-95">{t.contactUs}</a>
+                <a href="https://wa.me/94729204485" onClick={() => trackLead('Nav Apply', 'Global Apply')} target="_blank" className="bg-[#002F66] text-white px-6 py-2.5 rounded-full shadow-md hover:bg-[#002060] transition-all hover:scale-105 active:scale-95">{t.contactUs}</a>
                 <button onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')} className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-gray-100 text-[#002F66] hover:bg-gray-200 transition-all"><i className="fa-solid fa-globe text-[10px]"></i><span>{language === 'en' ? 'العربية' : 'English'}</span></button>
               </div>
               <button className="lg:hidden text-2xl text-[#002F66]" onClick={() => setSidebarOpen(true)}><i className="fa-solid fa-bars-staggered"></i></button>
@@ -925,7 +778,7 @@ User question: ${msg}`
               <a href="#services" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.services}</a>
               <button onClick={() => { setShowOurTeamPage(true); setShowHirePage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.ourTeam}</button>
               <button onClick={() => { setShowHirePage(true); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.hireNav}</button>
-              <a href="https://wa.me/97455355206" onClick={() => { trackLead('Mobile Nav Apply', 'Global Apply'); setSidebarOpen(false); }} target="_blank" className="sidebar-apply" style={{ backgroundColor: '#002F66' }}>{t.contactUs}</a>
+              <a href="https://wa.me/94729204485" onClick={() => { trackLead('Mobile Nav Apply', 'Global Apply'); setSidebarOpen(false); }} target="_blank" className="sidebar-apply" style={{ backgroundColor: '#002F66' }}>{t.contactUs}</a>
               <button onClick={() => { setLanguage(language === 'en' ? 'ar' : 'en'); setSidebarOpen(false); }} className="mt-4 w-full py-2 bg-gray-100 rounded-full text-sm font-bold text-[#002F66] hover:bg-gray-200 transition-all flex items-center justify-center gap-2"><i className="fa-solid fa-globe text-xs"></i>{language === 'en' ? 'العربية' : 'English'}</button>
             </div>
           </div>
@@ -1047,7 +900,7 @@ User question: ${msg}`
                         </div>
                         <div className="flex gap-3 mt-auto">
                           <a href={talent.cv} target="_blank" onClick={() => trackLead('Returned CV', talent.name)} className="flex-1 py-4 bg-gray-100 text-center rounded-xl font-bold text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
-                          <button onClick={() => handleHireClick(talent.name, 'Returned Housemaid')} className="flex-1 py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
+                          <a href={`https://wa.me/94729204485?text=Interested in returned housemaid ${encodeURIComponent(talent.name)}`} onClick={() => trackLead('Returned Hire', talent.name)} target="_blank" className="flex-1 py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</a>
                         </div>
                       </div>
                     ))}
@@ -1098,7 +951,7 @@ User question: ${msg}`
                         </div>
                         <div className="flex gap-3 mt-auto">
                           <a href={talent.cv} target="_blank" onClick={() => trackLead('Public CV', talent.name)} className="flex-1 py-4 bg-gray-100 text-center rounded-xl font-bold text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
-                          <button onClick={() => handleHireClick(talent.name, 'Hire Talent')} className="flex-1 py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
+                          <a href={`https://wa.me/94729204485?text=Interested in ${encodeURIComponent(talent.name)}`} onClick={() => trackLead('Hire Click', talent.name)} target="_blank" className="flex-1 py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</a>
                         </div>
                       </div>
                     ))}
@@ -1232,7 +1085,7 @@ User question: ${msg}`
                   </div>
                   <div className="w-full h-[400px] rounded-2xl overflow-hidden shadow-xl border-4 border-white">
                     <iframe 
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3608.756850059207!2d51.451755486019955!3d25.24511337222303!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e45da725e22a337%3A0xbea50deacb9863fc!2sZOD%20MANPOWER%20RECRUITMENT!5e0!3m2!1sen!2sqa!4v1776005672076!5m2!1sen!2sqa" 
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d115105.20279075674!2d51.43141955744967!3d25.301366678710125!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e45c5344cc6cd77%3A0x8e2c6f0b3d8b9b9b!2sDoha%2C%20Qatar!5e0!3m2!1sen!2slk!4v1712345678901!5m2!1sen!2slk" 
                       width="100%" 
                       height="100%" 
                       style={{ border: 0 }} 
@@ -1279,20 +1132,7 @@ User question: ${msg}`
               {/* Footer */}
               <footer className="py-20 bg-slate-900 text-white px-6">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 border-b border-white/5 pb-16">
-                  <div className="col-span-2">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#002F66] to-[#0040aa] flex items-center justify-center shadow-lg">
-                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                          <div className="w-8 h-8 rounded-full bg-[#002F66] flex items-center justify-center">
-                            <i className="fa-solid fa-globe text-white text-sm"></i>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-2xl font-black uppercase tracking-tighter">ZOD<span className="text-[#002F66]"> MANPOWER RECRUITMENT</span></div>
-                    </div>
-                    <p className="text-slate-500 text-sm leading-relaxed max-w-sm mb-6">{t.footerText}</p>
-                    <div className="flex space-x-4"><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-facebook-f"></i></a><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-linkedin-in"></i></a></div>
-                  </div>
+                  <div className="col-span-2"><div className="text-2xl font-black uppercase mb-6 tracking-tighter">ZOD<span className="text-[#002F66]"> MANPOWER RECRUITMENT</span></div><p className="text-slate-500 text-sm leading-relaxed max-w-sm mb-6">{t.footerText}</p><div className="flex space-x-4"><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-facebook-f"></i></a><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-linkedin-in"></i></a></div></div>
                   <div><h6 className="font-bold uppercase text-xs tracking-widest mb-6 text-slate-300">{t.quickLinks}</h6><ul className="space-y-4 text-xs text-slate-500 font-bold uppercase"><li><a href="#about" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.aboutDoha}</a></li><li><a href="#services" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.clientServices}</a></li><li><button onClick={() => setShowHirePage(true)} className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.browseCVs}</button></li></ul></div>
                   <div><h6 className="font-bold uppercase text-xs tracking-widest mb-6 text-slate-300">{t.internal}</h6><button onClick={() => setLoginModalOpen(true)} className="group flex items-center space-x-3 px-6 py-3 border border-white/10 rounded-2xl hover:bg-white hover:text-slate-900 transition-all duration-300 hover:scale-105"><i className="fa-solid fa-lock text-[10px] group-hover:rotate-12 transition-transform"></i><span className="text-[10px] font-bold uppercase tracking-widest">{t.adminPortal}</span></button></div>
                 </div>
