@@ -37,10 +37,9 @@ interface ChatMessage {
   cvCards?: Talent[];
 }
 
+// Only these 6 jobs for Manpower Services
 const jobOptions = [
-  'office boy', 'Driver', 'Domestic worker', 'Nurse', 'Babysitter', 'Teacher',
-  'Cook', 'Tailor', 'Farmer', 'Security Guard', 'Hairdresser', 'Secretary',
-  'Cleaner', 'Caregiver', 'Sales', 'Cashier', 'Waiter', 'hospitality', 'Technical'
+  'Driver', 'Baby sitting', 'Nurse', 'Cook', 'Domestic Worker', 'Teacher'
 ];
 
 const countryOptions = [
@@ -116,8 +115,10 @@ const translations = {
     visionText: 'To be the most trusted and innovative manpower solutions provider in the Middle East, connecting global talent with opportunities that drive economic growth.',
     missionText: 'To provide ethical, transparent, and efficient recruitment services that empower businesses and transform lives through quality employment.',
     experience: 'Experience', driversJob: 'Drivers', babysitting: 'Baby sitting', nursesJob: 'Nurses', cooks: 'Cook', domesticWorker: 'Domestic Worker', teacher: 'Teacher',
-    ourServicesTitle: 'Our Manpower Services', ourServicesDesc: 'Specialized recruitment solutions tailored to Qatar\'s diverse needs.',
+    ourServicesTitle: 'Our Expertise', ourServicesDesc: 'Specialized recruitment solutions tailored to Qatar\'s diverse needs.',
     viewCandidates: 'View Candidates',
+    discount1: '20% OFF on First Placement', discount2: 'Free Visa Processing for Group Hiring (10+)', discount3: '15% Discount for Annual Contracts', discountOffer: '🔥 LIMITED OFFER',
+    backToHome: 'Back to Home',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
@@ -176,8 +177,10 @@ const translations = {
     visionText: 'أن نكون مزود حلول القوى العاملة الأكثر ثقة وابتكاراً في الشرق الأوسط، نربط المواهب العالمية بالفرص التي تدفع النمو الاقتصادي.',
     missionText: 'تقديم خدمات توظيف أخلاقية وشفافة وفعالة تمكّن الشركات وتحول حياة الأفراد من خلال فرص العمل الجيدة.',
     experience: 'الخبرة', driversJob: 'سائقين', babysitting: 'رعاية أطفال', nursesJob: 'ممرضين', cooks: 'طهاة', domesticWorker: 'عمال منازل', teacher: 'معلمين',
-    ourServicesTitle: 'خدمات القوى العاملة لدينا', ourServicesDesc: 'حلول توظيف متخصصة مصممة خصيصاً لتلبية احتياجات قطر المتنوعة.',
+    ourServicesTitle: 'خبراتنا', ourServicesDesc: 'حلول توظيف متخصصة مصممة خصيصاً لتلبية احتياجات قطر المتنوعة.',
     viewCandidates: 'عرض المرشحين',
+    discount1: 'خصم 20% على أول تعيين', discount2: 'معالجة تأشيرة مجانية للتعيين الجماعي (10+)', discount3: 'خصم 15% على العقود السنوية', discountOffer: '🔥 عرض محدود',
+    backToHome: 'العودة إلى الرئيسية',
   }
 };
 
@@ -220,13 +223,12 @@ export default function Home() {
   const picRef = useRef<HTMLInputElement>(null);
   const cvRef = useRef<HTMLInputElement>(null);
 
-  // Our Manpower Services Jobs
   const manpowerJobs = [
-    { key: 'Drivers', label: t.driversJob, icon: 'fa-solid fa-truck-fast', color: 'from-blue-500 to-blue-700' },
+    { key: 'Driver', label: t.driversJob, icon: 'fa-solid fa-truck-fast', color: 'from-blue-500 to-blue-700' },
     { key: 'Baby sitting', label: t.babysitting, icon: 'fa-solid fa-baby-carriage', color: 'from-pink-500 to-pink-700' },
-    { key: 'Nurses', label: t.nursesJob, icon: 'fa-solid fa-hospital-user', color: 'from-green-500 to-green-700' },
+    { key: 'Nurse', label: t.nursesJob, icon: 'fa-solid fa-hospital-user', color: 'from-green-500 to-green-700' },
     { key: 'Cook', label: t.cooks, icon: 'fa-solid fa-utensils', color: 'from-orange-500 to-orange-700' },
-    { key: 'Domestic worker', label: t.domesticWorker, icon: 'fa-solid fa-broom', color: 'from-purple-500 to-purple-700' },
+    { key: 'Domestic Worker', label: t.domesticWorker, icon: 'fa-solid fa-broom', color: 'from-purple-500 to-purple-700' },
     { key: 'Teacher', label: t.teacher, icon: 'fa-solid fa-chalkboard-user', color: 'from-red-500 to-red-700' },
   ];
 
@@ -341,7 +343,7 @@ export default function Home() {
     setShowHirePage(false);
     setShowOurTeamPage(false);
     setShowAboutPage(false);
-    setJobFilter('Domestic worker');
+    setJobFilter('Domestic Worker');
   };
 
   const handleServiceJobClick = (jobKey: string) => {
@@ -497,9 +499,13 @@ User question: ${msg}`
   const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
   const regularTeam = teamMembers.filter(member => !member.isTopManagement);
 
+  // RTL direction for Arabic
+  const isRTL = language === 'ar';
+  const dir = isRTL ? 'rtl' : 'ltr';
+
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">
+      <div dir={dir} className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">
         <div className="text-center">
           <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-24 h-24 rounded-full mx-auto mb-8 object-cover shadow-lg animate-pulse" onError={(e) => (e.currentTarget.style.display = 'none')} />
           <h1 className="text-4xl md:text-5xl font-bold text-[#002F66] mb-4 animate-bounce">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
@@ -515,7 +521,29 @@ User question: ${msg}`
   }
 
   return (
-    <>
+    <div dir={dir} className={isRTL ? 'rtl' : 'ltr'}>
+      {/* Global RTL Style */}
+      <style jsx global>{`
+        .rtl {
+          direction: rtl;
+          text-align: right;
+        }
+        .rtl .flex-row-reverse-rtl {
+          flex-direction: row-reverse;
+        }
+        .rtl .ml-auto-rtl {
+          margin-left: auto;
+          margin-right: 0;
+        }
+        .rtl .mr-auto-rtl {
+          margin-right: auto;
+          margin-left: 0;
+        }
+        .rtl .text-left-rtl {
+          text-align: right;
+        }
+      `}</style>
+
       {/* WhatsApp Chat Button */}
       <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-3">
         {chatOpen && (
@@ -543,7 +571,7 @@ User question: ${msg}`
                 <>
                   {chatMessages.map((msg, i) => (
                     <div key={i} className="space-y-2">
-                      <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`flex ${msg.role === 'user' ? (isRTL ? 'justify-start' : 'justify-end') : (isRTL ? 'justify-end' : 'justify-start')}`}>
                         <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-[#002F66] text-white rounded-br-sm' : 'bg-white text-gray-700 rounded-bl-sm border border-gray-100'}`}>{msg.text}</div>
                       </div>
                       {msg.cvCards && msg.cvCards.length > 0 && (
@@ -630,8 +658,34 @@ User question: ${msg}`
 
       {!adminActive && (
         <div className="public-section">
+          {/* Discount Banner - Eye-catching animated banner */}
+          <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-24 pb-3 px-6 animate-gradient-x">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex flex-wrap justify-center items-center gap-4 md:gap-8">
+                <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                  <span className="text-white font-bold text-sm animate-pulse">{t.discountOffer}</span>
+                </div>
+                <div className="flex flex-wrap gap-3 justify-center">
+                  <div className="bg-white/95 backdrop-blur-sm px-5 py-2 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 cursor-pointer">
+                    <span className="text-red-600 font-bold text-sm flex items-center gap-2">🎉 {t.discount1}</span>
+                  </div>
+                  <div className="bg-white/95 backdrop-blur-sm px-5 py-2 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 cursor-pointer">
+                    <span className="text-red-600 font-bold text-sm flex items-center gap-2">✨ {t.discount2}</span>
+                  </div>
+                  <div className="bg-white/95 backdrop-blur-sm px-5 py-2 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 cursor-pointer">
+                    <span className="text-red-600 font-bold text-sm flex items-center gap-2">💎 {t.discount3}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Animated background effect */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
+            </div>
+          </div>
+
           {/* Navigation Bar */}
-          <nav className="fixed w-full z-50 glass-nav">
+          <nav className="fixed w-full z-50 glass-nav" style={{ top: '0' }}>
             <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
               <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); window.scrollTo(0, 0); }}>
                 <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-12 h-12 rounded-xl object-cover shadow-lg transition-transform duration-300 group-hover:scale-110" />
@@ -651,7 +705,7 @@ User question: ${msg}`
           </nav>
 
           {/* Mobile Sidebar */}
-          <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`}>
+          <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
             <div className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fa-solid fa-xmark text-[#002F66]"></i></div>
             <div className="sidebar-nav mt-8">
               <a href="#home" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.home}</a>
@@ -665,25 +719,11 @@ User question: ${msg}`
           </div>
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
-          {/* Discounts Banner */}
-          <div className="pt-28 pb-4 px-6 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200">
-            <div className="max-w-7xl mx-auto">
-              <div className="flex flex-wrap justify-center gap-4 items-center">
-                <div className="bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold animate-pulse">🔥 LIMITED OFFER</div>
-                <div className="flex flex-wrap gap-3">
-                  <span className="bg-white px-4 py-2 rounded-full text-sm font-semibold text-gray-700 shadow-sm">🎉 20% OFF on First Placement</span>
-                  <span className="bg-white px-4 py-2 rounded-full text-sm font-semibold text-gray-700 shadow-sm">✨ Free Visa Processing for Group Hiring (10+)</span>
-                  <span className="bg-white px-4 py-2 rounded-full text-sm font-semibold text-gray-700 shadow-sm">💎 15% Discount for Annual Contracts</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Our Team Page */}
           {showOurTeamPage ? (
             <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
-                <button onClick={() => setShowOurTeamPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> Back to Home</button>
+                <button onClick={() => setShowOurTeamPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
                 
                 <div className="text-center mb-12 reveal">
                   <h3 className="text-4xl font-bold text-slate-900 mb-4">{t.teamTitle}</h3>
@@ -736,7 +776,7 @@ User question: ${msg}`
           ) : showAboutPage ? (
             <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
-                <button onClick={() => setShowAboutPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> Back to Home</button>
+                <button onClick={() => setShowAboutPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
                 
                 <div className="bg-white rounded-3xl p-10 shadow-lg">
                   <div className="grid md:grid-cols-2 gap-12">
@@ -762,12 +802,12 @@ User question: ${msg}`
               </div>
             </div>
           ) : showReturnedHousemaids ? (
-            <div className="min-h-screen pt-28 pb-20 px-6 bg-gray-50">
+            <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
-                <button onClick={() => setShowReturnedHousemaids(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> Back to Home</button>
+                <button onClick={() => setShowReturnedHousemaids(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
                 
                 <div className="text-center mb-10">
-                  <h3 className="text-4xl font-bold text-slate-900 mb-2">Returned Housemaids</h3>
+                  <h3 className="text-4xl font-bold text-slate-900 mb-2">{t.returnedHousemaids}</h3>
                   <p className="text-gray-500">Experienced housemaids returning from overseas with proven track records</p>
                 </div>
 
@@ -804,9 +844,9 @@ User question: ${msg}`
               </div>
             </div>
           ) : showHirePage ? (
-            <div className="min-h-screen pt-28 pb-20 px-6 bg-gray-50">
+            <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
-                <button onClick={() => setShowHirePage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> Back to Home</button>
+                <button onClick={() => setShowHirePage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
                 <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
                   <div><h3 className="text-4xl font-bold text-slate-900 mb-2">{t.hireTitle}</h3><p className="text-gray-500">{t.hireDesc}</p></div>
                   <div className="flex gap-3 w-full md:w-auto flex-wrap">
@@ -840,7 +880,7 @@ User question: ${msg}`
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-5 text-[#002F66]"></i><span>{t.experience || '2-5'} Years Exp</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-5 text-[#002F66]"></i><span>2-5 Years Exp</span></div>
                           </div>
                         </div>
                         <div className="flex gap-3 mt-auto">
@@ -856,7 +896,7 @@ User question: ${msg}`
           ) : (
             <>
               {/* Hero Section */}
-              <section id="home" className="relative pt-48 pb-32 px-6 qatar-gradient text-white overflow-hidden">
+              <section id="home" className="relative pt-32 pb-32 px-6 qatar-gradient text-white overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center relative z-10">
                   <div className="space-y-8 fade-in">
@@ -864,7 +904,7 @@ User question: ${msg}`
                     <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
                     <p className="text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
                     
-                    {/* Quick Action Buttons */}
+                    {/* Quick Action Buttons - Including Returned Housemaids as normal button */}
                     <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                       <button onClick={() => handleQuickHire('House Maids')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-2 text-sm">🏠 {t.houseMaids}</span>
@@ -907,27 +947,8 @@ User question: ${msg}`
                 </div>
               </section>
 
-              {/* Manpower Services Section - 6 Jobs */}
-              <section className="py-20 px-6 bg-gray-50 reveal">
-                <div className="max-w-7xl mx-auto text-center mb-12">
-                  <h2 className="text-3xl font-bold text-slate-900 mb-4">{t.ourServicesTitle}</h2>
-                  <p className="text-gray-500 max-w-2xl mx-auto">{t.ourServicesDesc}</p>
-                </div>
-                <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {manpowerJobs.map((job, idx) => (
-                    <div key={idx} onClick={() => handleServiceJobClick(job.key)} className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group border border-gray-100">
-                      <div className={`w-16 h-16 bg-gradient-to-r ${job.color} rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-md`}>
-                        <i className={`${job.icon} text-white text-2xl`}></i>
-                      </div>
-                      <h3 className="text-xl font-bold text-slate-800 mb-2">{job.label}</h3>
-                      <p className="text-gray-400 text-sm">View available candidates →</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
               {/* Featured Candidates Section */}
-              <section className="py-16 bg-white px-6 reveal">
+              <section className="py-16 bg-gray-50 px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-8">
                     <h3 className="text-2xl font-bold text-slate-900">{t.featuredCandidates}</h3>
@@ -957,7 +978,7 @@ User question: ${msg}`
               </section>
 
               {/* Our Legacy Section with View More Button */}
-              <section id="about" className="py-24 px-6 bg-gray-50 reveal">
+              <section id="about" className="py-24 px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
                   <div className="relative group">
                     <div className="aspect-square bg-gray-200 rounded-[4rem] overflow-hidden shadow-inner"><img src="https://raw.githubusercontent.com/AshiLara2007/ZOD-Photos/main/ZOD.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="About" /></div>
@@ -976,11 +997,11 @@ User question: ${msg}`
               </section>
 
               {/* Services/Expertise Section */}
-              <section id="services" className="py-24 px-6 bg-white reveal">
+              <section id="services" className="py-24 px-6 bg-gray-50 reveal">
                 <div className="max-w-7xl mx-auto text-center mb-20"><h2 className="text-sm font-bold text-red-800 uppercase tracking-[0.3em] mb-4">{t.ourExpertise}</h2><h3 className="text-4xl font-bold text-slate-900">{t.comprehensiveSolutions}</h3></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
                   {[{ icon: 'passport', title: t.visaTitle, desc: t.visaDesc }, { icon: 'users-gear', title: t.techTitle, desc: t.techDesc }, { icon: 'city', title: t.projectsTitle, desc: t.projectsDesc }].map((s, i) => (
-                    <div key={i} className="bg-gray-50 p-10 rounded-[3rem] shadow-sm hover:shadow-xl transition-all duration-500 group hover:-translate-y-3 border border-gray-100 cursor-pointer">
+                    <div key={i} className="bg-white p-10 rounded-[3rem] shadow-sm hover:shadow-xl transition-all duration-500 group hover:-translate-y-3 border border-gray-100 cursor-pointer">
                       <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-[#002F66] group-hover:text-white transition-all duration-500 group-hover:rotate-6"><i className={`fa-solid fa-${s.icon} text-2xl`}></i></div>
                       <h4 className="text-xl font-bold mb-4 text-slate-900 group-hover:text-[#002F66] transition-colors">{s.title}</h4>
                       <p className="text-gray-500 text-sm leading-relaxed">{s.desc}</p>
@@ -990,7 +1011,7 @@ User question: ${msg}`
               </section>
 
               {/* Location / Google Maps Section */}
-              <section className="py-16 px-6 bg-gray-50 reveal">
+              <section className="py-16 px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="text-center mb-8">
                     <h3 className="text-2xl font-bold text-slate-900 mb-2">Our Location</h3>
@@ -1012,12 +1033,12 @@ User question: ${msg}`
               </section>
 
               {/* Testimonials Section */}
-              <section className="py-20 bg-white px-6 reveal">
+              <section className="py-20 bg-gray-50 px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-3xl font-bold text-center mb-12">What Our Clients Say</h3>
                   <div className="grid md:grid-cols-3 gap-8">
                     {[{ text: t.testimonial1, author: t.author1 }, { text: t.testimonial2, author: t.author2 }, { text: t.testimonial3, author: t.author3 }].map((tst, i) => (
-                      <div key={i} className="bg-gray-50 p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-2">
+                      <div key={i} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-2">
                         <i className="fa-solid fa-quote-left text-3xl text-[#002F66]/20 mb-4 block"></i>
                         <p className="text-gray-600 text-sm leading-relaxed mb-6">{tst.text}</p>
                         <p className="font-bold text-slate-800 text-sm">{tst.author}</p>
@@ -1028,12 +1049,12 @@ User question: ${msg}`
               </section>
 
               {/* FAQ Section */}
-              <section className="py-20 bg-gray-50 px-6 reveal">
+              <section className="py-20 bg-white px-6 reveal">
                 <div className="max-w-5xl mx-auto">
                   <h3 className="text-3xl font-bold text-center mb-12">{t.faqTitle}</h3>
                   <div className="grid md:grid-cols-2 gap-6">
                     {[{ q: t.faqQ1, a: t.faqA1 }, { q: t.faqQ2, a: t.faqA2 }, { q: t.faqQ3, a: t.faqA3 }, { q: t.faqQ4, a: t.faqA4 }].map((faq, i) => (
-                      <div key={i} className="bg-white p-6 rounded-2xl border shadow-sm faq-item cursor-pointer transition-all duration-300 hover:shadow-md" onClick={(e) => { const parent = e.currentTarget; parent.classList.toggle('active'); const answer = parent.querySelector('.faq-answer') as HTMLElement; if (parent.classList.contains('active')) answer.style.maxHeight = answer.scrollHeight + 'px'; else answer.style.maxHeight = '0px'; }}>
+                      <div key={i} className="bg-gray-50 p-6 rounded-2xl border shadow-sm faq-item cursor-pointer transition-all duration-300 hover:shadow-md" onClick={(e) => { const parent = e.currentTarget; parent.classList.toggle('active'); const answer = parent.querySelector('.faq-answer') as HTMLElement; if (parent.classList.contains('active')) answer.style.maxHeight = answer.scrollHeight + 'px'; else answer.style.maxHeight = '0px'; }}>
                         <h5 className="font-bold text-sm flex justify-between items-center uppercase tracking-tight">{faq.q}<i className="fa-solid fa-plus text-xs transition-transform duration-300 ml-2 shrink-0"></i></h5>
                         <div className="faq-answer text-gray-500 text-sm leading-relaxed">{faq.a}</div>
                       </div>
@@ -1086,7 +1107,9 @@ User question: ${msg}`
                       <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.age}</label><input ref={ageRef} type="number" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
                       <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.gender}</label><select ref={genderRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option>Male</option><option>Female</option></select></div>
                     </div>
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{jobOptions.map(job => <option key={job} value={job}>{job}</option>)}</select></div>
+                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">
+                      {jobOptions.map(job => <option key={job} value={job}>{job}</option>)}
+                    </select></div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.country}</label><select ref={countryRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Muslim">Muslim</option><option value="Christian">Christian</option></select></div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
@@ -1125,6 +1148,6 @@ User question: ${msg}`
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
