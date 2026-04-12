@@ -13,6 +13,9 @@ interface Talent {
   salary: number;
   pic: string;
   cv: string;
+  dob?: string;
+  experience?: string;
+  maritalStatus?: string;
 }
 
 interface Employer {
@@ -110,6 +113,9 @@ const translations = {
     cancel: 'Cancel', yesDelete: 'Yes, Delete', english: 'English', arabic: 'العربية',
     houseMaids: 'House Maids', drivers: 'Drivers', nurses: 'Nurses', monthlyCleaners: 'Monthly Cleaners',
     ourEmployers: 'Our Employers', employersTitle: 'Our Trusted Employers', employersDesc: 'Meet our valued employer partners who trust ZOD Manpower for their recruitment needs.',
+    discount: '🔥 SPECIAL OFFER! 20% DISCOUNT ON FIRST HIRE! Contact us now! 🔥',
+    birthOfDate: 'Birth of Date', experience: 'Experience (Years)', maritalStatus: 'Marital Status',
+    single: 'Single', married: 'Married', discountOffer: 'Special Discount Offer',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور',
@@ -163,6 +169,9 @@ const translations = {
     cancel: 'إلغاء', yesDelete: 'نعم، احذف', english: 'English', arabic: 'العربية',
     houseMaids: 'خادمات منازل', drivers: 'سائقين', nurses: 'ممرضين', monthlyCleaners: 'عمال نظافة شهري',
     ourEmployers: 'أصحاب العمل', employersTitle: 'أصحاب العمل الموثوقون', employersDesc: 'تعرف على شركائنا من أصحاب العمل الذين يثقون في زود مان باور لتلبية احتياجات التوظيف.',
+    discount: '🔥 عرض خاص! خصم 20% على أول تعيين! اتصل بنا الآن! 🔥',
+    birthOfDate: 'تاريخ الميلاد', experience: 'الخبرة (سنوات)', maritalStatus: 'الحالة الاجتماعية',
+    single: 'أعزب', married: 'متزوج', discountOffer: 'عرض خصم خاص',
   }
 };
 
@@ -185,6 +194,7 @@ export default function Home() {
   const [showHirePage, setShowHirePage] = useState(false);
   const [showEmployersPage, setShowEmployersPage] = useState(false);
   const [employers] = useState<Employer[]>(sampleEmployers);
+  const [calculatedAge, setCalculatedAge] = useState<number>(0);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -194,12 +204,14 @@ export default function Home() {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const nameRef = useRef<HTMLInputElement>(null);
-  const ageRef = useRef<HTMLInputElement>(null);
+  const dobRef = useRef<HTMLInputElement>(null);
   const genderRef = useRef<HTMLSelectElement>(null);
   const jobRef = useRef<HTMLSelectElement>(null);
   const countryRef = useRef<HTMLSelectElement>(null);
   const religionRef = useRef<HTMLSelectElement>(null);
   const salaryRef = useRef<HTMLInputElement>(null);
+  const experienceRef = useRef<HTMLInputElement>(null);
+  const maritalStatusRef = useRef<HTMLSelectElement>(null);
   const picRef = useRef<HTMLInputElement>(null);
   const cvRef = useRef<HTMLInputElement>(null);
 
@@ -234,17 +246,39 @@ export default function Home() {
     if (confirm(t.clearLogs)) { setLeads([]); localStorage.setItem('zod_activity_leads', '[]'); }
   };
 
+  const calculateAge = (dob: string) => {
+    if (!dob) return 0;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const handleDobChange = () => {
+    if (dobRef.current) {
+      const age = calculateAge(dobRef.current.value);
+      setCalculatedAge(age);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData();
     if (editTalent) formData.append('id', editTalent.id);
     formData.append('name', nameRef.current!.value);
-    formData.append('age', ageRef.current!.value);
+    formData.append('dob', dobRef.current!.value);
+    formData.append('age', String(calculatedAge));
     formData.append('gender', genderRef.current!.value);
     formData.append('job', jobRef.current!.value);
     formData.append('country', countryRef.current!.value);
     formData.append('religion', religionRef.current!.value);
     formData.append('salary', salaryRef.current!.value);
+    formData.append('experience', experienceRef.current!.value);
+    formData.append('maritalStatus', maritalStatusRef.current!.value);
     if (picRef.current?.files?.[0]) formData.append('tPic', picRef.current.files[0]);
     if (cvRef.current?.files?.[0]) formData.append('tCv', cvRef.current.files[0]);
     try {
@@ -256,13 +290,16 @@ export default function Home() {
 
   const resetForm = () => {
     setEditTalent(null);
+    setCalculatedAge(0);
     if (nameRef.current) nameRef.current.value = '';
-    if (ageRef.current) ageRef.current.value = '';
+    if (dobRef.current) dobRef.current.value = '';
     if (genderRef.current) genderRef.current.value = 'Male';
     if (jobRef.current) jobRef.current.value = jobOptions[0];
     if (countryRef.current) countryRef.current.value = countryOptions[0];
     if (religionRef.current) religionRef.current.value = 'Muslim';
     if (salaryRef.current) salaryRef.current.value = '0';
+    if (experienceRef.current) experienceRef.current.value = '';
+    if (maritalStatusRef.current) maritalStatusRef.current.value = 'Single';
     if (picRef.current) picRef.current.value = '';
     if (cvRef.current) cvRef.current.value = '';
   };
@@ -270,12 +307,15 @@ export default function Home() {
   const editHandler = (talent: Talent) => {
     setEditTalent(talent);
     if (nameRef.current) nameRef.current.value = talent.name;
-    if (ageRef.current) ageRef.current.value = String(talent.age);
+    if (dobRef.current && talent.dob) dobRef.current.value = talent.dob;
     if (genderRef.current) genderRef.current.value = talent.gender;
     if (jobRef.current) jobRef.current.value = talent.job;
     if (countryRef.current) countryRef.current.value = talent.country;
     if (religionRef.current) religionRef.current.value = talent.religion || 'Muslim';
     if (salaryRef.current) salaryRef.current.value = String(talent.salary || 0);
+    if (experienceRef.current && talent.experience) experienceRef.current.value = talent.experience;
+    if (maritalStatusRef.current && talent.maritalStatus) maritalStatusRef.current.value = talent.maritalStatus;
+    setCalculatedAge(talent.age);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -304,6 +344,11 @@ export default function Home() {
     setShowHirePage(true);
     setShowEmployersPage(false);
     setSearchQuery(category.toLowerCase());
+  };
+
+  const handleDiscountClick = () => {
+    trackLead('Discount Banner', 'Discount Offer Clicked');
+    window.location.href = 'https://wa.me/94729204485?text=I%20am%20interested%20in%20the%20SPECIAL%2020%25%20DISCOUNT%20offer%20for%20first%20hire!%20Please%20share%20more%20details.';
   };
 
   const startChat = (lang: 'en' | 'ar') => {
@@ -466,6 +511,41 @@ User question: ${msg}`
 
   return (
     <>
+      {/* Animated Discount Banner */}
+      <div className="fixed top-20 left-0 w-full z-[99] overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 py-3 shadow-lg cursor-pointer" onClick={handleDiscountClick}>
+        <div className="animate-marquee whitespace-nowrap">
+          <span className="text-white font-bold text-sm md:text-base mx-4 inline-block">
+            🎉 {t.discount} 🎉
+          </span>
+          <span className="text-white font-bold text-sm md:text-base mx-4 inline-block">
+            🎉 {t.discount} 🎉
+          </span>
+          <span className="text-white font-bold text-sm md:text-base mx-4 inline-block">
+            🎉 {t.discount} 🎉
+          </span>
+          <span className="text-white font-bold text-sm md:text-base mx-4 inline-block">
+            🎉 {t.discount} 🎉
+          </span>
+          <span className="text-white font-bold text-sm md:text-base mx-4 inline-block">
+            🎉 {t.discount} 🎉
+          </span>
+        </div>
+      </div>
+
+      <style jsx global>{`
+        @keyframes marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          animation: marquee 20s linear infinite;
+          display: inline-block;
+        }
+        .animate-marquee:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+
       <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-3">
         {chatOpen && (
           <div className="w-80 sm:w-96 bg-white rounded-[2rem] shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '520px' }}>
@@ -577,7 +657,7 @@ User question: ${msg}`
 
       {!adminActive && (
         <div className="public-section">
-          <nav className="fixed w-full z-50 glass-nav">
+          <nav className="fixed w-full z-50 glass-nav" style={{ top: '60px' }}>
             <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
               <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); window.scrollTo(0, 0); }}>
                 <img src="/logo/logo.jpeg" alt="ZOD MANPOWER Logo" className="w-10 h-10 rounded-xl object-cover shadow-lg transition-transform duration-300 group-hover:scale-110" />
@@ -596,7 +676,7 @@ User question: ${msg}`
             </div>
           </nav>
 
-          <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`}>
+          <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`} style={{ top: '60px' }}>
             <div className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fa-solid fa-xmark text-[#002F66]"></i></div>
             <div className="sidebar-nav mt-8">
               <a href="#home" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.home}</a>
@@ -611,7 +691,7 @@ User question: ${msg}`
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
           {showEmployersPage ? (
-            <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
+            <div className="min-h-screen pt-40 pb-20 px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowEmployersPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> Back to Home</button>
                 <div className="text-center mb-12">
@@ -647,7 +727,7 @@ User question: ${msg}`
               </div>
             </div>
           ) : showHirePage ? (
-            <div className="min-h-screen pt-28 pb-20 px-6 bg-gray-50">
+            <div className="min-h-screen pt-36 pb-20 px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowHirePage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> Back to Home</button>
                 <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
@@ -697,7 +777,7 @@ User question: ${msg}`
             </div>
           ) : (
             <>
-              <section id="home" className="relative pt-48 pb-32 px-6 qatar-gradient text-white overflow-hidden">
+              <section id="home" className="relative pt-48 pb-32 px-6 qatar-gradient text-white overflow-hidden" style={{ marginTop: '60px' }}>
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center relative z-10">
                   <div className="space-y-8 fade-in">
@@ -874,14 +954,19 @@ User question: ${msg}`
                   <div className="flex justify-between items-center mb-8 border-b pb-4"><h4 className="font-bold uppercase text-xs text-[#002F66] tracking-widest">{editTalent ? `${t.editCandidate} ${editTalent.name}` : t.newCandidate}</h4><button onClick={resetForm} className="text-[10px] text-gray-400 hover:text-red-600 transition-all hover:rotate-12"><i className="fa-solid fa-rotate-left"></i></button></div>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.fullName}</label><input ref={nameRef} type="text" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
+                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.birthOfDate}</label><input ref={dobRef} type="date" onChange={handleDobChange} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
+                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.age}</label><input type="number" value={calculatedAge} readOnly className="w-full p-4 bg-gray-100 border border-transparent rounded-xl outline-none text-gray-600" /></div>
                     <div className="grid grid-cols-2 gap-4">
-                      <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.age}</label><input ref={ageRef} type="number" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
                       <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.gender}</label><select ref={genderRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option>Male</option><option>Female</option></select></div>
+                      <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.maritalStatus}</label><select ref={maritalStatusRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Single">{t.single}</option><option value="Married">{t.married}</option></select></div>
                     </div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{jobOptions.map(job => <option key={job} value={job}>{job}</option>)}</select></div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.country}</label><select ref={countryRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Muslim">Muslim</option><option value="Christian">Christian</option></select></div>
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
+                      <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.experience}</label><input ref={experienceRef} type="text" placeholder="e.g., 2 years" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" /></div>
+                    </div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-2">{t.photo}</label><input ref={picRef} type="file" accept="image/*" className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 transition-all" /></div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-2">{t.cvUpload}</label><input ref={cvRef} type="file" accept=".pdf,image/*" className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all" /></div>
                     <button type="submit" className="w-full py-4 bg-[#002F66] text-white rounded-xl font-bold uppercase text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105">{t.saveRecord}</button>
