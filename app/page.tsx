@@ -40,7 +40,6 @@ interface ChatMessage {
   cvCards?: Talent[];
 }
 
-// Only these 6 jobs for Manpower Services
 const jobOptions = [
   'Driver', 'Baby sitting', 'Nurse', 'Cook', 'Domestic Worker', 'Teacher'
 ];
@@ -57,14 +56,13 @@ const maritalStatusOptions = ['Single', 'Married', 'Divorced', 'Widowed'];
 
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
-// Team Members Data
 const teamMembers: TeamMember[] = [
-  { id: '1', name: 'Mr. Ahmed Al Thani', position: 'CEO & Founder', photo: 'https://randomuser.me/api/portraits/men/1.jpg', phone: '+97412345678', isTopManagement: true },
-  { id: '2', name: 'Ms. Fatima Al Saeed', position: 'Operations Director', photo: 'https://randomuser.me/api/portraits/women/2.jpg', phone: '+97412345679', isTopManagement: true },
-  { id: '3', name: 'Mr. Khalid Al Mansouri', position: 'Recruitment Manager', photo: 'https://randomuser.me/api/portraits/men/3.jpg', phone: '+97412345680', isTopManagement: true },
-  { id: '4', name: 'Ms. Noor Al Emadi', position: 'Client Relations Head', photo: 'https://randomuser.me/api/portraits/women/4.jpg', phone: '+97412345681', isTopManagement: true },
-  { id: '5', name: 'Mr. Youssef Hassan', position: 'Visa Processing Officer', photo: 'https://randomuser.me/api/portraits/men/5.jpg', phone: '+97412345682', isTopManagement: false },
-  { id: '6', name: 'Ms. Lina Al Kuwari', position: 'Marketing Specialist', photo: 'https://randomuser.me/api/portraits/women/6.jpg', phone: '+97412345683', isTopManagement: false },
+  { id: '1', name: 'Mr. Ahmed Al Thani', position: 'CEO & Founder', photo: 'https://randomuser.me/api/portraits/men/1.jpg', phone: '+97455355206', isTopManagement: true },
+  { id: '2', name: 'Ms. Fatima Al Saeed', position: 'Operations Director', photo: 'https://randomuser.me/api/portraits/women/2.jpg', phone: '+97455355206', isTopManagement: true },
+  { id: '3', name: 'Mr. Khalid Al Mansouri', position: 'Recruitment Manager', photo: 'https://randomuser.me/api/portraits/men/3.jpg', phone: '+97455355206', isTopManagement: true },
+  { id: '4', name: 'Ms. Noor Al Emadi', position: 'Client Relations Head', photo: 'https://randomuser.me/api/portraits/women/4.jpg', phone: '+97455355206', isTopManagement: true },
+  { id: '5', name: 'Mr. Youssef Hassan', position: 'Visa Processing Officer', photo: 'https://randomuser.me/api/portraits/men/5.jpg', phone: '+97455355206', isTopManagement: false },
+  { id: '6', name: 'Ms. Lina Al Kuwari', position: 'Marketing Specialist', photo: 'https://randomuser.me/api/portraits/women/6.jpg', phone: '+97455355206', isTopManagement: false },
 ];
 
 const translations = {
@@ -128,12 +126,13 @@ const translations = {
     viewCandidates: 'View Candidates',
     discount1: '20% OFF on First Placement', discount2: 'Free Visa Processing for Group Hiring (10+)', discount3: '15% Discount for Annual Contracts', discountOffer: '🔥 LIMITED OFFER',
     backToHome: 'Back to Home', maritalStatus: 'Marital Status', single: 'Single', married: 'Married', divorced: 'Divorced', widowed: 'Widowed',
+    ourJourney: 'Our Journey', ourLocation: 'Our Location', whatClientsSay: 'What Our Clients Say',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
     home: 'الرئيسية', about: 'من نحن', services: 'خدماتنا',
     hireNav: 'توظيف', contactUs: 'اتصل بنا', adminPortal: 'بوابة المشرفين',
-    certified: 'وكالة معتمدة ISO 9001:2015', heroTitle: 'البوابة إلى',
+    certified: 'مرحباً بكم في الدوحة', heroTitle: 'البوابة إلى',
     heroTitleSpan: 'المواهب المتميزة', heroTitleEnd: 'في الدوحة.',
     heroDesc: 'نربط بخبرة الموارد البشرية العالمية برؤية قطر الطموحة.',
     yearsLabel: 'سنة في سوق الدوحة',
@@ -190,6 +189,7 @@ const translations = {
     viewCandidates: 'عرض المرشحين',
     discount1: 'خصم 20% على أول تعيين', discount2: 'معالجة تأشيرة مجانية للتعيين الجماعي (10+)', discount3: 'خصم 15% على العقود السنوية', discountOffer: '🔥 عرض محدود',
     backToHome: 'العودة إلى الرئيسية', maritalStatus: 'الحالة الاجتماعية', single: 'أعزب', married: 'متزوج', divorced: 'مطلق', widowed: 'أرمل',
+    ourJourney: 'رحلتنا', ourLocation: 'موقعنا', whatClientsSay: 'ماذا يقول عملاؤنا',
   }
 };
 
@@ -214,8 +214,6 @@ export default function Home() {
   const [showAboutPage, setShowAboutPage] = useState(false);
   const [showReturnedHousemaids, setShowReturnedHousemaids] = useState(false);
   const [jobFilter, setJobFilter] = useState('');
-  
-  // Form fields for admin panel
   const [calculatedAge, setCalculatedAge] = useState<number | null>(null);
 
   const [chatOpen, setChatOpen] = useState(false);
@@ -237,16 +235,6 @@ export default function Home() {
   const picRef = useRef<HTMLInputElement>(null);
   const cvRef = useRef<HTMLInputElement>(null);
 
-  const manpowerJobs = [
-    { key: 'Driver', label: t.driversJob, icon: 'fa-solid fa-truck-fast', color: 'from-blue-500 to-blue-700' },
-    { key: 'Baby sitting', label: t.babysitting, icon: 'fa-solid fa-baby-carriage', color: 'from-pink-500 to-pink-700' },
-    { key: 'Nurse', label: t.nursesJob, icon: 'fa-solid fa-hospital-user', color: 'from-green-500 to-green-700' },
-    { key: 'Cook', label: t.cooks, icon: 'fa-solid fa-utensils', color: 'from-orange-500 to-orange-700' },
-    { key: 'Domestic Worker', label: t.domesticWorker, icon: 'fa-solid fa-broom', color: 'from-purple-500 to-purple-700' },
-    { key: 'Teacher', label: t.teacher, icon: 'fa-solid fa-chalkboard-user', color: 'from-red-500 to-red-700' },
-  ];
-
-  // Calculate age from Date of Birth
   const calculateAge = (dob: string) => {
     if (!dob) return null;
     const birthDate = new Date(dob);
@@ -296,10 +284,17 @@ export default function Home() {
   };
 
   const handleDiscountClick = (discountText: string) => {
-    const whatsappNumber = '94729204485';
+    const whatsappNumber = '97455355206';
     const message = `Hi! I'm interested in the offer: ${discountText}. Can you please provide more details?`;
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
     trackLead('Discount Banner', discountText);
+  };
+
+  const handleHireClick = (talentName: string, source: string) => {
+    const whatsappNumber = '97455355206';
+    const message = `Hi! I'm interested in hiring ${talentName}. Can you please provide more details?`;
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    trackLead(source, `Hire: ${talentName}`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -394,20 +389,11 @@ export default function Home() {
     setJobFilter('Domestic Worker');
   };
 
-  const handleServiceJobClick = (jobKey: string) => {
-    trackLead('Service Job', jobKey);
-    setShowHirePage(true);
-    setShowOurTeamPage(false);
-    setShowAboutPage(false);
-    setShowReturnedHousemaids(false);
-    setSearchQuery(jobKey.toLowerCase());
-  };
-
   const startChat = (lang: 'en' | 'ar') => {
     setChatLanguageSelected(lang);
     const welcomeMsg = lang === 'en'
-      ? 'Hello! 👋 I am ZOD AI Assistant. Ask me about jobs, visa, hiring, or mention a country to see available CVs!'
-      : 'مرحباً! 👋 أنا مساعد ZOD AI. اسألني عن الوظائف، التأشيرات، التوظيف، أو اذكر دولة لمشاهدة السير الذاتية المتاحة!';
+      ? 'Hello! 👋 I am ZOD AI Assistant. Ask me about jobs, visa, hiring!'
+      : 'مرحباً! 👋 أنا مساعد ZOD AI. اسألني عن الوظائف!';
     setChatMessages([{ role: 'bot', text: welcomeMsg }]);
   };
 
@@ -420,54 +406,10 @@ export default function Home() {
     setChatLoading(true);
     trackLead('Chatbot', msg.slice(0, 40));
 
-    const detectedCountry = countryOptions.find((c) =>
-      msg.toLowerCase().includes(c.toLowerCase())
-    );
-    let cvCards: Talent[] = [];
-    if (detectedCountry) {
-      cvCards = talents.filter((tal) => tal.country.toLowerCase() === detectedCountry.toLowerCase()).slice(0, 3);
-    }
-
-    const simpleGreetings = ['hey', 'hi', 'hello', 'hola', 'salam', 'مرحبا'];
-    if (simpleGreetings.includes(msg.trim().toLowerCase())) {
-      const greetingResponse = chatLanguageSelected === 'en'
-        ? 'Hey there! 👋 How can I help you today? Ask me about jobs, visa, or mention a country to see CVs.'
-        : 'مرحباً! 👋 كيف يمكنني مساعدتك اليوم؟ اسأل عن الوظائف، التأشيرات، أو اذكر دولة لمشاهدة السير الذاتية.';
-      setChatMessages((prev) => [...prev, { role: 'bot', text: greetingResponse, cvCards: cvCards.length > 0 ? cvCards : undefined }]);
-      setChatLoading(false);
-      return;
-    }
-
     try {
       const systemPrompt = chatLanguageSelected === 'en'
-        ? `You are ZOD Assistant, the official AI chatbot for ZOD Manpower — Qatar's leading licensed recruitment agency (ISO 9001:2015 certified, licensed by Qatar Ministry of Labor).
-
-Key facts:
-- We recruit from: ${countryOptions.join(', ')}
-- Job categories: ${jobOptions.join(', ')}
-- WhatsApp contact: +94729204485
-- Visa processing: 15-45 business days
-- Zero fees for candidates (Qatar Labor Law compliant)
-- Salary range: 800-3000 QAR/month
-- Active in Doha, Al Khor, Al Wakrah, Lusail
-
-Answer the user helpfully, professionally, and concisely. If they ask about CVs from a specific country, acknowledge you are checking the database.
-
-User question: ${msg}`
-        : `أنت مساعد ZOD، بوت الدردشة الرسمي لشركة زود مان باور — وكالة التوظيف المرخصة الرائدة في قطر (معتمدة ISO 9001:2015، مرخصة من وزارة العمل القطرية).
-
-حقائق رئيسية:
-- نوظف من: ${countryOptions.join(', ')}
-- فئات الوظائف: ${jobOptions.join(', ')}
-- واتساب: +94729204485
-- معالجة التأشيرة: 15-45 يوم عمل
-- لا توجد رسوم للمرشحين (وفقاً لقانون العمل القطري)
-- نطاق الرواتب: 800-3000 ريال قطري/شهر
-- نعمل في الدوحة، الخور، الوكرة، لوسيل
-
-أجب المستخدم بشكل مفيد ومهني ومختصر. إذا سأل عن السير الذاتية من بلد معين، أقر بأنك تتحقق من قاعدة البيانات.
-
-سؤال المستخدم: ${msg}`;
+        ? `You are ZOD Assistant for ZOD Manpower. Answer concisely. User: ${msg}`
+        : `أنت مساعد ZOD. أجب باختصار. المستخدم: ${msg}`;
 
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -476,35 +418,20 @@ User question: ${msg}`
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: systemPrompt }] }],
-            generationConfig: { maxOutputTokens: 350, temperature: 0.7 }
+            generationConfig: { maxOutputTokens: 200, temperature: 0.7 }
           })
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Gemini API error:', response.status, errorData);
-        throw new Error(`API returned ${response.status}`);
-      }
-
       const data = await response.json();
       const botText = data?.candidates?.[0]?.content?.parts?.[0]?.text ||
         (chatLanguageSelected === 'en'
-          ? "I'm not sure how to answer that. Please contact us via WhatsApp at +94729204485."
-          : "لست متأكداً من الإجابة. يرجى الاتصال بنا عبر واتساب +94729204485.");
+          ? "Please contact us via WhatsApp at +97455355206"
+          : "يرجى الاتصال بنا على واتساب +97455355206");
 
-      setChatMessages((prev) => [...prev, { role: 'bot', text: botText, cvCards: cvCards.length > 0 ? cvCards : undefined }]);
+      setChatMessages((prev) => [...prev, { role: 'bot', text: botText }]);
     } catch (err) {
-      console.error('Chatbot error:', err);
-      let fallbackText = chatLanguageSelected === 'en'
-        ? "Sorry, I'm having trouble connecting to my AI brain right now. Please contact us directly on WhatsApp at +94729204485 or use the 'Contact Us' button. 😊"
-        : "عذراً، أواجه مشكلة في الاتصال بالذكاء الاصطناعي حالياً. يرجى الاتصال بنا مباشرة على واتساب +94729204485 أو استخدام زر 'اتصل بنا'. 😊";
-      if (detectedCountry) {
-        fallbackText = chatLanguageSelected === 'en'
-          ? `We have ${cvCards.length} candidate(s) from ${detectedCountry} in our database! You can browse them below or contact us on WhatsApp.`
-          : `لدينا ${cvCards.length} مرشح(ين) من ${detectedCountry} في قاعدة بياناتنا! يمكنك تصفحهم أدناه أو الاتصال بنا على واتساب.`;
-      }
-      setChatMessages((prev) => [...prev, { role: 'bot', text: fallbackText, cvCards: cvCards.length > 0 ? cvCards : undefined }]);
+      setChatMessages((prev) => [...prev, { role: 'bot', text: chatLanguageSelected === 'en' ? "Please contact us on WhatsApp +97455355206" : "يرجى الاتصال بنا على واتساب +97455355206" }]);
     } finally {
       setChatLoading(false);
     }
@@ -519,7 +446,7 @@ User question: ${msg}`
   }, [chatMessages, chatOpen]);
 
   useEffect(() => {
-    const init = async () => { await fetchTalents(); loadLeads(); setTimeout(() => setIsLoading(false), 5000); };
+    const init = async () => { await fetchTalents(); loadLeads(); setTimeout(() => setIsLoading(false), 3000); };
     init();
   }, [fetchTalents]);
 
@@ -547,7 +474,6 @@ User question: ${msg}`
   const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
   const regularTeam = teamMembers.filter(member => !member.isTopManagement);
 
-  // RTL direction for Arabic
   const isRTL = language === 'ar';
   const dir = isRTL ? 'rtl' : 'ltr';
 
@@ -570,36 +496,36 @@ User question: ${msg}`
 
   return (
     <div dir={dir} className={isRTL ? 'rtl' : 'ltr'}>
-      {/* Global RTL Style */}
       <style jsx global>{`
-        .rtl {
-          direction: rtl;
-          text-align: right;
-        }
-        .rtl .flex-row-reverse-rtl {
-          flex-direction: row-reverse;
-        }
-        .rtl .ml-auto-rtl {
-          margin-left: auto;
-          margin-right: 0;
-        }
-        .rtl .mr-auto-rtl {
-          margin-right: auto;
-          margin-left: 0;
-        }
-        .rtl .text-left-rtl {
-          text-align: right;
-        }
-        @keyframes marquee {
-          0% { transform: translateX(100%); }
-          100% { transform: translateX(-100%); }
-        }
-        .animate-marquee {
-          animation: marquee 15s linear infinite;
-        }
-        .animate-marquee:hover {
-          animation-play-state: paused;
-        }
+        .rtl { direction: rtl; text-align: right; }
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        @keyframes marquee-rtl { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        .animate-marquee { animation: marquee 15s linear infinite; }
+        .animate-marquee-rtl { animation: marquee-rtl 15s linear infinite; }
+        .animate-marquee:hover, .animate-marquee-rtl:hover { animation-play-state: paused; }
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        @keyframes shimmer { 0% { transform: translateX(-100%) skewX(-12deg); } 100% { transform: translateX(200%) skewX(-12deg); } }
+        .animate-shimmer { animation: shimmer 2s infinite; }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05); }
+        .nav-link { position: relative; }
+        .nav-link::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: #002F66; transition: width 0.3s ease; }
+        .nav-link:hover::after { width: 100%; }
+        .qatar-gradient { background: linear-gradient(135deg, #002F66 0%, #0040aa 50%, #002F66 100%); }
+        .mobile-sidebar { position: fixed; top: 0; right: -280px; width: 280px; height: 100vh; background: white; z-index: 1000; transition: right 0.3s ease; box-shadow: -2px 0 20px rgba(0,0,0,0.1); padding: 20px; overflow-y: auto; }
+        .mobile-sidebar.active { right: 0; }
+        .sidebar-close { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; }
+        .sidebar-nav { display: flex; flex-direction: column; gap: 20px; margin-top: 60px; }
+        .sidebar-nav a, .sidebar-nav button { font-size: 16px; font-weight: 600; text-transform: uppercase; color: #333; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .sidebar-apply { background: #002F66; color: white; padding: 12px; border-radius: 30px; text-align: center; margin-top: 20px; }
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .faq-item.active .fa-plus { transform: rotate(45deg); }
       `}</style>
 
       {/* WhatsApp Chat Button */}
@@ -611,7 +537,6 @@ User question: ${msg}`
                 <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center"><i className="fa-solid fa-robot text-white text-sm"></i></div>
                 <div>
                   <div className="text-white font-bold text-sm">ZOD AI Assistant</div>
-                  <div className="text-blue-200 text-[10px] flex items-center gap-1"><span className="w-1.5 h-1.5 bg-green-400 rounded-full inline-block animate-pulse"></span>Powered by Gemini AI</div>
                 </div>
               </div>
               <button onClick={() => setChatOpen(false)} className="text-white/60 hover:text-white transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
@@ -619,7 +544,7 @@ User question: ${msg}`
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50">
               {!chatLanguageSelected ? (
                 <div className="text-center py-8 space-y-4">
-                  <p className="text-gray-700 font-bold">Select Language / اختر اللغة</p>
+                  <p className="text-gray-700 font-bold">Select Language</p>
                   <div className="flex gap-3 justify-center">
                     <button onClick={() => startChat('en')} className="px-5 py-2 bg-[#002F66] text-white rounded-full text-sm font-bold hover:bg-[#002060] transition">English</button>
                     <button onClick={() => startChat('ar')} className="px-5 py-2 bg-[#002F66] text-white rounded-full text-sm font-bold hover:bg-[#002060] transition">العربية</button>
@@ -628,28 +553,8 @@ User question: ${msg}`
               ) : (
                 <>
                   {chatMessages.map((msg, i) => (
-                    <div key={i} className="space-y-2">
-                      <div className={`flex ${msg.role === 'user' ? (isRTL ? 'justify-start' : 'justify-end') : (isRTL ? 'justify-end' : 'justify-start')}`}>
-                        <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-[#002F66] text-white rounded-br-sm' : 'bg-white text-gray-700 rounded-bl-sm border border-gray-100'}`}>{msg.text}</div>
-                      </div>
-                      {msg.cvCards && msg.cvCards.length > 0 && (
-                        <div className="space-y-2 ml-1">
-                          <p className="text-[10px] font-bold text-[#002F66] uppercase tracking-widest">
-                            {chatLanguageSelected === 'en' ? 'Available CVs from our database:' : 'السير الذاتية المتاحة من قاعدة بياناتنا:'}
-                          </p>
-                          {msg.cvCards.map((talent) => (
-                            <div key={talent.id} className="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex items-center gap-3">
-                              <img src={talent.pic} className="w-10 h-10 rounded-lg object-cover shrink-0" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50?text=User')} alt={talent.name} />
-                              <div className="flex-1 min-w-0">
-                                <div className="font-bold text-slate-800 text-xs truncate">{escapeHtml(talent.name)}</div>
-                                <div className="text-[10px] text-[#002F66] font-bold">{escapeHtml(talent.job)}</div>
-                                <div className="text-[10px] text-gray-400">{talent.salary} QAR · {talent.gender}, {talent.age}y</div>
-                              </div>
-                              <a href={`https://wa.me/94729204485?text=Interested in ${encodeURIComponent(talent.name)}`} target="_blank" onClick={() => trackLead('Chatbot CV', talent.name)} className="shrink-0 bg-[#002F66] text-white text-[9px] font-bold px-2 py-1.5 rounded-lg hover:bg-[#002060] transition-all">Hire</a>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                    <div key={i} className={`flex ${msg.role === 'user' ? (isRTL ? 'justify-start' : 'justify-end') : (isRTL ? 'justify-end' : 'justify-start')}`}>
+                      <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-[#002F66] text-white rounded-br-sm' : 'bg-white text-gray-700 rounded-bl-sm border border-gray-100'}`}>{msg.text}</div>
                     </div>
                   ))}
                   {chatLoading && (
@@ -716,34 +621,32 @@ User question: ${msg}`
 
       {!adminActive && (
         <div className="public-section">
-          {/* Discount Banner - Animated Marquee Style */}
+          {/* Discount Banner */}
           <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-24 pb-3 px-6">
             <div className="max-w-7xl mx-auto">
               <div className="overflow-hidden whitespace-nowrap">
-                <div className="inline-flex animate-marquee gap-8">
+                <div className={`inline-flex gap-8 ${isRTL ? 'animate-marquee-rtl' : 'animate-marquee'}`}>
                   <div onClick={() => handleDiscountClick('20% OFF on First Placement')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
-                    <span className="text-white font-bold text-sm">🎉 20% OFF on First Placement</span>
+                    <span className="text-white font-bold text-sm">🎉 {t.discount1}</span>
                   </div>
                   <div onClick={() => handleDiscountClick('Free Visa Processing for Group Hiring (10+)')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
-                    <span className="text-white font-bold text-sm">✨ Free Visa Processing for Group Hiring (10+)</span>
+                    <span className="text-white font-bold text-sm">✨ {t.discount2}</span>
                   </div>
                   <div onClick={() => handleDiscountClick('15% Discount for Annual Contracts')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
-                    <span className="text-white font-bold text-sm">💎 15% Discount for Annual Contracts</span>
+                    <span className="text-white font-bold text-sm">💎 {t.discount3}</span>
                   </div>
-                  {/* Repeat for seamless loop */}
                   <div onClick={() => handleDiscountClick('20% OFF on First Placement')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
-                    <span className="text-white font-bold text-sm">🎉 20% OFF on First Placement</span>
+                    <span className="text-white font-bold text-sm">🎉 {t.discount1}</span>
                   </div>
                   <div onClick={() => handleDiscountClick('Free Visa Processing for Group Hiring (10+)')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
-                    <span className="text-white font-bold text-sm">✨ Free Visa Processing for Group Hiring (10+)</span>
+                    <span className="text-white font-bold text-sm">✨ {t.discount2}</span>
                   </div>
                   <div onClick={() => handleDiscountClick('15% Discount for Annual Contracts')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
-                    <span className="text-white font-bold text-sm">💎 15% Discount for Annual Contracts</span>
+                    <span className="text-white font-bold text-sm">💎 {t.discount3}</span>
                   </div>
                 </div>
               </div>
             </div>
-            {/* Animated background effect */}
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
             </div>
@@ -762,7 +665,7 @@ User question: ${msg}`
                 <a href="#services" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.services}</a>
                 <button onClick={() => { setShowOurTeamPage(true); setShowHirePage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.ourTeam}</button>
                 <button onClick={() => { setShowHirePage(true); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.hireNav}</button>
-                <a href="https://wa.me/94729204485" onClick={() => trackLead('Nav Apply', 'Global Apply')} target="_blank" className="bg-[#002F66] text-white px-6 py-2.5 rounded-full shadow-md hover:bg-[#002060] transition-all hover:scale-105 active:scale-95">{t.contactUs}</a>
+                <a href="https://wa.me/97455355206" onClick={() => trackLead('Nav Apply', 'Global Apply')} target="_blank" className="bg-[#002F66] text-white px-6 py-2.5 rounded-full shadow-md hover:bg-[#002060] transition-all hover:scale-105 active:scale-95">{t.contactUs}</a>
                 <button onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')} className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-gray-100 text-[#002F66] hover:bg-gray-200 transition-all"><i className="fa-solid fa-globe text-[10px]"></i><span>{language === 'en' ? 'العربية' : 'English'}</span></button>
               </div>
               <button className="lg:hidden text-2xl text-[#002F66]" onClick={() => setSidebarOpen(true)}><i className="fa-solid fa-bars-staggered"></i></button>
@@ -778,7 +681,7 @@ User question: ${msg}`
               <a href="#services" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.services}</a>
               <button onClick={() => { setShowOurTeamPage(true); setShowHirePage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.ourTeam}</button>
               <button onClick={() => { setShowHirePage(true); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.hireNav}</button>
-              <a href="https://wa.me/94729204485" onClick={() => { trackLead('Mobile Nav Apply', 'Global Apply'); setSidebarOpen(false); }} target="_blank" className="sidebar-apply" style={{ backgroundColor: '#002F66' }}>{t.contactUs}</a>
+              <a href="https://wa.me/97455355206" onClick={() => { trackLead('Mobile Nav Apply', 'Global Apply'); setSidebarOpen(false); }} target="_blank" className="sidebar-apply" style={{ backgroundColor: '#002F66' }}>{t.contactUs}</a>
               <button onClick={() => { setLanguage(language === 'en' ? 'ar' : 'en'); setSidebarOpen(false); }} className="mt-4 w-full py-2 bg-gray-100 rounded-full text-sm font-bold text-[#002F66] hover:bg-gray-200 transition-all flex items-center justify-center gap-2"><i className="fa-solid fa-globe text-xs"></i>{language === 'en' ? 'العربية' : 'English'}</button>
             </div>
           </div>
@@ -795,7 +698,6 @@ User question: ${msg}`
                   <p className="text-gray-500 max-w-2xl mx-auto">{t.teamDesc}</p>
                 </div>
 
-                {/* Top Management Team Section */}
                 <div className="mb-16">
                   <h4 className="text-2xl font-bold text-[#002F66] text-center mb-10">{t.topManagementTitle}</h4>
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -810,7 +712,7 @@ User question: ${msg}`
                         <div className="p-6 text-center">
                           <h4 className="text-xl font-bold text-slate-800 mb-3">{escapeHtml(member.name)}</h4>
                           <a href={`https://wa.me/${member.phone}`} target="_blank" onClick={() => trackLead('Team Contact', member.name)} className="inline-flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 transition-all hover:scale-105">
-                            <i className="fa-brands fa-whatsapp"></i> {t.contact} {member.name.split(' ')[0]}
+                            <i className="fa-brands fa-whatsapp"></i> {t.contact}
                           </a>
                         </div>
                       </div>
@@ -818,7 +720,6 @@ User question: ${msg}`
                   </div>
                 </div>
 
-                {/* Regular Team Members */}
                 <div>
                   <h4 className="text-xl font-bold text-slate-700 text-center mb-8">Our Dedicated Team</h4>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -855,12 +756,11 @@ User question: ${msg}`
                     </div>
                   </div>
                   <div className="mt-12 pt-8 border-t border-gray-200">
-                    <h3 className="text-2xl font-bold text-slate-800 mb-4">Our Journey</h3>
+                    <h3 className="text-2xl font-bold text-slate-800 mb-4">{t.ourJourney}</h3>
                     <p className="text-gray-500 leading-relaxed">
-                      Founded in 2010, ZOD MANPOWER RECRUITMENT has grown to become one of Qatar's most trusted manpower agencies. 
-                      With over 12 years of experience in the Doha market, we have successfully placed thousands of skilled professionals 
-                      across various industries including hospitality, construction, healthcare, and domestic services. Our commitment to 
-                      ethical recruitment and compliance with Qatar Labor Laws has earned us the trust of both employers and candidates alike.
+                      {language === 'en' 
+                        ? 'Founded in 2010, ZOD MANPOWER RECRUITMENT has grown to become one of Qatar\'s most trusted manpower agencies. With over 12 years of experience in the Doha market, we have successfully placed thousands of skilled professionals across various industries including hospitality, construction, healthcare, and domestic services. Our commitment to ethical recruitment and compliance with Qatar Labor Laws has earned us the trust of both employers and candidates alike.'
+                        : 'تأسست شركة زود مان باور للتوظيف في عام 2010، وأصبحت واحدة من أكثر وكالات القوى العاملة الموثوقة في قطر. مع أكثر من 12 عاماً من الخبرة في سوق الدوحة، قمنا بنجاح بتوظيف آلاف المهنيين المهرة في مختلف القطاعات بما في ذلك الضيافة والبناء والرعاية الصحية والخدمات المنزلية. لقد أكسبنا التزامنا بالتوظيف الأخلاقي والامتثال لقوانين العمل القطرية ثقة كل من أصحاب العمل والمرشحين على حد سواء.'}
                     </p>
                   </div>
                 </div>
@@ -900,7 +800,7 @@ User question: ${msg}`
                         </div>
                         <div className="flex gap-3 mt-auto">
                           <a href={talent.cv} target="_blank" onClick={() => trackLead('Returned CV', talent.name)} className="flex-1 py-4 bg-gray-100 text-center rounded-xl font-bold text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
-                          <a href={`https://wa.me/94729204485?text=Interested in returned housemaid ${encodeURIComponent(talent.name)}`} onClick={() => trackLead('Returned Hire', talent.name)} target="_blank" className="flex-1 py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</a>
+                          <button onClick={() => handleHireClick(talent.name, 'Returned Housemaid')} className="flex-1 py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
                         </div>
                       </div>
                     ))}
@@ -951,7 +851,7 @@ User question: ${msg}`
                         </div>
                         <div className="flex gap-3 mt-auto">
                           <a href={talent.cv} target="_blank" onClick={() => trackLead('Public CV', talent.name)} className="flex-1 py-4 bg-gray-100 text-center rounded-xl font-bold text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
-                          <a href={`https://wa.me/94729204485?text=Interested in ${encodeURIComponent(talent.name)}`} onClick={() => trackLead('Hire Click', talent.name)} target="_blank" className="flex-1 py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</a>
+                          <button onClick={() => handleHireClick(talent.name, 'Hire Talent')} className="flex-1 py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
                         </div>
                       </div>
                     ))}
@@ -970,7 +870,6 @@ User question: ${msg}`
                     <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
                     <p className="text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
                     
-                    {/* Quick Action Buttons */}
                     <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                       <button onClick={() => handleQuickHire('House Maids')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-2 text-sm">🏠 {t.houseMaids}</span>
@@ -1080,7 +979,7 @@ User question: ${msg}`
               <section className="py-16 px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold text-slate-900 mb-2">Our Location</h3>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-2">{t.ourLocation}</h3>
                     <p className="text-gray-500">ZOD MANPOWER RECRUITMENT, Doha, Qatar</p>
                   </div>
                   <div className="w-full h-[400px] rounded-2xl overflow-hidden shadow-xl border-4 border-white">
@@ -1101,7 +1000,7 @@ User question: ${msg}`
               {/* Testimonials Section */}
               <section className="py-20 bg-gray-50 px-6 reveal">
                 <div className="max-w-7xl mx-auto">
-                  <h3 className="text-3xl font-bold text-center mb-12">What Our Clients Say</h3>
+                  <h3 className="text-3xl font-bold text-center mb-12">{t.whatClientsSay}</h3>
                   <div className="grid md:grid-cols-3 gap-8">
                     {[{ text: t.testimonial1, author: t.author1 }, { text: t.testimonial2, author: t.author2 }, { text: t.testimonial3, author: t.author3 }].map((tst, i) => (
                       <div key={i} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-2">
@@ -1132,7 +1031,14 @@ User question: ${msg}`
               {/* Footer */}
               <footer className="py-20 bg-slate-900 text-white px-6">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 border-b border-white/5 pb-16">
-                  <div className="col-span-2"><div className="text-2xl font-black uppercase mb-6 tracking-tighter">ZOD<span className="text-[#002F66]"> MANPOWER RECRUITMENT</span></div><p className="text-slate-500 text-sm leading-relaxed max-w-sm mb-6">{t.footerText}</p><div className="flex space-x-4"><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-facebook-f"></i></a><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-linkedin-in"></i></a></div></div>
+                  <div className="col-span-2">
+                    <div className="flex items-center gap-3 mb-6">
+                      <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-12 h-12 rounded-xl object-cover shadow-lg" />
+                      <div className="text-2xl font-black uppercase tracking-tighter">ZOD<span className="text-[#002F66]"> MANPOWER RECRUITMENT</span></div>
+                    </div>
+                    <p className="text-slate-500 text-sm leading-relaxed max-w-sm mb-6">{t.footerText}</p>
+                    <div className="flex space-x-4"><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-facebook-f"></i></a><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-linkedin-in"></i></a></div>
+                  </div>
                   <div><h6 className="font-bold uppercase text-xs tracking-widest mb-6 text-slate-300">{t.quickLinks}</h6><ul className="space-y-4 text-xs text-slate-500 font-bold uppercase"><li><a href="#about" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.aboutDoha}</a></li><li><a href="#services" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.clientServices}</a></li><li><button onClick={() => setShowHirePage(true)} className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.browseCVs}</button></li></ul></div>
                   <div><h6 className="font-bold uppercase text-xs tracking-widest mb-6 text-slate-300">{t.internal}</h6><button onClick={() => setLoginModalOpen(true)} className="group flex items-center space-x-3 px-6 py-3 border border-white/10 rounded-2xl hover:bg-white hover:text-slate-900 transition-all duration-300 hover:scale-105"><i className="fa-solid fa-lock text-[10px] group-hover:rotate-12 transition-transform"></i><span className="text-[10px] font-bold uppercase tracking-widest">{t.adminPortal}</span></button></div>
                 </div>
