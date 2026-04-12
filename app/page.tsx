@@ -15,20 +15,20 @@ interface Talent {
   cv: string;
 }
 
-interface Employer {
-  id: string;
-  name: string;
-  age: number;
-  position: string;
-  photo: string;
-  company: string;
-}
-
 interface Lead {
   id: number;
   source: string;
   action: string;
   time: string;
+}
+
+interface TeamMember {
+  id: string;
+  name: string;
+  position: string;
+  photo: string;
+  phone: string;
+  isTopManagement: boolean;
 }
 
 interface ChatMessage {
@@ -49,20 +49,21 @@ const countryOptions = [
 
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
-const sampleEmployers: Employer[] = [
-  { id: '1', name: 'Unknown', age: 25, position: '##', photo: 'https://randomuser.me/api/portraits/men/1.jpg', company: 'ZOD MANPOWER' },
-  { id: '2', name: 'Unknown', age: 25, position: '##', photo: 'https://randomuser.me/api/portraits/women/2.jpg', company: 'ZOD MANPOWER' },
-  { id: '3', name: 'Unknown', age: 25, position: '##', photo: 'https://randomuser.me/api/portraits/men/3.jpg', company: 'ZOD MANPOWER' },
-  { id: '4', name: 'Unknown', age: 25, position: '##', photo: 'https://randomuser.me/api/portraits/women/4.jpg', company: 'ZOD MANPOWER' },
-  { id: '5', name: 'Unknown', age: 25, position: '##', photo: 'https://randomuser.me/api/portraits/men/5.jpg', company: 'ZOD MANPOWER' },
-  { id: '6', name: 'Unknown', age: 25, position: '##', photo: 'https://randomuser.me/api/portraits/women/6.jpg', company: 'ZOD MANPOWER' },
+// Team Members Data
+const teamMembers: TeamMember[] = [
+  { id: '1', name: 'Mr. Ahmed Al Thani', position: 'CEO & Founder', photo: 'https://randomuser.me/api/portraits/men/1.jpg', phone: '+97412345678', isTopManagement: true },
+  { id: '2', name: 'Ms. Fatima Al Saeed', position: 'Operations Director', photo: 'https://randomuser.me/api/portraits/women/2.jpg', phone: '+97412345679', isTopManagement: true },
+  { id: '3', name: 'Mr. Khalid Al Mansouri', position: 'Recruitment Manager', photo: 'https://randomuser.me/api/portraits/men/3.jpg', phone: '+97412345680', isTopManagement: true },
+  { id: '4', name: 'Ms. Noor Al Emadi', position: 'Client Relations Head', photo: 'https://randomuser.me/api/portraits/women/4.jpg', phone: '+97412345681', isTopManagement: true },
+  { id: '5', name: 'Mr. Youssef Hassan', position: 'Visa Processing Officer', photo: 'https://randomuser.me/api/portraits/men/5.jpg', phone: '+97412345682', isTopManagement: false },
+  { id: '6', name: 'Ms. Lina Al Kuwari', position: 'Marketing Specialist', photo: 'https://randomuser.me/api/portraits/women/6.jpg', phone: '+97412345683', isTopManagement: false },
 ];
 
 const translations = {
   en: {
-    welcome: 'Welcome To Doha, Qatar', brandLoading: 'ZOD MANPOWER',
+    welcome: 'Welcome To Doha, Qatar', brandLoading: 'ZOD MANPOWER RECRUITMENT',
     home: 'Home', about: 'About', services: 'Services',
-    hireNav: 'Hire Talent', applyNow: 'Apply Now', adminPortal: 'Admin Portal',
+    hireNav: 'Hire Talent', contactUs: 'Contact Us', adminPortal: 'Admin Portal',
     certified: 'Welcome To Doha, Qatar', heroTitle: 'The Gateway to',
     heroTitleSpan: 'Premium Talent', heroTitleEnd: 'in Doha.',
     heroDesc: 'Expertly connecting world-class human resources to the ambitious vision of Qatar.',
@@ -94,7 +95,7 @@ const translations = {
     faqQ4: 'How do employers request candidates?', faqA4: 'Employers can browse our pre-vetted talent on this website and contact us directly via WhatsApp to request CVs or arrange interviews.',
     footerText: "Qatar's leading licensed manpower recruitment agency. Connecting global talent to the heart of the Middle East.",
     quickLinks: 'Quick Links', aboutDoha: 'About Doha Agency', clientServices: 'Client Services', browseCVs: 'Browse CVs',
-    internal: 'Internal', copyright: '© 2026 ZOD MANPOWER.',
+    internal: 'Internal', copyright: '© 2026 ZOD MANPOWER RECRUITMENT.',
     privacyPolicy: 'Privacy Policy', terms: 'Terms of Service',
     staffAuth: 'Staff Authentication', restricted: 'Restricted access for ZOD Manpower Admins',
     username: 'Username', password: 'Password', enterAdmin: 'Enter admin', authorizedOnly: 'Authorized Access Only',
@@ -108,13 +109,20 @@ const translations = {
     trafficSource: 'Traffic Source', actionTaken: 'Action Taken', timeLocal: 'Time (Local)',
     confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate? This action cannot be undone.',
     cancel: 'Cancel', yesDelete: 'Yes, Delete', english: 'English', arabic: 'العربية',
-    houseMaids: 'House Maids', drivers: 'Drivers', nurses: 'Nurses', monthlyCleaners: 'Monthly Cleaners',
-    ourEmployers: 'Our Employers', employersTitle: 'Our Trusted Employers', employersDesc: 'Meet our valued employer partners who trust ZOD Manpower for their recruitment needs.',
+    houseMaids: 'House Maids', drivers: 'Drivers', nurses: 'Nurses', monthlyCleaners: 'Monthly Cleaners', returnedHousemaids: 'Returned Housemaids',
+    ourTeam: 'Our Team', teamTitle: 'Meet Our Team', teamDesc: 'Dedicated professionals committed to excellence in recruitment.',
+    topManagementTitle: 'Our Top Management Team', contact: 'Contact', viewMore: 'View More',
+    ourVision: 'Our Vision', ourMission: 'Our Mission',
+    visionText: 'To be the most trusted and innovative manpower solutions provider in the Middle East, connecting global talent with opportunities that drive economic growth.',
+    missionText: 'To provide ethical, transparent, and efficient recruitment services that empower businesses and transform lives through quality employment.',
+    experience: 'Experience', driversJob: 'Drivers', babysitting: 'Baby sitting', nursesJob: 'Nurses', cooks: 'Cook', domesticWorker: 'Domestic Worker', teacher: 'Teacher',
+    ourServicesTitle: 'Our Manpower Services', ourServicesDesc: 'Specialized recruitment solutions tailored to Qatar\'s diverse needs.',
+    viewCandidates: 'View Candidates',
   },
   ar: {
-    welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور',
+    welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
     home: 'الرئيسية', about: 'من نحن', services: 'خدماتنا',
-    hireNav: 'توظيف', applyNow: 'قدم الآن', adminPortal: 'بوابة المشرفين',
+    hireNav: 'توظيف', contactUs: 'اتصل بنا', adminPortal: 'بوابة المشرفين',
     certified: 'وكالة معتمدة ISO 9001:2015', heroTitle: 'البوابة إلى',
     heroTitleSpan: 'المواهب المتميزة', heroTitleEnd: 'في الدوحة.',
     heroDesc: 'نربط بخبرة الموارد البشرية العالمية برؤية قطر الطموحة.',
@@ -146,7 +154,7 @@ const translations = {
     faqQ4: 'كيف يطلب أصحاب العمل المرشحين؟', faqA4: 'عبر واتساب أو من خلال الموقع مباشرة.',
     footerText: 'وكالة التوظيف المرخصة الرائدة في قطر.',
     quickLinks: 'روابط سريعة', aboutDoha: 'عن وكالة الدوحة', clientServices: 'خدمات العملاء', browseCVs: 'تصفح السير الذاتية',
-    internal: 'داخلي', copyright: '© 2026 زود مانباور.',
+    internal: 'داخلي', copyright: '© 2026 زود مانباور للتوظيف.',
     privacyPolicy: 'سياسة الخصوصية', terms: 'شروط الخدمة',
     staffAuth: 'مصادقة الموظفين', restricted: 'دخول مقيد لمشرفي زود مان باور',
     username: 'اسم المستخدم', password: 'كلمة المرور', enterAdmin: 'أدخل اسم المستخدم', authorizedOnly: 'دخول مصرح به فقط',
@@ -161,8 +169,15 @@ const translations = {
     trafficSource: 'مصدر الزيارة', actionTaken: 'الإجراء المتخذ', timeLocal: 'الوقت (محلي)',
     confirmDelete: 'تأكيد الحذف', deleteMsg: 'هل أنت متأكد من حذف هذا المرشح؟',
     cancel: 'إلغاء', yesDelete: 'نعم، احذف', english: 'English', arabic: 'العربية',
-    houseMaids: 'خادمات منازل', drivers: 'سائقين', nurses: 'ممرضين', monthlyCleaners: 'عمال نظافة شهري',
-    ourEmployers: 'أصحاب العمل', employersTitle: 'أصحاب العمل الموثوقون', employersDesc: 'تعرف على شركائنا من أصحاب العمل الذين يثقون في زود مان باور لتلبية احتياجات التوظيف.',
+    houseMaids: 'خادمات منازل', drivers: 'سائقين', nurses: 'ممرضين', monthlyCleaners: 'عمال نظافة شهري', returnedHousemaids: 'خادمات عائدات',
+    ourTeam: 'فريقنا', teamTitle: 'تعرف على فريقنا', teamDesc: 'محترفون ملتزمون بالتميز في التوظيف.',
+    topManagementTitle: 'فريق الإدارة العليا لدينا', contact: 'اتصل', viewMore: 'اقرأ المزيد',
+    ourVision: 'رؤيتنا', ourMission: 'مهمتنا',
+    visionText: 'أن نكون مزود حلول القوى العاملة الأكثر ثقة وابتكاراً في الشرق الأوسط، نربط المواهب العالمية بالفرص التي تدفع النمو الاقتصادي.',
+    missionText: 'تقديم خدمات توظيف أخلاقية وشفافة وفعالة تمكّن الشركات وتحول حياة الأفراد من خلال فرص العمل الجيدة.',
+    experience: 'الخبرة', driversJob: 'سائقين', babysitting: 'رعاية أطفال', nursesJob: 'ممرضين', cooks: 'طهاة', domesticWorker: 'عمال منازل', teacher: 'معلمين',
+    ourServicesTitle: 'خدمات القوى العاملة لدينا', ourServicesDesc: 'حلول توظيف متخصصة مصممة خصيصاً لتلبية احتياجات قطر المتنوعة.',
+    viewCandidates: 'عرض المرشحين',
   }
 };
 
@@ -183,8 +198,10 @@ export default function Home() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [showHirePage, setShowHirePage] = useState(false);
-  const [showEmployersPage, setShowEmployersPage] = useState(false);
-  const [employers] = useState<Employer[]>(sampleEmployers);
+  const [showOurTeamPage, setShowOurTeamPage] = useState(false);
+  const [showAboutPage, setShowAboutPage] = useState(false);
+  const [showReturnedHousemaids, setShowReturnedHousemaids] = useState(false);
+  const [jobFilter, setJobFilter] = useState('');
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -202,6 +219,16 @@ export default function Home() {
   const salaryRef = useRef<HTMLInputElement>(null);
   const picRef = useRef<HTMLInputElement>(null);
   const cvRef = useRef<HTMLInputElement>(null);
+
+  // Our Manpower Services Jobs
+  const manpowerJobs = [
+    { key: 'Drivers', label: t.driversJob, icon: 'fa-solid fa-truck-fast', color: 'from-blue-500 to-blue-700' },
+    { key: 'Baby sitting', label: t.babysitting, icon: 'fa-solid fa-baby-carriage', color: 'from-pink-500 to-pink-700' },
+    { key: 'Nurses', label: t.nursesJob, icon: 'fa-solid fa-hospital-user', color: 'from-green-500 to-green-700' },
+    { key: 'Cook', label: t.cooks, icon: 'fa-solid fa-utensils', color: 'from-orange-500 to-orange-700' },
+    { key: 'Domestic worker', label: t.domesticWorker, icon: 'fa-solid fa-broom', color: 'from-purple-500 to-purple-700' },
+    { key: 'Teacher', label: t.teacher, icon: 'fa-solid fa-chalkboard-user', color: 'from-red-500 to-red-700' },
+  ];
 
   const fetchTalents = useCallback(async () => {
     setLoading(true);
@@ -302,8 +329,28 @@ export default function Home() {
   const handleQuickHire = (category: string) => {
     trackLead('Quick Hire', category);
     setShowHirePage(true);
-    setShowEmployersPage(false);
+    setShowOurTeamPage(false);
+    setShowAboutPage(false);
+    setShowReturnedHousemaids(false);
     setSearchQuery(category.toLowerCase());
+  };
+
+  const handleReturnedHousemaids = () => {
+    trackLead('Returned Housemaids', 'View');
+    setShowReturnedHousemaids(true);
+    setShowHirePage(false);
+    setShowOurTeamPage(false);
+    setShowAboutPage(false);
+    setJobFilter('Domestic worker');
+  };
+
+  const handleServiceJobClick = (jobKey: string) => {
+    trackLead('Service Job', jobKey);
+    setShowHirePage(true);
+    setShowOurTeamPage(false);
+    setShowAboutPage(false);
+    setShowReturnedHousemaids(false);
+    setSearchQuery(jobKey.toLowerCase());
   };
 
   const startChat = (lang: 'en' | 'ar') => {
@@ -400,8 +447,8 @@ User question: ${msg}`
     } catch (err) {
       console.error('Chatbot error:', err);
       let fallbackText = chatLanguageSelected === 'en'
-        ? "Sorry, I'm having trouble connecting to my AI brain right now. Please contact us directly on WhatsApp at +94729204485 or use the 'Apply Now' button. 😊"
-        : "عذراً، أواجه مشكلة في الاتصال بالذكاء الاصطناعي حالياً. يرجى الاتصال بنا مباشرة على واتساب +94729204485 أو استخدام زر 'قدم الآن'. 😊";
+        ? "Sorry, I'm having trouble connecting to my AI brain right now. Please contact us directly on WhatsApp at +94729204485 or use the 'Contact Us' button. 😊"
+        : "عذراً، أواجه مشكلة في الاتصال بالذكاء الاصطناعي حالياً. يرجى الاتصال بنا مباشرة على واتساب +94729204485 أو استخدام زر 'اتصل بنا'. 😊";
       if (detectedCountry) {
         fallbackText = chatLanguageSelected === 'en'
           ? `We have ${cvCards.length} candidate(s) from ${detectedCountry} in our database! You can browse them below or contact us on WhatsApp.`
@@ -442,18 +489,21 @@ User question: ${msg}`
   const filteredTalents = talents.filter((tal) => {
     const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
     const matchCountry = !countryFilter || tal.country === countryFilter;
-    return matchSearch && matchCountry;
+    const matchJob = !jobFilter || tal.job.toLowerCase().includes(jobFilter.toLowerCase());
+    return matchSearch && matchCountry && matchJob;
   });
 
   const featuredTalents = talents.slice(0, 2);
+  const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
+  const regularTeam = teamMembers.filter(member => !member.isTopManagement);
 
   if (isLoading) {
     return (
       <div className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">
         <div className="text-center">
-          <img src="/logo/logo.jpeg" alt="ZOD MANPOWER" className="w-24 h-24 rounded-full mx-auto mb-8 object-cover shadow-lg animate-pulse" onError={(e) => (e.currentTarget.style.display = 'none')} />
+          <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-24 h-24 rounded-full mx-auto mb-8 object-cover shadow-lg animate-pulse" onError={(e) => (e.currentTarget.style.display = 'none')} />
           <h1 className="text-4xl md:text-5xl font-bold text-[#002F66] mb-4 animate-bounce">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-8">{language === 'en' ? 'ZOD MANPOWER' : 'زود مان باور'}</p>
+          <p className="text-xl md:text-2xl text-gray-600 mb-8">{t.brandLoading}</p>
           <div className="flex gap-4 justify-center">
             <button onClick={() => setLanguage('en')} className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${language === 'en' ? 'bg-[#002F66] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>English</button>
             <button onClick={() => setLanguage('ar')} className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${language === 'ar' ? 'bg-[#002F66] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>العربية</button>
@@ -466,6 +516,7 @@ User question: ${msg}`
 
   return (
     <>
+      {/* WhatsApp Chat Button */}
       <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-3">
         {chatOpen && (
           <div className="w-80 sm:w-96 bg-white rounded-[2rem] shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '520px' }}>
@@ -537,10 +588,11 @@ User question: ${msg}`
           </div>
         )}
         <button onClick={() => setChatOpen(!chatOpen)} className="w-14 h-14 bg-[#002F66] text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-[#002060] active:scale-95">
-          {chatOpen ? <i className="fa-solid fa-xmark text-xl"></i> : <i className="fa-solid fa-robot text-xl"></i>}
+          {chatOpen ? <i className="fa-solid fa-xmark text-xl"></i> : <i className="fa-regular fa-message text-xl"></i>}
         </button>
       </div>
 
+      {/* Admin Login Modal */}
       {loginModalOpen && (
         <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center backdrop-blur-sm">
           <div className="bg-white p-10 rounded-[2.5rem] w-full max-w-md shadow-2xl relative border border-gray-100">
@@ -559,6 +611,7 @@ User question: ${msg}`
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
         <div className="fixed inset-0 bg-black/70 z-[150] flex items-center justify-center backdrop-blur-sm">
           <div className="bg-white p-8 rounded-2xl max-w-md w-full shadow-2xl">
@@ -577,73 +630,177 @@ User question: ${msg}`
 
       {!adminActive && (
         <div className="public-section">
+          {/* Navigation Bar */}
           <nav className="fixed w-full z-50 glass-nav">
             <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-              <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); window.scrollTo(0, 0); }}>
-                <img src="/logo/logo.jpeg" alt="ZOD MANPOWER Logo" className="w-10 h-10 rounded-xl object-cover shadow-lg transition-transform duration-300 group-hover:scale-110" />
-                <div className="text-xl font-extrabold tracking-tighter uppercase">ZOD<span className="text-[#002F66]"> MANPOWER</span></div>
+              <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); window.scrollTo(0, 0); }}>
+                <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-12 h-12 rounded-xl object-cover shadow-lg transition-transform duration-300 group-hover:scale-110" />
+                <div className="text-2xl font-extrabold tracking-tighter uppercase">ZOD<span className="text-[#002F66]"> MANPOWER RECRUITMENT</span></div>
               </div>
               <div className="hidden lg:flex items-center space-x-8 font-semibold text-xs uppercase tracking-widest">
-                <a href="#home" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.home}</a>
-                <a href="#about" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.about}</a>
-                <a href="#services" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.services}</a>
-                <button onClick={() => { setShowEmployersPage(true); setShowHirePage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.ourEmployers}</button>
-                <button onClick={() => { setShowHirePage(true); setShowEmployersPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.hireNav}</button>
-                <a href="https://wa.me/94729204485" onClick={() => trackLead('Nav Apply', 'Global Apply')} target="_blank" className="bg-[#002F66] text-white px-6 py-2.5 rounded-full shadow-md hover:bg-[#002060] transition-all hover:scale-105 active:scale-95">{t.applyNow}</a>
+                <a href="#home" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.home}</a>
+                <a href="#about" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.about}</a>
+                <a href="#services" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.services}</a>
+                <button onClick={() => { setShowOurTeamPage(true); setShowHirePage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.ourTeam}</button>
+                <button onClick={() => { setShowHirePage(true); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.hireNav}</button>
+                <a href="https://wa.me/94729204485" onClick={() => trackLead('Nav Apply', 'Global Apply')} target="_blank" className="bg-[#002F66] text-white px-6 py-2.5 rounded-full shadow-md hover:bg-[#002060] transition-all hover:scale-105 active:scale-95">{t.contactUs}</a>
                 <button onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')} className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-gray-100 text-[#002F66] hover:bg-gray-200 transition-all"><i className="fa-solid fa-globe text-[10px]"></i><span>{language === 'en' ? 'العربية' : 'English'}</span></button>
               </div>
               <button className="lg:hidden text-2xl text-[#002F66]" onClick={() => setSidebarOpen(true)}><i className="fa-solid fa-bars-staggered"></i></button>
             </div>
           </nav>
 
+          {/* Mobile Sidebar */}
           <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`}>
             <div className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fa-solid fa-xmark text-[#002F66]"></i></div>
             <div className="sidebar-nav mt-8">
-              <a href="#home" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.home}</a>
-              <a href="#about" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.about}</a>
-              <a href="#services" onClick={() => { setShowHirePage(false); setShowEmployersPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.services}</a>
-              <button onClick={() => { setShowEmployersPage(true); setShowHirePage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.ourEmployers}</button>
-              <button onClick={() => { setShowHirePage(true); setShowEmployersPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.hireNav}</button>
-              <a href="https://wa.me/94729204485" onClick={() => { trackLead('Mobile Nav Apply', 'Global Apply'); setSidebarOpen(false); }} target="_blank" className="sidebar-apply" style={{ backgroundColor: '#002F66' }}>{t.applyNow}</a>
+              <a href="#home" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.home}</a>
+              <a href="#about" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.about}</a>
+              <a href="#services" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.services}</a>
+              <button onClick={() => { setShowOurTeamPage(true); setShowHirePage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.ourTeam}</button>
+              <button onClick={() => { setShowHirePage(true); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.hireNav}</button>
+              <a href="https://wa.me/94729204485" onClick={() => { trackLead('Mobile Nav Apply', 'Global Apply'); setSidebarOpen(false); }} target="_blank" className="sidebar-apply" style={{ backgroundColor: '#002F66' }}>{t.contactUs}</a>
               <button onClick={() => { setLanguage(language === 'en' ? 'ar' : 'en'); setSidebarOpen(false); }} className="mt-4 w-full py-2 bg-gray-100 rounded-full text-sm font-bold text-[#002F66] hover:bg-gray-200 transition-all flex items-center justify-center gap-2"><i className="fa-solid fa-globe text-xs"></i>{language === 'en' ? 'العربية' : 'English'}</button>
             </div>
           </div>
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
-          {showEmployersPage ? (
+          {/* Discounts Banner */}
+          <div className="pt-28 pb-4 px-6 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex flex-wrap justify-center gap-4 items-center">
+                <div className="bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold animate-pulse">🔥 LIMITED OFFER</div>
+                <div className="flex flex-wrap gap-3">
+                  <span className="bg-white px-4 py-2 rounded-full text-sm font-semibold text-gray-700 shadow-sm">🎉 20% OFF on First Placement</span>
+                  <span className="bg-white px-4 py-2 rounded-full text-sm font-semibold text-gray-700 shadow-sm">✨ Free Visa Processing for Group Hiring (10+)</span>
+                  <span className="bg-white px-4 py-2 rounded-full text-sm font-semibold text-gray-700 shadow-sm">💎 15% Discount for Annual Contracts</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Our Team Page */}
+          {showOurTeamPage ? (
             <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
-                <button onClick={() => setShowEmployersPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> Back to Home</button>
-                <div className="text-center mb-12">
-                  <h3 className="text-4xl font-bold text-slate-900 mb-4">{t.employersTitle}</h3>
-                  <p className="text-gray-500 max-w-2xl mx-auto">{t.employersDesc}</p>
+                <button onClick={() => setShowOurTeamPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> Back to Home</button>
+                
+                <div className="text-center mb-12 reveal">
+                  <h3 className="text-4xl font-bold text-slate-900 mb-4">{t.teamTitle}</h3>
+                  <p className="text-gray-500 max-w-2xl mx-auto">{t.teamDesc}</p>
                 </div>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {employers.map((employer) => (
-                    <div key={employer.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100">
-                      <div className="relative h-48 bg-gradient-to-r from-[#002F66] to-[#0040aa] flex items-center justify-center">
-                        <img src={employer.photo} alt={employer.name} className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg" onError={(e) => (e.currentTarget.src = 'https://placehold.co/150x150?text=User')} />
-                      </div>
-                      <div className="p-6 text-center">
-                        <h4 className="text-xl font-bold text-slate-800 mb-1">{escapeHtml(employer.name)}</h4>
-                        <p className="text-[#002F66] font-semibold text-sm mb-3">{escapeHtml(employer.position)}</p>
-                        <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
-                          <i className="fa-solid fa-building"></i>
-                          <span>{escapeHtml(employer.company)}</span>
+
+                {/* Top Management Team Section */}
+                <div className="mb-16">
+                  <h4 className="text-2xl font-bold text-[#002F66] text-center mb-10">{t.topManagementTitle}</h4>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {topManagementTeam.map((member) => (
+                      <div key={member.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 group">
+                        <div className="relative h-64 bg-gradient-to-r from-[#002F66] to-[#0040aa] flex items-center justify-center">
+                          <img src={member.photo} alt={member.name} className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg transition-transform duration-300 group-hover:scale-105" onError={(e) => (e.currentTarget.src = 'https://placehold.co/150x150?text=User')} />
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                            <div className="text-white font-bold text-sm text-center">{member.position}</div>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-center gap-2 text-gray-500 text-sm mt-1">
-                          <i className="fa-solid fa-calendar"></i>
-                          <span>{employer.age} Years Old</span>
-                        </div>
-                        <div className="mt-6 pt-4 border-t border-gray-100">
-                          <a href={`https://wa.me/94729204485?text=I'm interested in working with ${encodeURIComponent(employer.company)}`} target="_blank" onClick={() => trackLead('Employer Contact', employer.name)} className="inline-flex items-center gap-2 bg-[#002F66] text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-[#002060] transition-all hover:scale-105">
-                            <i className="fa-brands fa-whatsapp"></i> Contact Company
+                        <div className="p-6 text-center">
+                          <h4 className="text-xl font-bold text-slate-800 mb-3">{escapeHtml(member.name)}</h4>
+                          <a href={`https://wa.me/${member.phone}`} target="_blank" onClick={() => trackLead('Team Contact', member.name)} className="inline-flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 transition-all hover:scale-105">
+                            <i className="fa-brands fa-whatsapp"></i> {t.contact} {member.name.split(' ')[0]}
                           </a>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
+
+                {/* Regular Team Members */}
+                <div>
+                  <h4 className="text-xl font-bold text-slate-700 text-center mb-8">Our Dedicated Team</h4>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {regularTeam.map((member) => (
+                      <div key={member.id} className="bg-white rounded-xl p-5 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex items-center gap-4 border border-gray-100">
+                        <img src={member.photo} alt={member.name} className="w-16 h-16 rounded-full object-cover border-2 border-[#002F66]/20" onError={(e) => (e.currentTarget.src = 'https://placehold.co/80x80?text=User')} />
+                        <div className="flex-1">
+                          <h5 className="font-bold text-slate-800">{escapeHtml(member.name)}</h5>
+                          <p className="text-[#002F66] text-xs font-semibold">{escapeHtml(member.position)}</p>
+                        </div>
+                        <a href={`https://wa.me/${member.phone}`} target="_blank" onClick={() => trackLead('Team Contact', member.name)} className="text-green-600 hover:text-green-700 transition-all hover:scale-110">
+                          <i className="fa-brands fa-whatsapp text-xl"></i>
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : showAboutPage ? (
+            <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
+              <div className="max-w-7xl mx-auto">
+                <button onClick={() => setShowAboutPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> Back to Home</button>
+                
+                <div className="bg-white rounded-3xl p-10 shadow-lg">
+                  <div className="grid md:grid-cols-2 gap-12">
+                    <div>
+                      <h3 className="text-3xl font-bold text-[#002F66] mb-6">{t.ourVision}</h3>
+                      <p className="text-gray-600 leading-relaxed text-lg">{t.visionText}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-3xl font-bold text-[#002F66] mb-6">{t.ourMission}</h3>
+                      <p className="text-gray-600 leading-relaxed text-lg">{t.missionText}</p>
+                    </div>
+                  </div>
+                  <div className="mt-12 pt-8 border-t border-gray-200">
+                    <h3 className="text-2xl font-bold text-slate-800 mb-4">Our Journey</h3>
+                    <p className="text-gray-500 leading-relaxed">
+                      Founded in 2010, ZOD MANPOWER RECRUITMENT has grown to become one of Qatar's most trusted manpower agencies. 
+                      With over 12 years of experience in the Doha market, we have successfully placed thousands of skilled professionals 
+                      across various industries including hospitality, construction, healthcare, and domestic services. Our commitment to 
+                      ethical recruitment and compliance with Qatar Labor Laws has earned us the trust of both employers and candidates alike.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : showReturnedHousemaids ? (
+            <div className="min-h-screen pt-28 pb-20 px-6 bg-gray-50">
+              <div className="max-w-7xl mx-auto">
+                <button onClick={() => setShowReturnedHousemaids(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> Back to Home</button>
+                
+                <div className="text-center mb-10">
+                  <h3 className="text-4xl font-bold text-slate-900 mb-2">Returned Housemaids</h3>
+                  <p className="text-gray-500">Experienced housemaids returning from overseas with proven track records</p>
+                </div>
+
+                {loading ? (
+                  <div className="grid md:grid-cols-3 gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-8 rounded-[2.5rem] border animate-pulse"><div className="w-20 h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
+                ) : filteredTalents.length === 0 ? (
+                  <div className="text-center py-24 text-gray-400"><i className="fa-solid fa-user-slash text-5xl mb-4 block"></i><p className="font-bold">No returned housemaids found at the moment. Please check back later.</p></div>
+                ) : (
+                  <div className="grid md:grid-cols-3 gap-8">
+                    {filteredTalents.map((talent) => (
+                      <div key={talent.id} className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
+                        <div className="flex justify-between items-start mb-6">
+                          <img src={talent.pic} className="w-20 h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
+                          <span className="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
+                        </div>
+                        <div className="flex-grow">
+                          <h4 className="font-bold text-slate-800 text-xl leading-tight">{escapeHtml(talent.name)}</h4>
+                          <p className="text-[#002F66] font-bold text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
+                          <div className="mt-6 pt-6 border-t border-gray-100 space-y-3 mb-8">
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-briefcase w-5 text-[#002F66]"></i><span>5+ Years Experience</span></div>
+                          </div>
+                        </div>
+                        <div className="flex gap-3 mt-auto">
+                          <a href={talent.cv} target="_blank" onClick={() => trackLead('Returned CV', talent.name)} className="flex-1 py-4 bg-gray-100 text-center rounded-xl font-bold text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
+                          <a href={`https://wa.me/94729204485?text=Interested in returned housemaid ${encodeURIComponent(talent.name)}`} onClick={() => trackLead('Returned Hire', talent.name)} target="_blank" className="flex-1 py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ) : showHirePage ? (
@@ -683,6 +840,7 @@ User question: ${msg}`
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-5 text-[#002F66]"></i><span>{t.experience || '2-5'} Years Exp</span></div>
                           </div>
                         </div>
                         <div className="flex gap-3 mt-auto">
@@ -697,6 +855,7 @@ User question: ${msg}`
             </div>
           ) : (
             <>
+              {/* Hero Section */}
               <section id="home" className="relative pt-48 pb-32 px-6 qatar-gradient text-white overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center relative z-10">
@@ -705,34 +864,27 @@ User question: ${msg}`
                     <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
                     <p className="text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
                     
+                    {/* Quick Action Buttons */}
                     <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                      <button 
-                        onClick={() => handleQuickHire('House Maids')}
-                        className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]"
-                      >
+                      <button onClick={() => handleQuickHire('House Maids')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-2 text-sm">🏠 {t.houseMaids}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button 
-                        onClick={() => handleQuickHire('Drivers')}
-                        className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]"
-                      >
+                      <button onClick={() => handleQuickHire('Drivers')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-2 text-sm">🚗 {t.drivers}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button 
-                        onClick={() => handleQuickHire('Nurses')}
-                        className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]"
-                      >
+                      <button onClick={() => handleQuickHire('Nurses')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-2 text-sm">🏥 {t.nurses}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button 
-                        onClick={() => handleQuickHire('Monthly Cleaners')}
-                        className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]"
-                      >
+                      <button onClick={() => handleQuickHire('Monthly Cleaners')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-2 text-sm">🧹 {t.monthlyCleaners}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                      </button>
+                      <button onClick={handleReturnedHousemaids} className="group relative overflow-hidden bg-amber-500/30 backdrop-blur-md border border-amber-400/50 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-amber-500">
+                        <span className="relative z-10 flex items-center gap-2 text-sm">🔄 {t.returnedHousemaids}</span>
+                        <div className="absolute inset-0 bg-amber-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
                     </div>
                   </div>
@@ -743,9 +895,10 @@ User question: ${msg}`
                 </div>
               </section>
 
+              {/* Stats Section */}
               <section className="py-16 bg-white border-b reveal">
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-10">
-                  {[{ num: '9.2K', label: t.successfulPlacements }, { num: '1.8+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '98.2%', label: t.complianceRate }].map((s, i) => (
+                  {[{ num: '9.2K', label: t.successfulPlacements }, { num: '1.8K+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '98.2%', label: t.complianceRate }].map((s, i) => (
                     <div key={i} className="flex items-center space-x-4 border-r border-gray-100 last:border-0 hover:translate-x-2 transition-all duration-300 group">
                       <div className="text-4xl text-[#002F66] font-black group-hover:scale-110 transition-transform">{s.num}</div>
                       <div className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">{s.label}</div>
@@ -754,7 +907,27 @@ User question: ${msg}`
                 </div>
               </section>
 
-              <section className="py-16 bg-gray-50 px-6 reveal">
+              {/* Manpower Services Section - 6 Jobs */}
+              <section className="py-20 px-6 bg-gray-50 reveal">
+                <div className="max-w-7xl mx-auto text-center mb-12">
+                  <h2 className="text-3xl font-bold text-slate-900 mb-4">{t.ourServicesTitle}</h2>
+                  <p className="text-gray-500 max-w-2xl mx-auto">{t.ourServicesDesc}</p>
+                </div>
+                <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {manpowerJobs.map((job, idx) => (
+                    <div key={idx} onClick={() => handleServiceJobClick(job.key)} className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group border border-gray-100">
+                      <div className={`w-16 h-16 bg-gradient-to-r ${job.color} rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-md`}>
+                        <i className={`${job.icon} text-white text-2xl`}></i>
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-800 mb-2">{job.label}</h3>
+                      <p className="text-gray-400 text-sm">View available candidates →</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Featured Candidates Section */}
+              <section className="py-16 bg-white px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-8">
                     <h3 className="text-2xl font-bold text-slate-900">{t.featuredCandidates}</h3>
@@ -770,6 +943,7 @@ User question: ${msg}`
                           <div className="flex-1 min-w-0">
                             <div className="font-bold text-slate-800 text-base truncate">{escapeHtml(talent.name)}</div>
                             <div className="text-[#002F66] font-bold text-[11px] uppercase tracking-widest">{escapeHtml(talent.job)} · {escapeHtml(talent.country)}</div>
+                            <div className="text-[10px] text-gray-400 mt-1">Experience: 3-5 Years</div>
                           </div>
                           <div className="flex gap-3 items-center shrink-0">
                             <span className="text-xs font-bold text-gray-500 hidden sm:block">{talent.salary || 0} QAR</span>
@@ -782,7 +956,8 @@ User question: ${msg}`
                 </div>
               </section>
 
-              <section id="about" className="py-24 px-6 bg-white reveal">
+              {/* Our Legacy Section with View More Button */}
+              <section id="about" className="py-24 px-6 bg-gray-50 reveal">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
                   <div className="relative group">
                     <div className="aspect-square bg-gray-200 rounded-[4rem] overflow-hidden shadow-inner"><img src="https://raw.githubusercontent.com/AshiLara2007/ZOD-Photos/main/ZOD.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="About" /></div>
@@ -793,15 +968,19 @@ User question: ${msg}`
                     <h3 className="text-4xl font-bold text-slate-900 leading-tight">{t.aboutTitle}</h3>
                     <p className="text-gray-500 leading-relaxed">{t.aboutDesc}</p>
                     <ul className="space-y-4">{[t.personalizedMatching, t.directLiaison, t.multiIndustry].map((item, i) => (<li key={i} className="flex items-center space-x-3 font-bold text-sm text-slate-700 group cursor-pointer"><i className="fa-solid fa-check-circle text-[#002F66] transition-transform group-hover:scale-110"></i><span className="group-hover:translate-x-1 transition-transform">{item}</span></li>))}</ul>
+                    <button onClick={() => setShowAboutPage(true)} className="inline-flex items-center gap-2 bg-[#002F66] text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-[#002060] transition-all hover:scale-105 shadow-md">
+                      {t.viewMore} <i className="fa-solid fa-arrow-right"></i>
+                    </button>
                   </div>
                 </div>
               </section>
 
-              <section id="services" className="py-24 px-6 bg-gray-50 reveal">
+              {/* Services/Expertise Section */}
+              <section id="services" className="py-24 px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto text-center mb-20"><h2 className="text-sm font-bold text-red-800 uppercase tracking-[0.3em] mb-4">{t.ourExpertise}</h2><h3 className="text-4xl font-bold text-slate-900">{t.comprehensiveSolutions}</h3></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
                   {[{ icon: 'passport', title: t.visaTitle, desc: t.visaDesc }, { icon: 'users-gear', title: t.techTitle, desc: t.techDesc }, { icon: 'city', title: t.projectsTitle, desc: t.projectsDesc }].map((s, i) => (
-                    <div key={i} className="bg-white p-10 rounded-[3rem] shadow-sm hover:shadow-xl transition-all duration-500 group hover:-translate-y-3 border border-gray-50 cursor-pointer">
+                    <div key={i} className="bg-gray-50 p-10 rounded-[3rem] shadow-sm hover:shadow-xl transition-all duration-500 group hover:-translate-y-3 border border-gray-100 cursor-pointer">
                       <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-[#002F66] group-hover:text-white transition-all duration-500 group-hover:rotate-6"><i className={`fa-solid fa-${s.icon} text-2xl`}></i></div>
                       <h4 className="text-xl font-bold mb-4 text-slate-900 group-hover:text-[#002F66] transition-colors">{s.title}</h4>
                       <p className="text-gray-500 text-sm leading-relaxed">{s.desc}</p>
@@ -809,13 +988,52 @@ User question: ${msg}`
                   ))}
                 </div>
               </section>
-              
-              <section className="py-24 bg-white px-6 reveal">
+
+              {/* Location / Google Maps Section */}
+              <section className="py-16 px-6 bg-gray-50 reveal">
+                <div className="max-w-7xl mx-auto">
+                  <div className="text-center mb-8">
+                    <h3 className="text-2xl font-bold text-slate-900 mb-2">Our Location</h3>
+                    <p className="text-gray-500">ZOD MANPOWER RECRUITMENT, Doha, Qatar</p>
+                  </div>
+                  <div className="w-full h-[400px] rounded-2xl overflow-hidden shadow-xl border-4 border-white">
+                    <iframe 
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d115105.20279075674!2d51.43141955744967!3d25.301366678710125!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e45c5344cc6cd77%3A0x8e2c6f0b3d8b9b9b!2sDoha%2C%20Qatar!5e0!3m2!1sen!2slk!4v1712345678901!5m2!1sen!2slk" 
+                      width="100%" 
+                      height="100%" 
+                      style={{ border: 0 }} 
+                      allowFullScreen 
+                      loading="lazy" 
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="ZOD MANPOWER RECRUITMENT Location"
+                    ></iframe>
+                  </div>
+                </div>
+              </section>
+
+              {/* Testimonials Section */}
+              <section className="py-20 bg-white px-6 reveal">
+                <div className="max-w-7xl mx-auto">
+                  <h3 className="text-3xl font-bold text-center mb-12">What Our Clients Say</h3>
+                  <div className="grid md:grid-cols-3 gap-8">
+                    {[{ text: t.testimonial1, author: t.author1 }, { text: t.testimonial2, author: t.author2 }, { text: t.testimonial3, author: t.author3 }].map((tst, i) => (
+                      <div key={i} className="bg-gray-50 p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-2">
+                        <i className="fa-solid fa-quote-left text-3xl text-[#002F66]/20 mb-4 block"></i>
+                        <p className="text-gray-600 text-sm leading-relaxed mb-6">{tst.text}</p>
+                        <p className="font-bold text-slate-800 text-sm">{tst.author}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* FAQ Section */}
+              <section className="py-20 bg-gray-50 px-6 reveal">
                 <div className="max-w-5xl mx-auto">
                   <h3 className="text-3xl font-bold text-center mb-12">{t.faqTitle}</h3>
                   <div className="grid md:grid-cols-2 gap-6">
                     {[{ q: t.faqQ1, a: t.faqA1 }, { q: t.faqQ2, a: t.faqA2 }, { q: t.faqQ3, a: t.faqA3 }, { q: t.faqQ4, a: t.faqA4 }].map((faq, i) => (
-                      <div key={i} className="bg-gray-50 p-6 rounded-2xl border shadow-sm faq-item cursor-pointer transition-all duration-300 hover:shadow-md" onClick={(e) => { const parent = e.currentTarget; parent.classList.toggle('active'); const answer = parent.querySelector('.faq-answer') as HTMLElement; if (parent.classList.contains('active')) answer.style.maxHeight = answer.scrollHeight + 'px'; else answer.style.maxHeight = '0px'; }}>
+                      <div key={i} className="bg-white p-6 rounded-2xl border shadow-sm faq-item cursor-pointer transition-all duration-300 hover:shadow-md" onClick={(e) => { const parent = e.currentTarget; parent.classList.toggle('active'); const answer = parent.querySelector('.faq-answer') as HTMLElement; if (parent.classList.contains('active')) answer.style.maxHeight = answer.scrollHeight + 'px'; else answer.style.maxHeight = '0px'; }}>
                         <h5 className="font-bold text-sm flex justify-between items-center uppercase tracking-tight">{faq.q}<i className="fa-solid fa-plus text-xs transition-transform duration-300 ml-2 shrink-0"></i></h5>
                         <div className="faq-answer text-gray-500 text-sm leading-relaxed">{faq.a}</div>
                       </div>
@@ -824,9 +1042,10 @@ User question: ${msg}`
                 </div>
               </section>
 
-              <footer className="py-24 bg-slate-900 text-white px-6">
+              {/* Footer */}
+              <footer className="py-20 bg-slate-900 text-white px-6">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 border-b border-white/5 pb-16">
-                  <div className="col-span-2"><div className="text-2xl font-black uppercase mb-6 tracking-tighter">ZOD<span className="text-[#002F66]"> MANPOWER</span></div><p className="text-slate-500 text-sm leading-relaxed max-w-sm mb-6">{t.footerText}</p><div className="flex space-x-4"><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-facebook-f"></i></a><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-linkedin-in"></i></a></div></div>
+                  <div className="col-span-2"><div className="text-2xl font-black uppercase mb-6 tracking-tighter">ZOD<span className="text-[#002F66]"> MANPOWER RECRUITMENT</span></div><p className="text-slate-500 text-sm leading-relaxed max-w-sm mb-6">{t.footerText}</p><div className="flex space-x-4"><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-facebook-f"></i></a><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-linkedin-in"></i></a></div></div>
                   <div><h6 className="font-bold uppercase text-xs tracking-widest mb-6 text-slate-300">{t.quickLinks}</h6><ul className="space-y-4 text-xs text-slate-500 font-bold uppercase"><li><a href="#about" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.aboutDoha}</a></li><li><a href="#services" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.clientServices}</a></li><li><button onClick={() => setShowHirePage(true)} className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.browseCVs}</button></li></ul></div>
                   <div><h6 className="font-bold uppercase text-xs tracking-widest mb-6 text-slate-300">{t.internal}</h6><button onClick={() => setLoginModalOpen(true)} className="group flex items-center space-x-3 px-6 py-3 border border-white/10 rounded-2xl hover:bg-white hover:text-slate-900 transition-all duration-300 hover:scale-105"><i className="fa-solid fa-lock text-[10px] group-hover:rotate-12 transition-transform"></i><span className="text-[10px] font-bold uppercase tracking-widest">{t.adminPortal}</span></button></div>
                 </div>
@@ -837,6 +1056,7 @@ User question: ${msg}`
         </div>
       )}
 
+      {/* Admin Panel */}
       {adminActive && (
         <div className="admin-section min-h-screen bg-gray-50 pb-20">
           <nav className="bg-white border-b px-6 py-4 mb-10 sticky top-0 z-50">
@@ -849,7 +1069,7 @@ User question: ${msg}`
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
               <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{t.totalCandidates}</p><div className="text-4xl font-bold text-slate-800">{talents.length}</div></div>
               <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{t.webLeads}</p><div className="text-4xl font-bold text-indigo-600">{leads.length}</div></div>
-              <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{t.activeVacancies}</p><div className="text-4xl font-bold text-[#002F66]">4</div></div>
+              <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{t.activeVacancies}</p><div className="text-4xl font-bold text-[#002F66]">6</div></div>
               <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center justify-center"><button onClick={fetchTalents} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all duration-300 hover:scale-105"><i className="fa-solid fa-rotate-right mr-2"></i> {t.refresh}</button></div>
             </div>
             <div className="flex space-x-6 mb-8 border-b">
