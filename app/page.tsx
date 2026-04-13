@@ -40,6 +40,13 @@ interface ChatMessage {
   cvCards?: Talent[];
 }
 
+interface Toast {
+  id: number;
+  type: 'success' | 'error' | 'info' | 'warning';
+  message: string;
+  title?: string;
+}
+
 const jobOptions = [
   'Driver', 'Baby sitting', 'Nurse', 'Cook', 'Domestic Worker', 'Teacher'
 ];
@@ -77,29 +84,29 @@ const translations = {
     successfulPlacements: 'Successful Placements', corporateClients: 'Corporate Clients',
     responseTime: 'Candidate Response Time', complianceRate: 'Compliance Rate',
     ourLegacy: 'Our Legacy', aboutTitle: "Leading Doha's Recruitment Evolution for Over a Decade.",
-    aboutDesc: "ZOD Manpower is not just a recruitment firm; we are a strategic partner in Qatar's national growth. From the towering skyscrapers of Lusail to the bustling streets of Msheireb, our talent drives the nation forward.",
+    aboutDesc: "ZOD Manpower is not just a recruitment firm; we are a strategic partner in Qatar's national growth.",
     personalizedMatching: 'Personalized Candidate Matching', directLiaison: 'Direct Qatar Government Liaison',
     multiIndustry: 'Multi-Industry Expertise', ourExpertise: 'Our Expertise',
     comprehensiveSolutions: 'Comprehensive Recruitment Solutions',
-    visaTitle: 'Visa & Documentation', visaDesc: 'End-to-end handling of Qatar work permits, QID processing, and professional licensing for international talent.',
-    techTitle: 'Technical Screening', techDesc: "Rigorous multi-stage skill testing and background checks to ensure every candidate is ready for Doha's competitive market.",
-    projectsTitle: 'Lusail & Doha Projects', projectsDesc: 'Specialized large-scale staffing solutions for major national infrastructure, hospitality, and oil & gas sectors.',
+    visaTitle: 'Visa & Documentation', visaDesc: 'End-to-end handling of Qatar work permits, QID processing.',
+    techTitle: 'Technical Screening', techDesc: 'Rigorous multi-stage skill testing and background checks.',
+    projectsTitle: 'Lusail & Doha Projects', projectsDesc: 'Specialized large-scale staffing solutions.',
     applyViaWhatsapp: 'APPLY VIA WHATSAPP',
-    hireTitle: 'Hire Top Talent Instantly', hireDesc: 'Employers can browse our pre-vetted candidates and request CVs directly.',
+    hireTitle: 'Hire Top Talent Instantly', hireDesc: 'Employers can browse our pre-vetted candidates.',
     searchPlaceholder: 'Search Skill (e.g. Driver, Nurse)...', refresh: 'Refresh', ready: 'Ready', viewCV: 'View CV', hireBtn: 'Hire',
     allCountries: 'All Countries', featuredCandidates: 'Featured Candidates', viewAllCandidates: 'View All Candidates →',
-    testimonial1: '"ZOD Manpower found us 50+ staff for our luxury hotel in Lusail within 30 days. Their document processing is unmatched in Qatar."',
+    testimonial1: '"ZOD Manpower found us 50+ staff for our luxury hotel."',
     author1: '— HR Director, Doha Regency',
-    testimonial2: '"I came from Sri Lanka through ZOD and now work in a top company. They were honest and helped with everything."',
+    testimonial2: '"I came from Sri Lanka through ZOD and now work in a top company."',
     author2: '— Mohamed R., Office Admin',
-    testimonial3: '"Professional, reliable and very transparent. The best manpower agency I have worked with in the Middle East."',
+    testimonial3: '"Professional, reliable and very transparent."',
     author3: '— Sarah K., Hospitality Manager',
     faqTitle: 'Recruitment FAQ',
-    faqQ1: 'What is the typical visa processing time?', faqA1: 'Standard processing takes 15-45 business days depending on documentation, medicals, and embassy approvals.',
-    faqQ2: 'Are there any upfront fees for candidates?', faqA2: 'No. We strictly follow Qatar Labor Laws and Ethical Recruitment standards. Candidates should not pay for jobs.',
-    faqQ3: 'What industries do you specialize in?', faqA3: 'We specialize in hospitality, construction, healthcare, domestic services, security, retail, and oil & gas sectors across Qatar.',
-    faqQ4: 'How do employers request candidates?', faqA4: 'Employers can browse our pre-vetted talent on this website and contact us directly via WhatsApp to request CVs or arrange interviews.',
-    footerText: "Qatar's leading licensed manpower recruitment agency. Connecting global talent to the heart of the Middle East.",
+    faqQ1: 'What is the typical visa processing time?', faqA1: 'Standard processing takes 15-45 business days.',
+    faqQ2: 'Are there any upfront fees for candidates?', faqA2: 'No. We follow Qatar Labor Laws.',
+    faqQ3: 'What industries do you specialize in?', faqA3: 'Hospitality, construction, healthcare, domestic services.',
+    faqQ4: 'How do employers request candidates?', faqA4: 'Contact us directly via WhatsApp.',
+    footerText: "Qatar's leading licensed manpower recruitment agency.",
     quickLinks: 'Quick Links', aboutDoha: 'About Doha Agency', clientServices: 'Client Services', browseCVs: 'Browse CVs',
     internal: 'Internal', copyright: '© 2026 ZOD MANPOWER RECRUITMENT.',
     privacyPolicy: 'Privacy Policy', terms: 'Terms of Service',
@@ -113,21 +120,23 @@ const translations = {
     candidateDetails: 'Candidate Details', position: 'Position', salary: 'Salary', actions: 'Actions',
     realtimeLogs: 'Real-time Activity Logs', clearLogs: 'Clear All Logs',
     trafficSource: 'Traffic Source', actionTaken: 'Action Taken', timeLocal: 'Time (Local)',
-    confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate? This action cannot be undone.',
+    confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate?',
     cancel: 'Cancel', yesDelete: 'Yes, Delete', english: 'English', arabic: 'العربية',
     houseMaids: 'House Maids', drivers: 'Drivers', nurses: 'Nurses', monthlyCleaners: 'Monthly Cleaners', returnedHousemaids: 'Returned Housemaids',
-    ourTeam: 'Our Team', teamTitle: 'Meet Our Team', teamDesc: 'Dedicated professionals committed to excellence in recruitment.',
+    ourTeam: 'Our Team', teamTitle: 'Meet Our Team', teamDesc: 'Dedicated professionals committed to excellence.',
     topManagementTitle: 'Our Top Management Team', contact: 'Contact', viewMore: 'View More',
     ourVision: 'Our Vision', ourMission: 'Our Mission',
-    visionText: 'To be the most trusted and innovative manpower solutions provider in the Middle East, connecting global talent with opportunities that drive economic growth.',
-    missionText: 'To provide ethical, transparent, and efficient recruitment services that empower businesses and transform lives through quality employment.',
+    visionText: 'To be the most trusted manpower solutions provider in the Middle East.',
+    missionText: 'To provide ethical, transparent, and efficient recruitment services.',
     experience: 'Experience', driversJob: 'Drivers', babysitting: 'Baby sitting', nursesJob: 'Nurses', cooks: 'Cook', domesticWorker: 'Domestic Worker', teacher: 'Teacher',
-    ourServicesTitle: 'Our Expertise', ourServicesDesc: 'Specialized recruitment solutions tailored to Qatar\'s diverse needs.',
+    ourServicesTitle: 'Our Expertise', ourServicesDesc: 'Specialized recruitment solutions.',
     viewCandidates: 'View Candidates',
     discount1: '20% OFF on First Placement', discount2: 'Free Visa Processing for Group Hiring (10+)', discount3: '15% Discount for Annual Contracts', discountOffer: '🔥 LIMITED OFFER',
     backToHome: 'Back to Home', maritalStatus: 'Marital Status', single: 'Single', married: 'Married', divorced: 'Divorced', widowed: 'Widowed',
     ourJourney: 'Our Journey', ourLocation: 'Our Location', whatClientsSay: 'What Our Clients Say',
     brandName: 'ZOD MANPOWER RECRUITMENT',
+    candidateAdded: 'Candidate Added Successfully!', candidateUpdated: 'Candidate Updated Successfully!', candidateDeleted: 'Candidate Deleted Successfully!',
+    errorOccurred: 'An error occurred', saving: 'Saving...', deleting: 'Deleting...',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
@@ -140,28 +149,28 @@ const translations = {
     successfulPlacements: 'تعيين ناجح', corporateClients: 'عميل من الشركات',
     responseTime: 'وقت الاستجابة للمرشح', complianceRate: 'معدل الامتثال',
     ourLegacy: 'إرثنا', aboutTitle: 'ريادة تطور التوظيف في الدوحة لأكثر من عقد.',
-    aboutDesc: 'زود مان باور ليست مجرد شركة توظيف؛ نحن شريك استراتيجي في النمو الوطني لقطر.',
+    aboutDesc: 'زود مان باور ليست مجرد شركة توظيف؛ نحن شريك استراتيجي.',
     personalizedMatching: 'مطابقة مرشحين مخصصة', directLiaison: 'اتصال مباشر مع حكومة قطر',
     multiIndustry: 'خبرة متعددة الصناعات', ourExpertise: 'خبراتنا',
     comprehensiveSolutions: 'حلول توظيف شاملة',
-    visaTitle: 'التأشيرات والوثائق', visaDesc: 'معالجة شاملة لتصاريح العمل القطرية ومعالجة QID.',
-    techTitle: 'الفحص التقني', techDesc: 'اختبارات مهارات متعددة لضمان جاهزية كل مرشح.',
+    visaTitle: 'التأشيرات والوثائق', visaDesc: 'معالجة شاملة لتصاريح العمل القطرية.',
+    techTitle: 'الفحص التقني', techDesc: 'اختبارات مهارات متعددة.',
     projectsTitle: 'مشاريع لوسيل والدوحة', projectsDesc: 'حلول توظيف واسعة النطاق.',
     applyViaWhatsapp: 'قدم عبر واتساب',
-    hireTitle: 'وظف أفضل المواهب فوراً', hireDesc: 'تصفح مرشحينا المعتمدين مسبقاً.',
+    hireTitle: 'وظف أفضل المواهب فوراً', hireDesc: 'تصفح مرشحينا المعتمدين.',
     searchPlaceholder: 'ابحث عن مهارة...', refresh: 'تحديث', ready: 'جاهز', viewCV: 'عرض السيرة', hireBtn: 'توظيف',
     allCountries: 'كل الدول', featuredCandidates: 'المرشحون المميزون', viewAllCandidates: 'عرض كل المرشحين ←',
-    testimonial1: '"وجدت لنا زود مان باور أكثر من 50 موظفاً خلال 30 يوماً."',
-    author1: '— مدير الموارد البشرية، فندق الدوحة ريجنسي',
+    testimonial1: '"وجدت لنا زود مان باور أكثر من 50 موظفاً."',
+    author1: '— مدير الموارد البشرية',
     testimonial2: '"جئت من سريلانكا عبر زود والآن أعمل في شركة كبرى."',
-    author2: '— محمد ر.، مساعد إداري',
-    testimonial3: '"محترفون وموثوقون وشفافون جداً."',
-    author3: '— سارة ك.، مديرة الضيافة',
+    author2: '— محمد ر.',
+    testimonial3: '"محترفون وموثوقون وشفافون."',
+    author3: '— سارة ك.',
     faqTitle: 'الأسئلة الشائعة',
     faqQ1: 'ما وقت معالجة التأشيرة؟', faqA1: 'من 15 إلى 45 يوم عمل.',
     faqQ2: 'هل هناك رسوم للمرشحين؟', faqA2: 'لا. لا ينبغي للمرشحين دفع أي رسوم.',
-    faqQ3: 'ما القطاعات التي تتخصصون فيها؟', faqA3: 'الضيافة والبناء والرعاية الصحية والنفط والغاز.',
-    faqQ4: 'كيف يطلب أصحاب العمل المرشحين؟', faqA4: 'عبر واتساب أو من خلال الموقع مباشرة.',
+    faqQ3: 'ما القطاعات التي تتخصصون فيها؟', faqA3: 'الضيافة والبناء والرعاية الصحية.',
+    faqQ4: 'كيف يطلب أصحاب العمل المرشحين؟', faqA4: 'عبر واتساب مباشرة.',
     footerText: 'وكالة التوظيف المرخصة الرائدة في قطر.',
     quickLinks: 'روابط سريعة', aboutDoha: 'عن وكالة الدوحة', clientServices: 'خدمات العملاء', browseCVs: 'تصفح السير الذاتية',
     internal: 'داخلي', copyright: '© 2026 زود مانباور للتوظيف.',
@@ -173,26 +182,71 @@ const translations = {
     inventoryManagement: 'إدارة المخزون', visitorLogs: 'سجلات الزوار',
     newCandidate: 'مرشح جديد', editCandidate: 'تعديل:', fullName: 'الاسم الكامل', age: 'العمر', dob: 'تاريخ الميلاد', gender: 'الجنس',
     jobDesignation: 'المسمى الوظيفي', country: 'البلد', religion: 'الدين', salaryQAR: 'الراتب (ريال قطري)',
-    photo: 'الصورة', cvUpload: 'السيرة الذاتية (PDF/صورة)', saveRecord: 'حفظ بيانات المرشح',
+    photo: 'الصورة', cvUpload: 'السيرة الذاتية', saveRecord: 'حفظ بيانات المرشح',
     candidateDetails: 'تفاصيل المرشح', position: 'الوظيفة', salary: 'الراتب', actions: 'إجراءات',
-    realtimeLogs: 'سجلات النشاط الفورية', clearLogs: 'مسح جميع السجلات',
-    trafficSource: 'مصدر الزيارة', actionTaken: 'الإجراء المتخذ', timeLocal: 'الوقت (محلي)',
+    realtimeLogs: 'سجلات النشاط', clearLogs: 'مسح جميع السجلات',
+    trafficSource: 'مصدر الزيارة', actionTaken: 'الإجراء المتخذ', timeLocal: 'الوقت',
     confirmDelete: 'تأكيد الحذف', deleteMsg: 'هل أنت متأكد من حذف هذا المرشح؟',
     cancel: 'إلغاء', yesDelete: 'نعم، احذف', english: 'English', arabic: 'العربية',
     houseMaids: 'خادمات منازل', drivers: 'سائقين', nurses: 'ممرضين', monthlyCleaners: 'عمال نظافة شهري', returnedHousemaids: 'خادمات عائدات',
-    ourTeam: 'فريقنا', teamTitle: 'تعرف على فريقنا', teamDesc: 'محترفون ملتزمون بالتميز في التوظيف.',
-    topManagementTitle: 'فريق الإدارة العليا لدينا', contact: 'اتصل', viewMore: 'اقرأ المزيد',
+    ourTeam: 'فريقنا', teamTitle: 'تعرف على فريقنا', teamDesc: 'محترفون ملتزمون بالتميز.',
+    topManagementTitle: 'فريق الإدارة العليا', contact: 'اتصل', viewMore: 'اقرأ المزيد',
     ourVision: 'رؤيتنا', ourMission: 'مهمتنا',
-    visionText: 'أن نكون مزود حلول القوى العاملة الأكثر ثقة وابتكاراً في الشرق الأوسط، نربط المواهب العالمية بالفرص التي تدفع النمو الاقتصادي.',
-    missionText: 'تقديم خدمات توظيف أخلاقية وشفافة وفعالة تمكّن الشركات وتحول حياة الأفراد من خلال فرص العمل الجيدة.',
+    visionText: 'أن نكون مزود حلول القوى العاملة الأكثر ثقة.',
+    missionText: 'تقديم خدمات توظيف أخلاقية وشفافة.',
     experience: 'الخبرة', driversJob: 'سائقين', babysitting: 'رعاية أطفال', nursesJob: 'ممرضين', cooks: 'طهاة', domesticWorker: 'عمال منازل', teacher: 'معلمين',
-    ourServicesTitle: 'خبراتنا', ourServicesDesc: 'حلول توظيف متخصصة مصممة خصيصاً لتلبية احتياجات قطر المتنوعة.',
+    ourServicesTitle: 'خبراتنا', ourServicesDesc: 'حلول توظيف متخصصة.',
     viewCandidates: 'عرض المرشحين',
-    discount1: 'خصم 20% على أول تعيين', discount2: 'معالجة تأشيرة مجانية للتعيين الجماعي (10+)', discount3: 'خصم 15% على العقود السنوية', discountOffer: '🔥 عرض محدود',
+    discount1: 'خصم 20% على أول تعيين', discount2: 'معالجة تأشيرة مجانية', discount3: 'خصم 15% على العقود السنوية', discountOffer: '🔥 عرض محدود',
     backToHome: 'العودة إلى الرئيسية', maritalStatus: 'الحالة الاجتماعية', single: 'أعزب', married: 'متزوج', divorced: 'مطلق', widowed: 'أرمل',
     ourJourney: 'رحلتنا', ourLocation: 'موقعنا', whatClientsSay: 'ماذا يقول عملاؤنا',
     brandName: 'زود مان باور للتوظيف',
+    candidateAdded: 'تم إضافة المرشح بنجاح!', candidateUpdated: 'تم تحديث المرشح بنجاح!', candidateDeleted: 'تم حذف المرشح بنجاح!',
+    errorOccurred: 'حدث خطأ', saving: 'جاري الحفظ...', deleting: 'جاري الحذف...',
   }
+};
+
+// Toast Component
+const ToastNotification = ({ toast, onClose }: { toast: Toast; onClose: (id: number) => void }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => onClose(toast.id), 5000);
+    return () => clearTimeout(timer);
+  }, [toast.id, onClose]);
+
+  const getIcon = () => {
+    switch (toast.type) {
+      case 'success': return 'fa-circle-check';
+      case 'error': return 'fa-circle-exclamation';
+      case 'warning': return 'fa-triangle-exclamation';
+      default: return 'fa-circle-info';
+    }
+  };
+
+  const getBgColor = () => {
+    switch (toast.type) {
+      case 'success': return 'bg-gradient-to-r from-green-500 to-green-600';
+      case 'error': return 'bg-gradient-to-r from-red-500 to-red-600';
+      case 'warning': return 'bg-gradient-to-r from-amber-500 to-amber-600';
+      default: return 'bg-gradient-to-r from-blue-500 to-blue-600';
+    }
+  };
+
+  return (
+    <div className={`fixed top-20 right-4 z-[200] animate-slide-in-right ${toast.type === 'error' ? 'animate-shake' : ''}`}>
+      <div className={`${getBgColor()} text-white rounded-xl shadow-2xl p-4 min-w-[280px] max-w-md flex items-start gap-3 backdrop-blur-sm`}>
+        <div className="flex-shrink-0">
+          <i className={`fa-solid ${getIcon()} text-xl`}></i>
+        </div>
+        <div className="flex-1">
+          {toast.title && <h4 className="font-bold text-sm mb-1">{toast.title}</h4>}
+          <p className="text-sm opacity-90">{toast.message}</p>
+        </div>
+        <button onClick={() => onClose(toast.id)} className="flex-shrink-0 text-white/70 hover:text-white transition-colors">
+          <i className="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default function Home() {
@@ -217,6 +271,9 @@ export default function Home() {
   const [showReturnedHousemaids, setShowReturnedHousemaids] = useState(false);
   const [jobFilter, setJobFilter] = useState('');
   const [calculatedAge, setCalculatedAge] = useState<number | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -236,6 +293,16 @@ export default function Home() {
   const maritalStatusRef = useRef<HTMLSelectElement>(null);
   const picRef = useRef<HTMLInputElement>(null);
   const cvRef = useRef<HTMLInputElement>(null);
+
+  // Toast functions
+  const addToast = (type: Toast['type'], message: string, title?: string) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, type, message, title }]);
+  };
+
+  const removeToast = (id: number) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
 
   const calculateAge = (dob: string) => {
     if (!dob) return null;
@@ -262,10 +329,22 @@ export default function Home() {
       setTalents(data);
     } catch (err) {
       console.error('Fetch error', err);
+      addToast('error', t.errorOccurred, 'Network Error');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
+
+  // Live update polling - every 5 seconds when admin is active OR when on hire page
+  useEffect(() => {
+    if (!adminActive && !showHirePage && !showReturnedHousemaids) return;
+    
+    const interval = setInterval(() => {
+      fetchTalents();
+    }, 5000); // Poll every 5 seconds for live updates
+    
+    return () => clearInterval(interval);
+  }, [adminActive, showHirePage, showReturnedHousemaids, fetchTalents]);
 
   const loadLeads = () => {
     const stored = localStorage.getItem('zod_activity_leads');
@@ -282,7 +361,7 @@ export default function Home() {
   };
 
   const clearLeads = () => {
-    if (confirm(t.clearLogs)) { setLeads([]); localStorage.setItem('zod_activity_leads', '[]'); }
+    if (confirm(t.clearLogs)) { setLeads([]); localStorage.setItem('zod_activity_leads', '[]'); addToast('info', 'Logs cleared successfully'); }
   };
 
   const handleDiscountClick = (discountText: string) => {
@@ -290,6 +369,7 @@ export default function Home() {
     const message = `Hi! I'm interested in the offer: ${discountText}. Can you please provide more details?`;
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
     trackLead('Discount Banner', discountText);
+    addToast('info', `Redirecting to WhatsApp for ${discountText}`, 'Special Offer');
   };
 
   const handleHireClick = (talentName: string, source: string) => {
@@ -297,10 +377,12 @@ export default function Home() {
     const message = `Hi! I'm interested in hiring ${talentName}. Can you please provide more details?`;
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
     trackLead(source, `Hire: ${talentName}`);
+    addToast('success', `Inquiry sent for ${talentName}`, 'Application Started');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const formData = new FormData();
     if (editTalent) formData.append('id', editTalent.id);
     formData.append('name', nameRef.current!.value);
@@ -317,9 +399,17 @@ export default function Home() {
     if (cvRef.current?.files?.[0]) formData.append('tCv', cvRef.current.files[0]);
     try {
       const res = await fetch('/api/talents', { method: 'POST', body: formData });
-      if (res.ok) { resetForm(); await fetchTalents(); alert('Candidate saved successfully!'); }
-      else { const err = await res.json(); alert('Error: ' + (err.error || 'Unknown error')); }
-    } catch { alert('Network error.'); }
+      if (res.ok) { 
+        resetForm(); 
+        await fetchTalents(); 
+        addToast('success', editTalent ? t.candidateUpdated : t.candidateAdded, 'Success');
+      }
+      else { const err = await res.json(); addToast('error', err.error || t.errorOccurred, 'Error'); }
+    } catch { 
+      addToast('error', 'Network error. Please try again.', 'Connection Error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -351,16 +441,25 @@ export default function Home() {
     if (experienceRef.current) experienceRef.current.value = talent.experience || experienceOptions[0];
     if (maritalStatusRef.current) maritalStatusRef.current.value = talent.maritalStatus || maritalStatusOptions[0];
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    addToast('info', `Editing ${talent.name}`, 'Edit Mode');
   };
 
   const confirmDelete = (id: string) => { setDeleteTargetId(id); setDeleteModalOpen(true); };
 
   const performDelete = async () => {
     if (!deleteTargetId) return;
-    await fetch(`/api/talents/${deleteTargetId}`, { method: 'DELETE' });
-    await fetchTalents();
-    setDeleteModalOpen(false);
-    setDeleteTargetId(null);
+    setIsDeleting(true);
+    try {
+      await fetch(`/api/talents/${deleteTargetId}`, { method: 'DELETE' });
+      await fetchTalents();
+      addToast('success', t.candidateDeleted, 'Deleted');
+    } catch (err) {
+      addToast('error', t.errorOccurred, 'Delete Failed');
+    } finally {
+      setDeleteModalOpen(false);
+      setDeleteTargetId(null);
+      setIsDeleting(false);
+    }
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -370,7 +469,10 @@ export default function Home() {
     if (!u || !p) return;
     if (u.value === 'admin' && p.value === '1978') {
       setAdminActive(true); setLoginModalOpen(false); u.value = ''; p.value = '';
-    } else { alert('Invalid credentials. Use admin / 1978'); }
+      addToast('success', 'Welcome back, Admin!', 'Login Successful');
+    } else { 
+      addToast('error', 'Invalid credentials. Use admin / 1978', 'Access Denied');
+    }
   };
 
   const handleQuickHire = (category: string) => {
@@ -380,6 +482,7 @@ export default function Home() {
     setShowAboutPage(false);
     setShowReturnedHousemaids(false);
     setSearchQuery(category.toLowerCase());
+    addToast('info', `Browsing ${category} candidates`, 'Category Selected');
   };
 
   const handleReturnedHousemaids = () => {
@@ -389,6 +492,7 @@ export default function Home() {
     setShowOurTeamPage(false);
     setShowAboutPage(false);
     setJobFilter('Domestic Worker');
+    addToast('info', 'Viewing experienced returned housemaids', 'Experienced Candidates');
   };
 
   const startChat = (lang: 'en' | 'ar') => {
@@ -511,6 +615,10 @@ export default function Home() {
         .animate-float { animation: float 3s ease-in-out infinite; }
         @keyframes shimmer { 0% { transform: translateX(-100%) skewX(-12deg); } 100% { transform: translateX(200%) skewX(-12deg); } }
         .animate-shimmer { animation: shimmer 2s infinite; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .animate-slide-in-right { animation: slideInRight 0.3s ease-out; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
         .reveal.active { opacity: 1; transform: translateY(0); }
         .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05); }
@@ -529,7 +637,6 @@ export default function Home() {
         .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
         .faq-item.active .fa-plus { transform: rotate(45deg); }
         
-        /* Mobile Responsive Styles */
         @media (max-width: 768px) {
           .container-padding { padding-left: 1rem; padding-right: 1rem; }
           .text-responsive-hero { font-size: 2rem !important; }
@@ -544,6 +651,13 @@ export default function Home() {
           .grid-responsive-tablet { grid-template-columns: repeat(2, 1fr) !important; }
         }
       `}</style>
+
+      {/* Toast Notifications */}
+      <div className="fixed top-16 right-0 z-[200] space-y-3">
+        {toasts.map(toast => (
+          <ToastNotification key={toast.id} toast={toast} onClose={removeToast} />
+        ))}
+      </div>
 
       {/* WhatsApp Chat Button */}
       <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[100] flex flex-col items-end gap-3">
@@ -629,7 +743,10 @@ export default function Home() {
               <p className="text-xs md:text-sm text-gray-500 mb-5 md:mb-6">{t.deleteMsg}</p>
               <div className="flex gap-3 justify-center">
                 <button onClick={() => setDeleteModalOpen(false)} className="px-3 md:px-4 py-1.5 md:py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-all text-sm">{t.cancel}</button>
-                <button onClick={performDelete} className="px-3 md:px-4 py-1.5 md:py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all text-sm">{t.yesDelete}</button>
+                <button onClick={performDelete} disabled={isDeleting} className="px-3 md:px-4 py-1.5 md:py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all text-sm disabled:opacity-50">
+                  {isDeleting ? <i className="fa-solid fa-spinner fa-spin mr-1"></i> : null}
+                  {t.yesDelete}
+                </button>
               </div>
             </div>
           </div>
@@ -638,7 +755,7 @@ export default function Home() {
 
       {!adminActive && (
         <div className="public-section">
-          {/* Discount Banner - Larger Size */}
+          {/* Discount Banner */}
           <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-20 md:pt-24 pb-2 md:pb-3 px-4 md:px-6">
             <div className="max-w-7xl mx-auto">
               <div className="overflow-hidden whitespace-nowrap">
@@ -1118,7 +1235,10 @@ export default function Home() {
                     
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.cvUpload}</label><input ref={cvRef} type="file" accept=".pdf,image/*" className="text-[10px] md:text-xs file:mr-2 md:file:mr-4 file:py-1 md:file:py-2 file:px-2 md:file:px-4 file:rounded-full file:border-0 file:text-[8px] md:file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all" /></div>
                     
-                    <button type="submit" className="w-full py-3 md:py-4 bg-[#002F66] text-white rounded-lg md:rounded-xl font-bold uppercase text-[8px] md:text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105">{t.saveRecord}</button>
+                    <button type="submit" disabled={isSubmitting} className="w-full py-3 md:py-4 bg-[#002F66] text-white rounded-lg md:rounded-xl font-bold uppercase text-[8px] md:text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105 disabled:opacity-50">
+                      {isSubmitting ? <i className="fa-solid fa-spinner fa-spin mr-2"></i> : null}
+                      {t.saveRecord}
+                    </button>
                   </form>
                 </div>
                 <div className="lg:col-span-2 bg-white rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-sm overflow-x-auto">
