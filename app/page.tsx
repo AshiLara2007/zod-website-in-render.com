@@ -131,7 +131,7 @@ const translations = {
     experience: 'Experience', driversJob: 'Drivers', babysitting: 'Baby sitting', nursesJob: 'Nurses', cooks: 'Cook', domesticWorker: 'Domestic Worker', teacher: 'Teacher',
     ourServicesTitle: 'Our Expertise', ourServicesDesc: 'Specialized recruitment solutions.',
     viewCandidates: 'View Candidates',
-    discount1: '20% OFF on First Placement', discount2: 'Free Visa Processing for Group Hiring (10+)', discount3: '15% Discount for Annual Contracts', discountOffer: '🔥 LIMITED OFFER',
+    discount1: 'Welcome To ZOD MANPOWER', discount2: 'Offers Will Be Coming Soon', discount3: 'Doha, Qatar', discountOffer: '🔥 LIMITED OFFER',
     backToHome: 'Back to Home', maritalStatus: 'Marital Status', single: 'Single', married: 'Married', divorced: 'Divorced', widowed: 'Widowed',
     ourJourney: 'Our Journey', ourLocation: 'Our Location', whatClientsSay: 'What Our Clients Say',
     brandName: 'ZOD MANPOWER RECRUITMENT',
