@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../lib/supabaseClient';
 
-// In-memory storage for leads (ප්‍රොඩක්ෂන් එකේදී database table එකක් භාවිතා කරන්න)
-// Leads will be stored in a separate table called 'leads'
-// For now, using in-memory - but recommend creating a 'leads' table in Supabase
-
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const type = searchParams.get('type');
@@ -158,7 +154,7 @@ export async function DELETE(req: NextRequest) {
       const { error } = await supabaseAdmin
         .from('leads')
         .delete()
-        .neq('id', 0); // Delete all rows
+        .neq('id', 0);
 
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
