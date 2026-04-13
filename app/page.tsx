@@ -127,6 +127,7 @@ const translations = {
     discount1: '20% OFF on First Placement', discount2: 'Free Visa Processing for Group Hiring (10+)', discount3: '15% Discount for Annual Contracts', discountOffer: '🔥 LIMITED OFFER',
     backToHome: 'Back to Home', maritalStatus: 'Marital Status', single: 'Single', married: 'Married', divorced: 'Divorced', widowed: 'Widowed',
     ourJourney: 'Our Journey', ourLocation: 'Our Location', whatClientsSay: 'What Our Clients Say',
+    brandName: 'ZOD MANPOWER RECRUITMENT',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
@@ -190,6 +191,7 @@ const translations = {
     discount1: 'خصم 20% على أول تعيين', discount2: 'معالجة تأشيرة مجانية للتعيين الجماعي (10+)', discount3: 'خصم 15% على العقود السنوية', discountOffer: '🔥 عرض محدود',
     backToHome: 'العودة إلى الرئيسية', maritalStatus: 'الحالة الاجتماعية', single: 'أعزب', married: 'متزوج', divorced: 'مطلق', widowed: 'أرمل',
     ourJourney: 'رحلتنا', ourLocation: 'موقعنا', whatClientsSay: 'ماذا يقول عملاؤنا',
+    brandName: 'زود مان باور للتوظيف',
   }
 };
 
@@ -480,15 +482,15 @@ export default function Home() {
   if (isLoading) {
     return (
       <div dir={dir} className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">
-        <div className="text-center">
-          <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-24 h-24 rounded-full mx-auto mb-8 object-cover shadow-lg animate-pulse" onError={(e) => (e.currentTarget.style.display = 'none')} />
-          <h1 className="text-4xl md:text-5xl font-bold text-[#002F66] mb-4 animate-bounce">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-8">{t.brandLoading}</p>
-          <div className="flex gap-4 justify-center">
-            <button onClick={() => setLanguage('en')} className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${language === 'en' ? 'bg-[#002F66] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>English</button>
-            <button onClick={() => setLanguage('ar')} className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${language === 'ar' ? 'bg-[#002F66] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>العربية</button>
+        <div className="text-center px-4">
+          <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-6 md:mb-8 object-cover shadow-lg animate-pulse" onError={(e) => (e.currentTarget.style.display = 'none')} />
+          <h1 className="text-3xl md:text-5xl font-bold text-[#002F66] mb-3 md:mb-4 animate-bounce">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
+          <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8">{t.brandLoading}</p>
+          <div className="flex gap-3 md:gap-4 justify-center flex-wrap">
+            <button onClick={() => setLanguage('en')} className={`px-4 md:px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${language === 'en' ? 'bg-[#002F66] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>English</button>
+            <button onClick={() => setLanguage('ar')} className={`px-4 md:px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${language === 'ar' ? 'bg-[#002F66] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>العربية</button>
           </div>
-          <div className="mt-12 w-12 h-12 border-4 border-[#002F66] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="mt-8 md:mt-12 w-10 h-10 md:w-12 md:h-12 border-4 border-[#002F66] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     );
@@ -526,43 +528,58 @@ export default function Home() {
         .sidebar-overlay.active { opacity: 1; visibility: visible; }
         .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
         .faq-item.active .fa-plus { transform: rotate(45deg); }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+          .container-padding { padding-left: 1rem; padding-right: 1rem; }
+          .text-responsive-hero { font-size: 2rem !important; }
+          .text-responsive-title { font-size: 1.5rem !important; }
+          .grid-responsive { grid-template-columns: 1fr !important; gap: 1rem !important; }
+          .nav-text { font-size: 0.7rem !important; }
+          .discount-text { font-size: 0.75rem !important; }
+          .discount-padding { padding: 0.5rem 1rem !important; }
+        }
+        
+        @media (max-width: 1024px) and (min-width: 769px) {
+          .grid-responsive-tablet { grid-template-columns: repeat(2, 1fr) !important; }
+        }
       `}</style>
 
       {/* WhatsApp Chat Button */}
-      <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-3">
+      <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[100] flex flex-col items-end gap-3">
         {chatOpen && (
-          <div className="w-80 sm:w-96 bg-white rounded-[2rem] shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '520px' }}>
-            <div className="bg-[#002F66] px-5 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center"><i className="fa-solid fa-robot text-white text-sm"></i></div>
+          <div className="w-72 sm:w-80 md:w-96 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '480px' }}>
+            <div className="bg-[#002F66] px-4 py-3 md:px-5 md:py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-8 h-8 md:w-9 md:h-9 bg-white/20 rounded-full flex items-center justify-center"><i className="fa-solid fa-robot text-white text-xs md:text-sm"></i></div>
                 <div>
-                  <div className="text-white font-bold text-sm">ZOD AI Assistant</div>
+                  <div className="text-white font-bold text-xs md:text-sm">ZOD AI Assistant</div>
                 </div>
               </div>
               <button onClick={() => setChatOpen(false)} className="text-white/60 hover:text-white transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50">
+            <div className="flex-1 overflow-y-auto px-3 py-3 md:px-4 md:py-4 space-y-3 bg-gray-50">
               {!chatLanguageSelected ? (
-                <div className="text-center py-8 space-y-4">
-                  <p className="text-gray-700 font-bold">Select Language</p>
-                  <div className="flex gap-3 justify-center">
-                    <button onClick={() => startChat('en')} className="px-5 py-2 bg-[#002F66] text-white rounded-full text-sm font-bold hover:bg-[#002060] transition">English</button>
-                    <button onClick={() => startChat('ar')} className="px-5 py-2 bg-[#002F66] text-white rounded-full text-sm font-bold hover:bg-[#002060] transition">العربية</button>
+                <div className="text-center py-6 md:py-8 space-y-3 md:space-y-4">
+                  <p className="text-gray-700 font-bold text-sm md:text-base">Select Language</p>
+                  <div className="flex gap-2 md:gap-3 justify-center">
+                    <button onClick={() => startChat('en')} className="px-4 md:px-5 py-1.5 md:py-2 bg-[#002F66] text-white rounded-full text-xs md:text-sm font-bold hover:bg-[#002060] transition">English</button>
+                    <button onClick={() => startChat('ar')} className="px-4 md:px-5 py-1.5 md:py-2 bg-[#002F66] text-white rounded-full text-xs md:text-sm font-bold hover:bg-[#002060] transition">العربية</button>
                   </div>
                 </div>
               ) : (
                 <>
                   {chatMessages.map((msg, i) => (
                     <div key={i} className={`flex ${msg.role === 'user' ? (isRTL ? 'justify-start' : 'justify-end') : (isRTL ? 'justify-end' : 'justify-start')}`}>
-                      <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-[#002F66] text-white rounded-br-sm' : 'bg-white text-gray-700 rounded-bl-sm border border-gray-100'}`}>{msg.text}</div>
+                      <div className={`max-w-[85%] px-3 py-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl text-xs md:text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-[#002F66] text-white rounded-br-sm' : 'bg-white text-gray-700 rounded-bl-sm border border-gray-100'}`}>{msg.text}</div>
                     </div>
                   ))}
                   {chatLoading && (
                     <div className="flex justify-start">
-                      <div className="bg-white border border-gray-100 rounded-2xl px-4 py-3 rounded-bl-sm shadow-sm flex gap-1 items-center">
-                        <span className="w-2 h-2 bg-[#002F66] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                        <span className="w-2 h-2 bg-[#002F66] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                        <span className="w-2 h-2 bg-[#002F66] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                      <div className="bg-white border border-gray-100 rounded-xl md:rounded-2xl px-3 py-2 md:px-4 md:py-3 rounded-bl-sm shadow-sm flex gap-1 items-center">
+                        <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#002F66] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                        <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#002F66] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                        <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#002F66] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
                       </div>
                     </div>
                   )}
@@ -571,32 +588,32 @@ export default function Home() {
               <div ref={chatEndRef} />
             </div>
             {chatLanguageSelected && (
-              <div className="px-4 py-3 border-t bg-white flex gap-2">
-                <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={handleChatKey} placeholder={chatLanguageSelected === 'en' ? "Ask me anything..." : "اسألني أي شيء..."} className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-[#002F66] transition-all" disabled={chatLoading} />
-                <button onClick={sendChatMessage} disabled={chatLoading} className="w-10 h-10 bg-[#002F66] text-white rounded-xl flex items-center justify-center hover:bg-[#002060] transition-all hover:scale-105 active:scale-95 disabled:opacity-50"><i className="fa-solid fa-paper-plane text-xs"></i></button>
+              <div className="px-3 py-2 md:px-4 md:py-3 border-t bg-white flex gap-2">
+                <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={handleChatKey} placeholder={chatLanguageSelected === 'en' ? "Ask me anything..." : "اسألني أي شيء..."} className="flex-1 px-3 py-2 md:px-4 md:py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs md:text-sm outline-none focus:border-[#002F66] transition-all" disabled={chatLoading} />
+                <button onClick={sendChatMessage} disabled={chatLoading} className="w-8 h-8 md:w-10 md:h-10 bg-[#002F66] text-white rounded-xl flex items-center justify-center hover:bg-[#002060] transition-all hover:scale-105 active:scale-95 disabled:opacity-50"><i className="fa-solid fa-paper-plane text-xs"></i></button>
               </div>
             )}
           </div>
         )}
-        <button onClick={() => setChatOpen(!chatOpen)} className="w-14 h-14 bg-[#002F66] text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-[#002060] active:scale-95">
-          {chatOpen ? <i className="fa-solid fa-xmark text-xl"></i> : <i className="fa-regular fa-message text-xl"></i>}
+        <button onClick={() => setChatOpen(!chatOpen)} className="w-12 h-12 md:w-14 md:h-14 bg-[#002F66] text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-[#002060] active:scale-95">
+          {chatOpen ? <i className="fa-solid fa-xmark text-lg md:text-xl"></i> : <i className="fa-regular fa-message text-lg md:text-xl"></i>}
         </button>
       </div>
 
       {/* Admin Login Modal */}
       {loginModalOpen && (
-        <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center backdrop-blur-sm">
-          <div className="bg-white p-10 rounded-[2.5rem] w-full max-w-md shadow-2xl relative border border-gray-100">
-            <button onClick={() => setLoginModalOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-black transition-transform hover:rotate-90"><i className="fa-solid fa-circle-xmark text-2xl"></i></button>
-            <div className="text-center mb-8">
-              <i className="fa-solid fa-user-shield text-5xl text-[#002F66] mb-4"></i>
-              <h2 className="text-2xl font-bold text-slate-900">{t.staffAuth}</h2>
-              <p className="text-sm text-gray-500">{t.restricted}</p>
+        <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center backdrop-blur-sm p-4">
+          <div className="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] w-full max-w-md shadow-2xl relative border border-gray-100">
+            <button onClick={() => setLoginModalOpen(false)} className="absolute top-4 right-4 md:top-6 md:right-6 text-gray-400 hover:text-black transition-transform hover:rotate-90"><i className="fa-solid fa-circle-xmark text-xl md:text-2xl"></i></button>
+            <div className="text-center mb-6 md:mb-8">
+              <i className="fa-solid fa-user-shield text-4xl md:text-5xl text-[#002F66] mb-3 md:mb-4"></i>
+              <h2 className="text-xl md:text-2xl font-bold text-slate-900">{t.staffAuth}</h2>
+              <p className="text-xs md:text-sm text-gray-500">{t.restricted}</p>
             </div>
-            <form onSubmit={handleLogin} className="space-y-5" autoComplete="off">
-              <div><label className="text-xs font-bold uppercase text-gray-400 ml-1">{t.username}</label><input type="text" id="adminUser" placeholder={t.enterAdmin} autoComplete="off" className="w-full p-4 bg-gray-50 border rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all" required /></div>
-              <div><label className="text-xs font-bold uppercase text-gray-400 ml-1">{t.password}</label><input type="password" id="adminPass" placeholder="••••••••" autoComplete="new-password" className="w-full p-4 bg-gray-50 border rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all" required /></div>
-              <button type="submit" className="w-full py-4 bg-[#002F66] text-white font-bold rounded-2xl hover:bg-[#002060] transition-all shadow-lg">{t.authorizedOnly}</button>
+            <form onSubmit={handleLogin} className="space-y-4 md:space-y-5" autoComplete="off">
+              <div><label className="text-[10px] md:text-xs font-bold uppercase text-gray-400 ml-1">{t.username}</label><input type="text" id="adminUser" placeholder={t.enterAdmin} autoComplete="off" className="w-full p-3 md:p-4 bg-gray-50 border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all" required /></div>
+              <div><label className="text-[10px] md:text-xs font-bold uppercase text-gray-400 ml-1">{t.password}</label><input type="password" id="adminPass" placeholder="••••••••" autoComplete="new-password" className="w-full p-3 md:p-4 bg-gray-50 border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all" required /></div>
+              <button type="submit" className="w-full py-3 md:py-4 bg-[#002F66] text-white font-bold rounded-xl md:rounded-2xl hover:bg-[#002060] transition-all shadow-lg">{t.authorizedOnly}</button>
             </form>
           </div>
         </div>
@@ -604,15 +621,15 @@ export default function Home() {
 
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
-        <div className="fixed inset-0 bg-black/70 z-[150] flex items-center justify-center backdrop-blur-sm">
-          <div className="bg-white p-8 rounded-2xl max-w-md w-full shadow-2xl">
+        <div className="fixed inset-0 bg-black/70 z-[150] flex items-center justify-center backdrop-blur-sm p-4">
+          <div className="bg-white p-6 md:p-8 rounded-xl md:rounded-2xl max-w-md w-full shadow-2xl">
             <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4 animate-pulse"><i className="fa-solid fa-trash-can text-red-600 text-xl"></i></div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">{t.confirmDelete}</h3>
-              <p className="text-sm text-gray-500 mb-6">{t.deleteMsg}</p>
+              <div className="mx-auto flex items-center justify-center h-10 w-10 md:h-12 md:w-12 rounded-full bg-red-100 mb-3 md:mb-4 animate-pulse"><i className="fa-solid fa-trash-can text-red-600 text-lg md:text-xl"></i></div>
+              <h3 className="text-base md:text-lg font-bold text-slate-900 mb-2">{t.confirmDelete}</h3>
+              <p className="text-xs md:text-sm text-gray-500 mb-5 md:mb-6">{t.deleteMsg}</p>
               <div className="flex gap-3 justify-center">
-                <button onClick={() => setDeleteModalOpen(false)} className="px-4 py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-all">{t.cancel}</button>
-                <button onClick={performDelete} className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all">{t.yesDelete}</button>
+                <button onClick={() => setDeleteModalOpen(false)} className="px-3 md:px-4 py-1.5 md:py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-all text-sm">{t.cancel}</button>
+                <button onClick={performDelete} className="px-3 md:px-4 py-1.5 md:py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all text-sm">{t.yesDelete}</button>
               </div>
             </div>
           </div>
@@ -621,28 +638,28 @@ export default function Home() {
 
       {!adminActive && (
         <div className="public-section">
-          {/* Discount Banner */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-24 pb-3 px-6">
+          {/* Discount Banner - Larger Size */}
+          <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-20 md:pt-24 pb-2 md:pb-3 px-4 md:px-6">
             <div className="max-w-7xl mx-auto">
               <div className="overflow-hidden whitespace-nowrap">
-                <div className={`inline-flex gap-8 ${isRTL ? 'animate-marquee-rtl' : 'animate-marquee'}`}>
-                  <div onClick={() => handleDiscountClick('20% OFF on First Placement')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
-                    <span className="text-white font-bold text-sm">🎉 {t.discount1}</span>
+                <div className={`inline-flex gap-4 md:gap-8 ${isRTL ? 'animate-marquee-rtl' : 'animate-marquee'}`}>
+                  <div onClick={() => handleDiscountClick('20% OFF on First Placement')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">🎉 {t.discount1}</span>
                   </div>
-                  <div onClick={() => handleDiscountClick('Free Visa Processing for Group Hiring (10+)')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
-                    <span className="text-white font-bold text-sm">✨ {t.discount2}</span>
+                  <div onClick={() => handleDiscountClick('Free Visa Processing for Group Hiring (10+)')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount2}</span>
                   </div>
-                  <div onClick={() => handleDiscountClick('15% Discount for Annual Contracts')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
-                    <span className="text-white font-bold text-sm">💎 {t.discount3}</span>
+                  <div onClick={() => handleDiscountClick('15% Discount for Annual Contracts')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">💎 {t.discount3}</span>
                   </div>
-                  <div onClick={() => handleDiscountClick('20% OFF on First Placement')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
-                    <span className="text-white font-bold text-sm">🎉 {t.discount1}</span>
+                  <div onClick={() => handleDiscountClick('20% OFF on First Placement')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">🎉 {t.discount1}</span>
                   </div>
-                  <div onClick={() => handleDiscountClick('Free Visa Processing for Group Hiring (10+)')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
-                    <span className="text-white font-bold text-sm">✨ {t.discount2}</span>
+                  <div onClick={() => handleDiscountClick('Free Visa Processing for Group Hiring (10+)')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount2}</span>
                   </div>
-                  <div onClick={() => handleDiscountClick('15% Discount for Annual Contracts')} className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-2">
-                    <span className="text-white font-bold text-sm">💎 {t.discount3}</span>
+                  <div onClick={() => handleDiscountClick('15% Discount for Annual Contracts')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">💎 {t.discount3}</span>
                   </div>
                 </div>
               </div>
@@ -654,21 +671,21 @@ export default function Home() {
 
           {/* Navigation Bar */}
           <nav className="fixed w-full z-50 glass-nav" style={{ top: '0' }}>
-            <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-              <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); window.scrollTo(0, 0); }}>
-                <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-12 h-12 rounded-xl object-cover shadow-lg transition-transform duration-300 group-hover:scale-110" />
-                <div className="text-2xl font-extrabold tracking-tighter uppercase">ZOD<span className="text-[#002F66]"> MANPOWER RECRUITMENT</span></div>
+            <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
+              <div className="flex items-center space-x-2 md:space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); window.scrollTo(0, 0); }}>
+                <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-8 h-8 md:w-12 md:h-12 rounded-xl object-cover shadow-lg transition-transform duration-300 group-hover:scale-110" />
+                <div className="text-sm md:text-2xl font-extrabold tracking-tighter uppercase">{t.brandName}</div>
               </div>
-              <div className="hidden lg:flex items-center space-x-8 font-semibold text-xs uppercase tracking-widest">
+              <div className="hidden lg:flex items-center space-x-4 md:space-x-8 font-semibold text-[10px] md:text-xs uppercase tracking-widest">
                 <a href="#home" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.home}</a>
                 <a href="#about" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.about}</a>
                 <a href="#services" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.services}</a>
                 <button onClick={() => { setShowOurTeamPage(true); setShowHirePage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.ourTeam}</button>
                 <button onClick={() => { setShowHirePage(true); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.hireNav}</button>
-                <a href="https://wa.me/97455355206" onClick={() => trackLead('Nav Apply', 'Global Apply')} target="_blank" className="bg-[#002F66] text-white px-6 py-2.5 rounded-full shadow-md hover:bg-[#002060] transition-all hover:scale-105 active:scale-95">{t.contactUs}</a>
-                <button onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')} className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-gray-100 text-[#002F66] hover:bg-gray-200 transition-all"><i className="fa-solid fa-globe text-[10px]"></i><span>{language === 'en' ? 'العربية' : 'English'}</span></button>
+                <a href="https://wa.me/97455355206" onClick={() => trackLead('Nav Apply', 'Global Apply')} target="_blank" className="bg-[#002F66] text-white px-4 md:px-6 py-2 md:py-2.5 rounded-full shadow-md hover:bg-[#002060] transition-all hover:scale-105 active:scale-95 text-[10px] md:text-xs">{t.contactUs}</a>
+                <button onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')} className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-[#002F66] hover:bg-gray-200 transition-all"><i className="fa-solid fa-globe text-[8px] md:text-[10px]"></i><span>{language === 'en' ? 'العربية' : 'English'}</span></button>
               </div>
-              <button className="lg:hidden text-2xl text-[#002F66]" onClick={() => setSidebarOpen(true)}><i className="fa-solid fa-bars-staggered"></i></button>
+              <button className="lg:hidden text-xl md:text-2xl text-[#002F66]" onClick={() => setSidebarOpen(true)}><i className="fa-solid fa-bars-staggered"></i></button>
             </div>
           </nav>
 
@@ -689,30 +706,30 @@ export default function Home() {
 
           {/* Our Team Page */}
           {showOurTeamPage ? (
-            <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
+            <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
-                <button onClick={() => setShowOurTeamPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
+                <button onClick={() => setShowOurTeamPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
                 
-                <div className="text-center mb-12 reveal">
-                  <h3 className="text-4xl font-bold text-slate-900 mb-4">{t.teamTitle}</h3>
-                  <p className="text-gray-500 max-w-2xl mx-auto">{t.teamDesc}</p>
+                <div className="text-center mb-8 md:mb-12 reveal">
+                  <h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-3 md:mb-4">{t.teamTitle}</h3>
+                  <p className="text-gray-500 text-sm md:text-base max-w-2xl mx-auto">{t.teamDesc}</p>
                 </div>
 
-                <div className="mb-16">
-                  <h4 className="text-2xl font-bold text-[#002F66] text-center mb-10">{t.topManagementTitle}</h4>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="mb-12 md:mb-16">
+                  <h4 className="text-xl md:text-2xl font-bold text-[#002F66] text-center mb-6 md:mb-10">{t.topManagementTitle}</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                     {topManagementTeam.map((member) => (
-                      <div key={member.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 group">
-                        <div className="relative h-64 bg-gradient-to-r from-[#002F66] to-[#0040aa] flex items-center justify-center">
-                          <img src={member.photo} alt={member.name} className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg transition-transform duration-300 group-hover:scale-105" onError={(e) => (e.currentTarget.src = 'https://placehold.co/150x150?text=User')} />
-                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                            <div className="text-white font-bold text-sm text-center">{member.position}</div>
+                      <div key={member.id} className="bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 group">
+                        <div className="relative h-48 md:h-64 bg-gradient-to-r from-[#002F66] to-[#0040aa] flex items-center justify-center">
+                          <img src={member.photo} alt={member.name} className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover border-4 border-white shadow-lg transition-transform duration-300 group-hover:scale-105" onError={(e) => (e.currentTarget.src = 'https://placehold.co/150x150?text=User')} />
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 md:p-4">
+                            <div className="text-white font-bold text-xs md:text-sm text-center">{member.position}</div>
                           </div>
                         </div>
-                        <div className="p-6 text-center">
-                          <h4 className="text-xl font-bold text-slate-800 mb-3">{escapeHtml(member.name)}</h4>
-                          <a href={`https://wa.me/${member.phone}`} target="_blank" onClick={() => trackLead('Team Contact', member.name)} className="inline-flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 transition-all hover:scale-105">
-                            <i className="fa-brands fa-whatsapp"></i> {t.contact}
+                        <div className="p-4 md:p-6 text-center">
+                          <h4 className="text-base md:text-xl font-bold text-slate-800 mb-2 md:mb-3">{escapeHtml(member.name)}</h4>
+                          <a href={`https://wa.me/${member.phone}`} target="_blank" onClick={() => trackLead('Team Contact', member.name)} className="inline-flex items-center gap-2 bg-green-600 text-white px-4 md:px-5 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-semibold hover:bg-green-700 transition-all hover:scale-105">
+                            <i className="fa-brands fa-whatsapp text-sm md:text-base"></i> {t.contact}
                           </a>
                         </div>
                       </div>
@@ -721,17 +738,17 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <h4 className="text-xl font-bold text-slate-700 text-center mb-8">Our Dedicated Team</h4>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <h4 className="text-lg md:text-xl font-bold text-slate-700 text-center mb-6 md:mb-8">Our Dedicated Team</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     {regularTeam.map((member) => (
-                      <div key={member.id} className="bg-white rounded-xl p-5 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex items-center gap-4 border border-gray-100">
-                        <img src={member.photo} alt={member.name} className="w-16 h-16 rounded-full object-cover border-2 border-[#002F66]/20" onError={(e) => (e.currentTarget.src = 'https://placehold.co/80x80?text=User')} />
+                      <div key={member.id} className="bg-white rounded-lg md:rounded-xl p-4 md:p-5 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex items-center gap-3 md:gap-4 border border-gray-100">
+                        <img src={member.photo} alt={member.name} className="w-12 h-12 md:w-16 md:h-16 rounded-full object-cover border-2 border-[#002F66]/20" onError={(e) => (e.currentTarget.src = 'https://placehold.co/80x80?text=User')} />
                         <div className="flex-1">
-                          <h5 className="font-bold text-slate-800">{escapeHtml(member.name)}</h5>
-                          <p className="text-[#002F66] text-xs font-semibold">{escapeHtml(member.position)}</p>
+                          <h5 className="font-bold text-slate-800 text-sm md:text-base">{escapeHtml(member.name)}</h5>
+                          <p className="text-[#002F66] text-[10px] md:text-xs font-semibold">{escapeHtml(member.position)}</p>
                         </div>
                         <a href={`https://wa.me/${member.phone}`} target="_blank" onClick={() => trackLead('Team Contact', member.name)} className="text-green-600 hover:text-green-700 transition-all hover:scale-110">
-                          <i className="fa-brands fa-whatsapp text-xl"></i>
+                          <i className="fa-brands fa-whatsapp text-lg md:text-xl"></i>
                         </a>
                       </div>
                     ))}
@@ -740,24 +757,24 @@ export default function Home() {
               </div>
             </div>
           ) : showAboutPage ? (
-            <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
+            <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
-                <button onClick={() => setShowAboutPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
+                <button onClick={() => setShowAboutPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
                 
-                <div className="bg-white rounded-3xl p-10 shadow-lg">
-                  <div className="grid md:grid-cols-2 gap-12">
+                <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-10 shadow-lg">
+                  <div className="grid md:grid-cols-2 gap-8 md:gap-12">
                     <div>
-                      <h3 className="text-3xl font-bold text-[#002F66] mb-6">{t.ourVision}</h3>
-                      <p className="text-gray-600 leading-relaxed text-lg">{t.visionText}</p>
+                      <h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourVision}</h3>
+                      <p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.visionText}</p>
                     </div>
                     <div>
-                      <h3 className="text-3xl font-bold text-[#002F66] mb-6">{t.ourMission}</h3>
-                      <p className="text-gray-600 leading-relaxed text-lg">{t.missionText}</p>
+                      <h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourMission}</h3>
+                      <p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.missionText}</p>
                     </div>
                   </div>
-                  <div className="mt-12 pt-8 border-t border-gray-200">
-                    <h3 className="text-2xl font-bold text-slate-800 mb-4">{t.ourJourney}</h3>
-                    <p className="text-gray-500 leading-relaxed">
+                  <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-gray-200">
+                    <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-3 md:mb-4">{t.ourJourney}</h3>
+                    <p className="text-gray-500 leading-relaxed text-sm md:text-base">
                       {language === 'en' 
                         ? 'Founded in 2010, ZOD MANPOWER RECRUITMENT has grown to become one of Qatar\'s most trusted manpower agencies. With over 12 years of experience in the Doha market, we have successfully placed thousands of skilled professionals across various industries including hospitality, construction, healthcare, and domestic services. Our commitment to ethical recruitment and compliance with Qatar Labor Laws has earned us the trust of both employers and candidates alike.'
                         : 'تأسست شركة زود مان باور للتوظيف في عام 2010، وأصبحت واحدة من أكثر وكالات القوى العاملة الموثوقة في قطر. مع أكثر من 12 عاماً من الخبرة في سوق الدوحة، قمنا بنجاح بتوظيف آلاف المهنيين المهرة في مختلف القطاعات بما في ذلك الضيافة والبناء والرعاية الصحية والخدمات المنزلية. لقد أكسبنا التزامنا بالتوظيف الأخلاقي والامتثال لقوانين العمل القطرية ثقة كل من أصحاب العمل والمرشحين على حد سواء.'}
@@ -767,40 +784,40 @@ export default function Home() {
               </div>
             </div>
           ) : showReturnedHousemaids ? (
-            <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
+            <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
-                <button onClick={() => setShowReturnedHousemaids(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
+                <button onClick={() => setShowReturnedHousemaids(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
                 
-                <div className="text-center mb-10">
-                  <h3 className="text-4xl font-bold text-slate-900 mb-2">{t.returnedHousemaids}</h3>
-                  <p className="text-gray-500">Experienced housemaids returning from overseas with proven track records</p>
+                <div className="text-center mb-8 md:mb-10">
+                  <h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-2">{t.returnedHousemaids}</h3>
+                  <p className="text-gray-500 text-sm md:text-base">Experienced housemaids returning from overseas with proven track records</p>
                 </div>
 
                 {loading ? (
-                  <div className="grid md:grid-cols-3 gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-8 rounded-[2.5rem] border animate-pulse"><div className="w-20 h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
                 ) : filteredTalents.length === 0 ? (
-                  <div className="text-center py-24 text-gray-400"><i className="fa-solid fa-user-slash text-5xl mb-4 block"></i><p className="font-bold">No returned housemaids found at the moment. Please check back later.</p></div>
+                  <div className="text-center py-16 md:py-24 text-gray-400"><i className="fa-solid fa-user-slash text-4xl md:text-5xl mb-4 block"></i><p className="font-bold text-sm md:text-base">No returned housemaids found at the moment. Please check back later.</p></div>
                 ) : (
-                  <div className="grid md:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                     {filteredTalents.map((talent) => (
-                      <div key={talent.id} className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
-                        <div className="flex justify-between items-start mb-6">
-                          <img src={talent.pic} className="w-20 h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
-                          <span className="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
+                      <div key={talent.id} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
+                        <div className="flex justify-between items-start mb-4 md:mb-6">
+                          <img src={talent.pic} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
+                          <span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
                         </div>
                         <div className="flex-grow">
-                          <h4 className="font-bold text-slate-800 text-xl leading-tight">{escapeHtml(talent.name)}</h4>
-                          <p className="text-[#002F66] font-bold text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
-                          <div className="mt-6 pt-6 border-t border-gray-100 space-y-3 mb-8">
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-briefcase w-5 text-[#002F66]"></i><span>{talent.experience || '5+ Years'} Experience</span></div>
+                          <h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight">{escapeHtml(talent.name)}</h4>
+                          <p className="text-[#002F66] font-bold text-[10px] md:text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
+                          <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-100 space-y-2 md:space-y-3 mb-6 md:mb-8">
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-4 md:w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-4 md:w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-4 md:w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-briefcase w-4 md:w-5 text-[#002F66]"></i><span>{talent.experience || '5+ Years'} Experience</span></div>
                           </div>
                         </div>
-                        <div className="flex gap-3 mt-auto">
-                          <a href={talent.cv} target="_blank" onClick={() => trackLead('Returned CV', talent.name)} className="flex-1 py-4 bg-gray-100 text-center rounded-xl font-bold text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
-                          <button onClick={() => handleHireClick(talent.name, 'Returned Housemaid')} className="flex-1 py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
+                        <div className="flex gap-2 md:gap-3 mt-auto">
+                          <a href={talent.cv} target="_blank" onClick={() => trackLead('Returned CV', talent.name)} className="flex-1 py-2 md:py-4 bg-gray-100 text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
+                          <button onClick={() => handleHireClick(talent.name, 'Returned Housemaid')} className="flex-1 py-2 md:py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
                         </div>
                       </div>
                     ))}
@@ -809,49 +826,49 @@ export default function Home() {
               </div>
             </div>
           ) : showHirePage ? (
-            <div className="min-h-screen pt-32 pb-20 px-6 bg-gray-50">
+            <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
-                <button onClick={() => setShowHirePage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-sm mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
-                <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
-                  <div><h3 className="text-4xl font-bold text-slate-900 mb-2">{t.hireTitle}</h3><p className="text-gray-500">{t.hireDesc}</p></div>
-                  <div className="flex gap-3 w-full md:w-auto flex-wrap">
-                    <div className="relative flex-1 min-w-[180px]">
-                      <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t.searchPlaceholder} className="w-full p-4 pl-12 bg-white border rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all" />
-                      <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <button onClick={() => setShowHirePage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
+                <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-10 gap-4 md:gap-6">
+                  <div><h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-2">{t.hireTitle}</h3><p className="text-gray-500 text-sm md:text-base">{t.hireDesc}</p></div>
+                  <div className="flex gap-2 md:gap-3 w-full md:w-auto flex-wrap">
+                    <div className="relative flex-1 min-w-[150px] md:min-w-[180px]">
+                      <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t.searchPlaceholder} className="w-full p-3 md:p-4 pl-8 md:pl-12 bg-white border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-sm md:text-base" />
+                      <i className="fa-solid fa-magnifying-glass absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-sm"></i>
                     </div>
-                    <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="p-4 bg-white border rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-sm font-bold text-gray-700">
+                    <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="p-3 md:p-4 bg-white border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-xs md:text-sm font-bold text-gray-700">
                       <option value="">{t.allCountries}</option>
                       {countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
-                    <button onClick={fetchTalents} className="px-5 py-4 bg-gray-200 rounded-2xl hover:bg-gray-300 transition-all hover:scale-105" title={t.refresh}><i className="fa-solid fa-rotate-right"></i></button>
+                    <button onClick={fetchTalents} className="px-4 md:px-5 py-3 md:py-4 bg-gray-200 rounded-xl md:rounded-2xl hover:bg-gray-300 transition-all hover:scale-105" title={t.refresh}><i className="fa-solid fa-rotate-right text-xs md:text-sm"></i></button>
                   </div>
                 </div>
                 {loading ? (
-                  <div className="grid md:grid-cols-3 gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-8 rounded-[2.5rem] border animate-pulse"><div className="w-20 h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
                 ) : filteredTalents.length === 0 ? (
-                  <div className="text-center py-24 text-gray-400"><i className="fa-solid fa-user-slash text-5xl mb-4 block"></i><p className="font-bold">No candidates found. Try a different search or country filter.</p></div>
+                  <div className="text-center py-16 md:py-24 text-gray-400"><i className="fa-solid fa-user-slash text-4xl md:text-5xl mb-4 block"></i><p className="font-bold text-sm md:text-base">No candidates found. Try a different search or country filter.</p></div>
                 ) : (
-                  <div className="grid md:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                     {filteredTalents.map((talent) => (
-                      <div key={talent.id} className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
-                        <div className="flex justify-between items-start mb-6">
-                          <img src={talent.pic} className="w-20 h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
-                          <span className="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
+                      <div key={talent.id} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
+                        <div className="flex justify-between items-start mb-4 md:mb-6">
+                          <img src={talent.pic} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
+                          <span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
                         </div>
                         <div className="flex-grow">
-                          <h4 className="font-bold text-slate-800 text-xl leading-tight">{escapeHtml(talent.name)}</h4>
-                          <p className="text-[#002F66] font-bold text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
-                          <div className="mt-6 pt-6 border-t border-gray-100 space-y-3 mb-8">
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-5 text-[#002F66]"></i><span>{talent.experience || '2-5 Years'} Exp</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-heart w-5 text-[#002F66]"></i><span>{talent.maritalStatus || 'Single'}</span></div>
+                          <h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight">{escapeHtml(talent.name)}</h4>
+                          <p className="text-[#002F66] font-bold text-[10px] md:text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
+                          <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-100 space-y-2 md:space-y-3 mb-6 md:mb-8">
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-4 md:w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-4 md:w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-4 md:w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-4 md:w-5 text-[#002F66]"></i><span>{talent.experience || '2-5 Years'} Exp</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-heart w-4 md:w-5 text-[#002F66]"></i><span>{talent.maritalStatus || 'Single'}</span></div>
                           </div>
                         </div>
-                        <div className="flex gap-3 mt-auto">
-                          <a href={talent.cv} target="_blank" onClick={() => trackLead('Public CV', talent.name)} className="flex-1 py-4 bg-gray-100 text-center rounded-xl font-bold text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
-                          <button onClick={() => handleHireClick(talent.name, 'Hire Talent')} className="flex-1 py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
+                        <div className="flex gap-2 md:gap-3 mt-auto">
+                          <a href={talent.cv} target="_blank" onClick={() => trackLead('Public CV', talent.name)} className="flex-1 py-2 md:py-4 bg-gray-100 text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
+                          <button onClick={() => handleHireClick(talent.name, 'Hire Talent')} className="flex-1 py-2 md:py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
                         </div>
                       </div>
                     ))}
@@ -862,78 +879,78 @@ export default function Home() {
           ) : (
             <>
               {/* Hero Section */}
-              <section id="home" className="relative pt-32 pb-32 px-6 qatar-gradient text-white overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
-                <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center relative z-10">
-                  <div className="space-y-8 fade-in">
-                    <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/20 animate-pulse">{t.certified}</span>
-                    <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
-                    <p className="text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
+              <section id="home" className="relative pt-24 md:pt-32 pb-16 md:pb-32 px-4 md:px-6 qatar-gradient text-white overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[20rem] md:text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
+                <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center relative z-10">
+                  <div className="space-y-6 md:space-y-8 fade-in">
+                    <span className="inline-block px-3 md:px-4 py-1 md:py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-widest border border-white/20 animate-pulse">{t.certified}</span>
+                    <h1 className="text-3xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
+                    <p className="text-sm md:text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
                     
-                    <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                      <button onClick={() => handleQuickHire('House Maids')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
-                        <span className="relative z-10 flex items-center gap-2 text-sm">🏠 {t.houseMaids}</span>
+                    <div className="flex flex-wrap gap-3 md:gap-4 justify-center md:justify-start">
+                      <button onClick={() => handleQuickHire('House Maids')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                        <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🏠 {t.houseMaids}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button onClick={() => handleQuickHire('Drivers')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
-                        <span className="relative z-10 flex items-center gap-2 text-sm">🚗 {t.drivers}</span>
+                      <button onClick={() => handleQuickHire('Drivers')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                        <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🚗 {t.drivers}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button onClick={() => handleQuickHire('Nurses')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
-                        <span className="relative z-10 flex items-center gap-2 text-sm">🏥 {t.nurses}</span>
+                      <button onClick={() => handleQuickHire('Nurses')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                        <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🏥 {t.nurses}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button onClick={() => handleQuickHire('Monthly Cleaners')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
-                        <span className="relative z-10 flex items-center gap-2 text-sm">🧹 {t.monthlyCleaners}</span>
+                      <button onClick={() => handleQuickHire('Monthly Cleaners')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                        <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🧹 {t.monthlyCleaners}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button onClick={handleReturnedHousemaids} className="group relative overflow-hidden bg-amber-500/30 backdrop-blur-md border border-amber-400/50 px-6 py-4 rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-amber-500">
-                        <span className="relative z-10 flex items-center gap-2 text-sm">🔄 {t.returnedHousemaids}</span>
+                      <button onClick={handleReturnedHousemaids} className="group relative overflow-hidden bg-amber-500/30 backdrop-blur-md border border-amber-400/50 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-amber-500">
+                        <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🔄 {t.returnedHousemaids}</span>
                         <div className="absolute inset-0 bg-amber-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
                     </div>
                   </div>
                   <div className="hidden md:flex justify-center relative">
-                    <div className="w-80 h-80 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[4rem] rotate-12 flex items-center justify-center shadow-2xl hover:rotate-0 transition-transform duration-700 hover:scale-105"><i className="fa-solid fa-building-columns text-[10rem] opacity-20 -rotate-12"></i></div>
-                    <div className="absolute -bottom-10 -left-10 p-8 bg-amber-400 rounded-3xl shadow-2xl text-[#002F66] animate-float" style={{ animationDuration: '3s' }}><div className="text-4xl font-bold">12+</div><div className="text-[10px] font-bold uppercase tracking-tighter leading-none">{t.yearsLabel}</div></div>
+                    <div className="w-64 h-64 md:w-80 md:h-80 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[3rem] md:rounded-[4rem] rotate-12 flex items-center justify-center shadow-2xl hover:rotate-0 transition-transform duration-700 hover:scale-105"><i className="fa-solid fa-building-columns text-[6rem] md:text-[10rem] opacity-20 -rotate-12"></i></div>
+                    <div className="absolute -bottom-6 md:-bottom-10 -left-6 md:-left-10 p-4 md:p-8 bg-amber-400 rounded-2xl md:rounded-3xl shadow-2xl text-[#002F66] animate-float" style={{ animationDuration: '3s' }}><div className="text-2xl md:text-4xl font-bold">12+</div><div className="text-[8px] md:text-[10px] font-bold uppercase tracking-tighter leading-none">{t.yearsLabel}</div></div>
                   </div>
                 </div>
               </section>
 
               {/* Stats Section */}
-              <section className="py-16 bg-white border-b reveal">
-                <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-10">
+              <section className="py-12 md:py-16 bg-white border-b reveal">
+                <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
                   {[{ num: '9.2K', label: t.successfulPlacements }, { num: '1.8K+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '98.2%', label: t.complianceRate }].map((s, i) => (
-                    <div key={i} className="flex items-center space-x-4 border-r border-gray-100 last:border-0 hover:translate-x-2 transition-all duration-300 group">
-                      <div className="text-4xl text-[#002F66] font-black group-hover:scale-110 transition-transform">{s.num}</div>
-                      <div className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">{s.label}</div>
+                    <div key={i} className="flex items-center space-x-2 md:space-x-4 border-r border-gray-100 last:border-0 hover:translate-x-2 transition-all duration-300 group">
+                      <div className="text-2xl md:text-4xl text-[#002F66] font-black group-hover:scale-110 transition-transform">{s.num}</div>
+                      <div className="text-[8px] md:text-[10px] uppercase font-bold text-gray-400 tracking-widest">{s.label}</div>
                     </div>
                   ))}
                 </div>
               </section>
 
               {/* Featured Candidates Section */}
-              <section className="py-16 bg-gray-50 px-6 reveal">
+              <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
-                  <div className="flex justify-between items-center mb-8">
-                    <h3 className="text-2xl font-bold text-slate-900">{t.featuredCandidates}</h3>
-                    <button onClick={() => setShowHirePage(true)} className="text-[#002F66] font-bold text-sm hover:underline transition-all flex items-center gap-1">{t.viewAllCandidates}</button>
+                  <div className="flex justify-between items-center mb-6 md:mb-8">
+                    <h3 className="text-xl md:text-2xl font-bold text-slate-900">{t.featuredCandidates}</h3>
+                    <button onClick={() => setShowHirePage(true)} className="text-[#002F66] font-bold text-xs md:text-sm hover:underline transition-all flex items-center gap-1">{t.viewAllCandidates}</button>
                   </div>
                   {loading ? (
-                    <div className="space-y-4">{[...Array(2)].map((_, i) => <div key={i} className="bg-white p-5 rounded-2xl border animate-pulse flex gap-4"><div className="w-16 h-16 bg-gray-200 rounded-xl shrink-0"></div><div className="flex-1"><div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div><div className="h-3 bg-gray-200 rounded w-1/3"></div></div></div>)}</div>
+                    <div className="space-y-3 md:space-y-4">{[...Array(2)].map((_, i) => <div key={i} className="bg-white p-4 md:p-5 rounded-xl md:rounded-2xl border animate-pulse flex gap-3 md:gap-4"><div className="w-12 h-12 md:w-16 md:h-16 bg-gray-200 rounded-lg md:rounded-xl shrink-0"></div><div className="flex-1"><div className="h-3 md:h-4 bg-gray-200 rounded w-1/2 mb-2"></div><div className="h-2 md:h-3 bg-gray-200 rounded w-1/3"></div></div></div>)}</div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3 md:space-y-4">
                       {featuredTalents.map((talent) => (
-                        <div key={talent.id} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex items-center gap-5">
-                          <img src={talent.pic} className="w-16 h-16 rounded-xl object-cover border-2 border-[#002F66]/10 shrink-0" onError={(e) => (e.currentTarget.src = 'https://placehold.co/80x80?text=User')} alt={talent.name} />
+                        <div key={talent.id} className="bg-white p-4 md:p-5 rounded-xl md:rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex items-center gap-3 md:gap-5">
+                          <img src={talent.pic} className="w-12 h-12 md:w-16 md:h-16 rounded-lg md:rounded-xl object-cover border-2 border-[#002F66]/10 shrink-0" onError={(e) => (e.currentTarget.src = 'https://placehold.co/80x80?text=User')} alt={talent.name} />
                           <div className="flex-1 min-w-0">
-                            <div className="font-bold text-slate-800 text-base truncate">{escapeHtml(talent.name)}</div>
-                            <div className="text-[#002F66] font-bold text-[11px] uppercase tracking-widest">{escapeHtml(talent.job)} · {escapeHtml(talent.country)}</div>
-                            <div className="text-[10px] text-gray-400 mt-1">Experience: {talent.experience || '3-5 Years'}</div>
+                            <div className="font-bold text-slate-800 text-sm md:text-base truncate">{escapeHtml(talent.name)}</div>
+                            <div className="text-[#002F66] font-bold text-[9px] md:text-[11px] uppercase tracking-widest">{escapeHtml(talent.job)} · {escapeHtml(talent.country)}</div>
+                            <div className="text-[8px] md:text-[10px] text-gray-400 mt-1">Experience: {talent.experience || '3-5 Years'}</div>
                           </div>
-                          <div className="flex gap-3 items-center shrink-0">
-                            <span className="text-xs font-bold text-gray-500 hidden sm:block">{talent.salary || 0} QAR</span>
-                            <button onClick={() => setShowHirePage(true)} className="bg-[#002F66] text-white text-[10px] font-bold px-4 py-2 rounded-xl hover:bg-[#002060] transition-all hover:scale-105">{t.hireBtn}</button>
+                          <div className="flex gap-2 md:gap-3 items-center shrink-0">
+                            <span className="text-[10px] md:text-xs font-bold text-gray-500 hidden sm:block">{talent.salary || 0} QAR</span>
+                            <button onClick={() => setShowHirePage(true)} className="bg-[#002F66] text-white text-[8px] md:text-[10px] font-bold px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl hover:bg-[#002060] transition-all hover:scale-105">{t.hireBtn}</button>
                           </div>
                         </div>
                       ))}
@@ -943,18 +960,18 @@ export default function Home() {
               </section>
 
               {/* Our Legacy Section with View More Button */}
-              <section id="about" className="py-24 px-6 bg-white reveal">
-                <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+              <section id="about" className="py-16 md:py-24 px-4 md:px-6 bg-white reveal">
+                <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center">
                   <div className="relative group">
-                    <div className="aspect-square bg-gray-200 rounded-[4rem] overflow-hidden shadow-inner"><img src="https://raw.githubusercontent.com/AshiLara2007/ZOD-Photos/main/ZOD.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="About" /></div>
-                    <div className="absolute -bottom-8 -right-8 p-10 bg-[#002F66] rounded-[3rem] text-white shadow-2xl hidden md:block transition-all duration-300 hover:scale-105"><i className="fa-solid fa-quote-left text-4xl opacity-20 mb-4 block"></i><p className="font-bold text-lg italic">"Connecting People, <br />Empowering Visions."</p></div>
+                    <div className="aspect-square bg-gray-200 rounded-[2rem] md:rounded-[4rem] overflow-hidden shadow-inner"><img src="https://raw.githubusercontent.com/AshiLara2007/ZOD-Photos/main/ZOD.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="About" /></div>
+                    <div className="absolute -bottom-4 md:-bottom-8 -right-4 md:-right-8 p-6 md:p-10 bg-[#002F66] rounded-[2rem] md:rounded-[3rem] text-white shadow-2xl hidden md:block transition-all duration-300 hover:scale-105"><i className="fa-solid fa-quote-left text-3xl md:text-4xl opacity-20 mb-4 block"></i><p className="font-bold text-base md:text-lg italic">"Connecting People, <br />Empowering Visions."</p></div>
                   </div>
-                  <div className="space-y-8">
+                  <div className="space-y-6 md:space-y-8">
                     <h2 className="text-sm font-bold text-red-800 uppercase tracking-[0.3em]">{t.ourLegacy}</h2>
-                    <h3 className="text-4xl font-bold text-slate-900 leading-tight">{t.aboutTitle}</h3>
-                    <p className="text-gray-500 leading-relaxed">{t.aboutDesc}</p>
-                    <ul className="space-y-4">{[t.personalizedMatching, t.directLiaison, t.multiIndustry].map((item, i) => (<li key={i} className="flex items-center space-x-3 font-bold text-sm text-slate-700 group cursor-pointer"><i className="fa-solid fa-check-circle text-[#002F66] transition-transform group-hover:scale-110"></i><span className="group-hover:translate-x-1 transition-transform">{item}</span></li>))}</ul>
-                    <button onClick={() => setShowAboutPage(true)} className="inline-flex items-center gap-2 bg-[#002F66] text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-[#002060] transition-all hover:scale-105 shadow-md">
+                    <h3 className="text-2xl md:text-4xl font-bold text-slate-900 leading-tight">{t.aboutTitle}</h3>
+                    <p className="text-gray-500 leading-relaxed text-sm md:text-base">{t.aboutDesc}</p>
+                    <ul className="space-y-3 md:space-y-4">{[t.personalizedMatching, t.directLiaison, t.multiIndustry].map((item, i) => (<li key={i} className="flex items-center space-x-2 md:space-x-3 font-bold text-xs md:text-sm text-slate-700 group cursor-pointer"><i className="fa-solid fa-check-circle text-[#002F66] transition-transform group-hover:scale-110"></i><span className="group-hover:translate-x-1 transition-transform">{item}</span></li>))}</ul>
+                    <button onClick={() => setShowAboutPage(true)} className="inline-flex items-center gap-2 bg-[#002F66] text-white px-6 md:px-8 py-2 md:py-3 rounded-lg md:rounded-xl font-bold text-xs md:text-sm hover:bg-[#002060] transition-all hover:scale-105 shadow-md">
                       {t.viewMore} <i className="fa-solid fa-arrow-right"></i>
                     </button>
                   </div>
@@ -962,27 +979,27 @@ export default function Home() {
               </section>
 
               {/* Services/Expertise Section */}
-              <section id="services" className="py-24 px-6 bg-gray-50 reveal">
-                <div className="max-w-7xl mx-auto text-center mb-20"><h2 className="text-sm font-bold text-red-800 uppercase tracking-[0.3em] mb-4">{t.ourExpertise}</h2><h3 className="text-4xl font-bold text-slate-900">{t.comprehensiveSolutions}</h3></div>
-                <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
+              <section id="services" className="py-16 md:py-24 px-4 md:px-6 bg-gray-50 reveal">
+                <div className="max-w-7xl mx-auto text-center mb-12 md:mb-20"><h2 className="text-sm font-bold text-red-800 uppercase tracking-[0.3em] mb-4">{t.ourExpertise}</h2><h3 className="text-2xl md:text-4xl font-bold text-slate-900">{t.comprehensiveSolutions}</h3></div>
+                <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6 md:gap-8">
                   {[{ icon: 'passport', title: t.visaTitle, desc: t.visaDesc }, { icon: 'users-gear', title: t.techTitle, desc: t.techDesc }, { icon: 'city', title: t.projectsTitle, desc: t.projectsDesc }].map((s, i) => (
-                    <div key={i} className="bg-white p-10 rounded-[3rem] shadow-sm hover:shadow-xl transition-all duration-500 group hover:-translate-y-3 border border-gray-100 cursor-pointer">
-                      <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-[#002F66] group-hover:text-white transition-all duration-500 group-hover:rotate-6"><i className={`fa-solid fa-${s.icon} text-2xl`}></i></div>
-                      <h4 className="text-xl font-bold mb-4 text-slate-900 group-hover:text-[#002F66] transition-colors">{s.title}</h4>
-                      <p className="text-gray-500 text-sm leading-relaxed">{s.desc}</p>
+                    <div key={i} className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-sm hover:shadow-xl transition-all duration-500 group hover:-translate-y-3 border border-gray-100 cursor-pointer">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-red-50 rounded-xl md:rounded-2xl flex items-center justify-center mb-6 md:mb-8 group-hover:bg-[#002F66] group-hover:text-white transition-all duration-500 group-hover:rotate-6"><i className={`fa-solid fa-${s.icon} text-xl md:text-2xl`}></i></div>
+                      <h4 className="text-base md:text-xl font-bold mb-3 md:mb-4 text-slate-900 group-hover:text-[#002F66] transition-colors">{s.title}</h4>
+                      <p className="text-gray-500 text-xs md:text-sm leading-relaxed">{s.desc}</p>
                     </div>
                   ))}
                 </div>
               </section>
 
               {/* Location / Google Maps Section */}
-              <section className="py-16 px-6 bg-white reveal">
+              <section className="py-12 md:py-16 px-4 md:px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto">
-                  <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold text-slate-900 mb-2">{t.ourLocation}</h3>
-                    <p className="text-gray-500">ZOD MANPOWER RECRUITMENT, Doha, Qatar</p>
+                  <div className="text-center mb-6 md:mb-8">
+                    <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">{t.ourLocation}</h3>
+                    <p className="text-gray-500 text-sm md:text-base">ZOD MANPOWER RECRUITMENT, Doha, Qatar</p>
                   </div>
-                  <div className="w-full h-[400px] rounded-2xl overflow-hidden shadow-xl border-4 border-white">
+                  <div className="w-full h-[250px] md:h-[400px] rounded-xl md:rounded-2xl overflow-hidden shadow-xl border-4 border-white">
                     <iframe 
                       src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3608.756850059207!2d51.451755486019955!3d25.24511337222303!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e45da725e22a337%3A0xbea50deacb9863fc!2sZOD%20MANPOWER%20RECRUITMENT!5e0!3m2!1sen!2sqa!4v1776013064557!5m2!1sen!2sqa" 
                       width="100%" 
@@ -998,15 +1015,15 @@ export default function Home() {
               </section>
 
               {/* Testimonials Section */}
-              <section className="py-20 bg-gray-50 px-6 reveal">
+              <section className="py-16 md:py-20 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
-                  <h3 className="text-3xl font-bold text-center mb-12">{t.whatClientsSay}</h3>
-                  <div className="grid md:grid-cols-3 gap-8">
+                  <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">{t.whatClientsSay}</h3>
+                  <div className="grid md:grid-cols-3 gap-6 md:gap-8">
                     {[{ text: t.testimonial1, author: t.author1 }, { text: t.testimonial2, author: t.author2 }, { text: t.testimonial3, author: t.author3 }].map((tst, i) => (
-                      <div key={i} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-2">
-                        <i className="fa-solid fa-quote-left text-3xl text-[#002F66]/20 mb-4 block"></i>
-                        <p className="text-gray-600 text-sm leading-relaxed mb-6">{tst.text}</p>
-                        <p className="font-bold text-slate-800 text-sm">{tst.author}</p>
+                      <div key={i} className="bg-white p-6 md:p-8 rounded-xl md:rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-2">
+                        <i className="fa-solid fa-quote-left text-2xl md:text-3xl text-[#002F66]/20 mb-3 md:mb-4 block"></i>
+                        <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4 md:mb-6">{tst.text}</p>
+                        <p className="font-bold text-slate-800 text-xs md:text-sm">{tst.author}</p>
                       </div>
                     ))}
                   </div>
@@ -1014,14 +1031,14 @@ export default function Home() {
               </section>
 
               {/* FAQ Section */}
-              <section className="py-20 bg-white px-6 reveal">
+              <section className="py-16 md:py-20 bg-white px-4 md:px-6 reveal">
                 <div className="max-w-5xl mx-auto">
-                  <h3 className="text-3xl font-bold text-center mb-12">{t.faqTitle}</h3>
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">{t.faqTitle}</h3>
+                  <div className="grid md:grid-cols-2 gap-4 md:gap-6">
                     {[{ q: t.faqQ1, a: t.faqA1 }, { q: t.faqQ2, a: t.faqA2 }, { q: t.faqQ3, a: t.faqA3 }, { q: t.faqQ4, a: t.faqA4 }].map((faq, i) => (
-                      <div key={i} className="bg-gray-50 p-6 rounded-2xl border shadow-sm faq-item cursor-pointer transition-all duration-300 hover:shadow-md" onClick={(e) => { const parent = e.currentTarget; parent.classList.toggle('active'); const answer = parent.querySelector('.faq-answer') as HTMLElement; if (parent.classList.contains('active')) answer.style.maxHeight = answer.scrollHeight + 'px'; else answer.style.maxHeight = '0px'; }}>
-                        <h5 className="font-bold text-sm flex justify-between items-center uppercase tracking-tight">{faq.q}<i className="fa-solid fa-plus text-xs transition-transform duration-300 ml-2 shrink-0"></i></h5>
-                        <div className="faq-answer text-gray-500 text-sm leading-relaxed">{faq.a}</div>
+                      <div key={i} className="bg-gray-50 p-4 md:p-6 rounded-xl md:rounded-2xl border shadow-sm faq-item cursor-pointer transition-all duration-300 hover:shadow-md" onClick={(e) => { const parent = e.currentTarget; parent.classList.toggle('active'); const answer = parent.querySelector('.faq-answer') as HTMLElement; if (parent.classList.contains('active')) answer.style.maxHeight = answer.scrollHeight + 'px'; else answer.style.maxHeight = '0px'; }}>
+                        <h5 className="font-bold text-xs md:text-sm flex justify-between items-center uppercase tracking-tight">{faq.q}<i className="fa-solid fa-plus text-[10px] md:text-xs transition-transform duration-300 ml-2 shrink-0"></i></h5>
+                        <div className="faq-answer text-gray-500 text-xs md:text-sm leading-relaxed">{faq.a}</div>
                       </div>
                     ))}
                   </div>
@@ -1029,20 +1046,20 @@ export default function Home() {
               </section>
 
               {/* Footer */}
-              <footer className="py-20 bg-slate-900 text-white px-6">
-                <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 border-b border-white/5 pb-16">
+              <footer className="py-16 md:py-20 bg-slate-900 text-white px-4 md:px-6">
+                <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 md:gap-12 border-b border-white/5 pb-12 md:pb-16">
                   <div className="col-span-2">
                     <div className="flex items-center gap-3 mb-6">
-                      <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-12 h-12 rounded-xl object-cover shadow-lg" />
-                      <div className="text-2xl font-black uppercase tracking-tighter">ZOD<span className="text-[#002F66]"> MANPOWER RECRUITMENT</span></div>
+                      <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover shadow-lg" />
+                      <div className="text-lg md:text-2xl font-black uppercase tracking-tighter">{t.brandName}</div>
                     </div>
-                    <p className="text-slate-500 text-sm leading-relaxed max-w-sm mb-6">{t.footerText}</p>
-                    <div className="flex space-x-4"><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-facebook-f"></i></a><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-linkedin-in"></i></a></div>
+                    <p className="text-slate-500 text-xs md:text-sm leading-relaxed max-w-sm mb-6">{t.footerText}</p>
+                    <div className="flex space-x-3 md:space-x-4"><a href="#" className="w-8 h-8 md:w-10 md:h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-facebook-f text-sm md:text-base"></i></a><a href="#" className="w-8 h-8 md:w-10 md:h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-linkedin-in text-sm md:text-base"></i></a></div>
                   </div>
-                  <div><h6 className="font-bold uppercase text-xs tracking-widest mb-6 text-slate-300">{t.quickLinks}</h6><ul className="space-y-4 text-xs text-slate-500 font-bold uppercase"><li><a href="#about" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.aboutDoha}</a></li><li><a href="#services" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.clientServices}</a></li><li><button onClick={() => setShowHirePage(true)} className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.browseCVs}</button></li></ul></div>
-                  <div><h6 className="font-bold uppercase text-xs tracking-widest mb-6 text-slate-300">{t.internal}</h6><button onClick={() => setLoginModalOpen(true)} className="group flex items-center space-x-3 px-6 py-3 border border-white/10 rounded-2xl hover:bg-white hover:text-slate-900 transition-all duration-300 hover:scale-105"><i className="fa-solid fa-lock text-[10px] group-hover:rotate-12 transition-transform"></i><span className="text-[10px] font-bold uppercase tracking-widest">{t.adminPortal}</span></button></div>
+                  <div><h6 className="font-bold uppercase text-[10px] md:text-xs tracking-widest mb-4 md:mb-6 text-slate-300">{t.quickLinks}</h6><ul className="space-y-3 md:space-y-4 text-[10px] md:text-xs text-slate-500 font-bold uppercase"><li><a href="#about" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.aboutDoha}</a></li><li><a href="#services" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.clientServices}</a></li><li><button onClick={() => setShowHirePage(true)} className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.browseCVs}</button></li></ul></div>
+                  <div><h6 className="font-bold uppercase text-[10px] md:text-xs tracking-widest mb-4 md:mb-6 text-slate-300">{t.internal}</h6><button onClick={() => setLoginModalOpen(true)} className="group flex items-center space-x-2 md:space-x-3 px-4 md:px-6 py-2 md:py-3 border border-white/10 rounded-xl md:rounded-2xl hover:bg-white hover:text-slate-900 transition-all duration-300 hover:scale-105"><i className="fa-solid fa-lock text-[8px] md:text-[10px] group-hover:rotate-12 transition-transform"></i><span className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest">{t.adminPortal}</span></button></div>
                 </div>
-                <div className="max-w-7xl mx-auto pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] text-slate-700 tracking-widest uppercase font-bold"><p>{t.copyright}</p><div className="flex space-x-6"><a href="#" className="hover:text-white transition-colors">{t.privacyPolicy}</a><a href="#" className="hover:text-white transition-colors">{t.terms}</a></div></div>
+                <div className="max-w-7xl mx-auto pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6 text-[8px] md:text-[10px] text-slate-700 tracking-widest uppercase font-bold"><p>{t.copyright}</p><div className="flex space-x-4 md:space-x-6"><a href="#" className="hover:text-white transition-colors">{t.privacyPolicy}</a><a href="#" className="hover:text-white transition-colors">{t.terms}</a></div></div>
               </footer>
             </>
           )}
@@ -1051,70 +1068,73 @@ export default function Home() {
 
       {/* Admin Panel */}
       {adminActive && (
-        <div className="admin-section min-h-screen bg-gray-50 pb-20">
-          <nav className="bg-white border-b px-6 py-4 mb-10 sticky top-0 z-50">
+        <div className="admin-section min-h-screen bg-gray-50 pb-16 md:pb-20">
+          <nav className="bg-white border-b px-4 md:px-6 py-3 md:py-4 mb-6 md:mb-10 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
-              <div className="flex items-center space-x-3"><div className="w-8 h-8 bg-[#002F66] rounded-lg flex items-center justify-center text-white"><i className="fa-solid fa-gears text-[10px]"></i></div><span className="font-bold text-sm tracking-widest uppercase text-slate-900">{t.staffPortal}</span></div>
-              <button onClick={() => setAdminActive(false)} className="bg-red-600 text-white px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg hover:bg-red-700 transition-all duration-300 hover:scale-105">{t.logout}</button>
+              <div className="flex items-center space-x-2 md:space-x-3"><div className="w-6 h-6 md:w-8 md:h-8 bg-[#002F66] rounded-lg flex items-center justify-center text-white"><i className="fa-solid fa-gears text-[8px] md:text-[10px]"></i></div><span className="font-bold text-xs md:text-sm tracking-widest uppercase text-slate-900">{t.staffPortal}</span></div>
+              <button onClick={() => setAdminActive(false)} className="bg-red-600 text-white px-4 md:px-6 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[8px] md:text-[10px] font-bold uppercase tracking-widest shadow-lg hover:bg-red-700 transition-all duration-300 hover:scale-105">{t.logout}</button>
             </div>
           </nav>
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-              <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{t.totalCandidates}</p><div className="text-4xl font-bold text-slate-800">{talents.length}</div></div>
-              <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{t.webLeads}</p><div className="text-4xl font-bold text-indigo-600">{leads.length}</div></div>
-              <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{t.activeVacancies}</p><div className="text-4xl font-bold text-[#002F66]">6</div></div>
-              <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center justify-center"><button onClick={fetchTalents} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all duration-300 hover:scale-105"><i className="fa-solid fa-rotate-right mr-2"></i> {t.refresh}</button></div>
+          <div className="max-w-7xl mx-auto px-4 md:px-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-10">
+              <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.totalCandidates}</p><div className="text-2xl md:text-4xl font-bold text-slate-800">{talents.length}</div></div>
+              <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.webLeads}</p><div className="text-2xl md:text-4xl font-bold text-indigo-600">{leads.length}</div></div>
+              <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.activeVacancies}</p><div className="text-2xl md:text-4xl font-bold text-[#002F66]">6</div></div>
+              <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center justify-center"><button onClick={fetchTalents} className="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold uppercase transition-all duration-300 hover:scale-105"><i className="fa-solid fa-rotate-right mr-1 md:mr-2"></i> {t.refresh}</button></div>
             </div>
-            <div className="flex space-x-6 mb-8 border-b">
-              <button onClick={() => setActiveTab('candidates')} className={`pb-4 border-b-2 font-bold text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === 'candidates' ? 'border-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{t.inventoryManagement}</button>
-              <button onClick={() => setActiveTab('leads')} className={`pb-4 border-b-2 font-bold text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === 'leads' ? 'border-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{t.visitorLogs}</button>
+            <div className="flex space-x-4 md:space-x-6 mb-6 md:mb-8 border-b">
+              <button onClick={() => setActiveTab('candidates')} className={`pb-3 md:pb-4 border-b-2 font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === 'candidates' ? 'border-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{t.inventoryManagement}</button>
+              <button onClick={() => setActiveTab('leads')} className={`pb-3 md:pb-4 border-b-2 font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === 'leads' ? 'border-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{t.visitorLogs}</button>
             </div>
             {activeTab === 'candidates' && (
-              <div className="grid lg:grid-cols-3 gap-8">
-                <div className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm h-fit">
-                  <div className="flex justify-between items-center mb-8 border-b pb-4"><h4 className="font-bold uppercase text-xs text-[#002F66] tracking-widest">{editTalent ? `${t.editCandidate} ${editTalent.name}` : t.newCandidate}</h4><button onClick={resetForm} className="text-[10px] text-gray-400 hover:text-red-600 transition-all hover:rotate-12"><i className="fa-solid fa-rotate-left"></i></button></div>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.fullName}</label><input ref={nameRef} type="text" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
+              <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
+                <div className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-sm h-fit">
+                  <div className="flex justify-between items-center mb-6 md:mb-8 border-b pb-3 md:pb-4"><h4 className="font-bold uppercase text-[10px] md:text-xs text-[#002F66] tracking-widest">{editTalent ? `${t.editCandidate} ${editTalent.name}` : t.newCandidate}</h4><button onClick={resetForm} className="text-[8px] md:text-[10px] text-gray-400 hover:text-red-600 transition-all hover:rotate-12"><i className="fa-solid fa-rotate-left"></i></button></div>
+                  <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.fullName}</label><input ref={nameRef} type="text" className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all text-sm md:text-base" required /></div>
                     
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.dob}</label><input ref={dobRef} type="date" onChange={handleDobChange} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.dob}</label><input ref={dobRef} type="date" onChange={handleDobChange} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
                     
                     {calculatedAge !== null && (
-                      <div className="bg-blue-50 p-3 rounded-xl"><span className="text-[10px] font-bold text-blue-600">Age: {calculatedAge} years</span></div>
+                      <div className="bg-blue-50 p-2 md:p-3 rounded-lg md:rounded-xl"><span className="text-[10px] md:text-xs font-bold text-blue-600">Age: {calculatedAge} years</span></div>
                     )}
                     
-                    <div className="grid grid-cols-2 gap-4">
-                      <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.gender}</label><select ref={genderRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option>Male</option><option>Female</option></select></div>
-                      <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.maritalStatus}</label><select ref={maritalStatusRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{maritalStatusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div>
+                    <div className="grid grid-cols-2 gap-3 md:gap-4">
+                      <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.gender}</label><select ref={genderRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option>Male</option><option>Female</option></select></div>
+                      <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.maritalStatus}</label><select ref={maritalStatusRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{maritalStatusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div>
                     </div>
                     
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{jobOptions.map(job => <option key={job} value={job}>{job}</option>)}</select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{jobOptions.map(job => <option key={job} value={job}>{job}</option>)}</select></div>
                     
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.country}</label><select ref={countryRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.country}</label><select ref={countryRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
                     
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Muslim">Muslim</option><option value="Christian">Christian</option><option value="Hindu">Hindu</option><option value="Buddhist">Buddhist</option></select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Muslim">Muslim</option><option value="Christian">Christian</option><option value="Hindu">Hindu</option><option value="Buddhist">Buddhist</option></select></div>
                     
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
                     
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.experience}</label><select ref={experienceRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{experienceOptions.map(exp => <option key={exp} value={exp}>{exp}</option>)}</select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.experience}</label><select ref={experienceRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{experienceOptions.map(exp => <option key={exp} value={exp}>{exp}</option>)}</select></div>
                     
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-2">{t.photo}</label><input ref={picRef} type="file" accept="image/*" className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 transition-all" /></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.photo}</label><input ref={picRef} type="file" accept="image/*" className="text-[10px] md:text-xs file:mr-2 md:file:mr-4 file:py-1 md:file:py-2 file:px-2 md:file:px-4 file:rounded-full file:border-0 file:text-[8px] md:file:text-[10px] file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 transition-all" /></div>
                     
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-2">{t.cvUpload}</label><input ref={cvRef} type="file" accept=".pdf,image/*" className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all" /></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.cvUpload}</label><input ref={cvRef} type="file" accept=".pdf,image/*" className="text-[10px] md:text-xs file:mr-2 md:file:mr-4 file:py-1 md:file:py-2 file:px-2 md:file:px-4 file:rounded-full file:border-0 file:text-[8px] md:file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all" /></div>
                     
-                    <button type="submit" className="w-full py-4 bg-[#002F66] text-white rounded-xl font-bold uppercase text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105">{t.saveRecord}</button>
+                    <button type="submit" className="w-full py-3 md:py-4 bg-[#002F66] text-white rounded-lg md:rounded-xl font-bold uppercase text-[8px] md:text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105">{t.saveRecord}</button>
                   </form>
                 </div>
-                <div className="lg:col-span-2 bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
-                  <table className="w-full text-left"><thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b"><tr><th className="p-6">{t.candidateDetails}</th><th className="p-6">{t.position}</th><th className="p-6">{t.salary}</th><th className="p-6 text-right">{t.actions}</th></tr></thead>
+                <div className="lg:col-span-2 bg-white rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-sm overflow-x-auto">
+                  <table className="w-full text-left min-w-[500px]">
+                    <thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b">
+                      <tr><th className="p-4 md:p-6">{t.candidateDetails}</th><th className="p-4 md:p-6">{t.position}</th><th className="p-4 md:p-6">{t.salary}</th><th className="p-4 md:p-6 text-right">{t.actions}</th></tr>
+                    </thead>
                     <tbody className="divide-y divide-gray-100">
                       {talents.map((talent) => (
                         <tr key={talent.id} className="hover:bg-gray-50 transition-all duration-200">
-                          <td className="p-6"><div className="flex items-center space-x-3"><img src={talent.pic} className="w-10 h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-sm">{escapeHtml(talent.name)}</div><div className="text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div></div></div></td>
-                          <td className="p-6"><div className="text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td>
-                          <td className="p-6"><div className="text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td>
-                          <td className="p-6 text-right">
-                            <button onClick={() => editHandler(talent)} className="text-blue-500 p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen"></i></button>
-                            <button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash"></i></button>
+                          <td className="p-4 md:p-6"><div className="flex items-center space-x-2 md:space-x-3"><img src={talent.pic} className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-xs md:text-sm">{escapeHtml(talent.name)}</div><div className="text-[8px] md:text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div></div></div></td>
+                          <td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td>
+                          <td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td>
+                          <td className="p-4 md:p-6 text-right">
+                            <button onClick={() => editHandler(talent)} className="text-blue-500 p-1 md:p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen text-xs md:text-sm"></i></button>
+                            <button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-1 md:p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash text-xs md:text-sm"></i></button>
                           </td>
                         </tr>
                       ))}
@@ -1124,10 +1144,15 @@ export default function Home() {
               </div>
             )}
             {activeTab === 'leads' && (
-              <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
-                <div className="p-8 border-b flex justify-between items-center"><h4 className="font-bold text-xs uppercase tracking-widest text-indigo-600">{t.realtimeLogs}</h4><button onClick={clearLeads} className="text-[10px] font-bold text-red-500 uppercase hover:underline transition-all">{t.clearLogs}</button></div>
-                <table className="w-full text-left"><thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest"><tr><th className="p-8">{t.trafficSource}</th><th className="p-8">{t.actionTaken}</th><th className="p-8 text-right">{t.timeLocal}</th></tr></thead>
-                  <tbody className="divide-y divide-gray-100">{leads.map((lead) => (<tr key={lead.id}><td className="p-8 text-xs font-bold">{escapeHtml(lead.source)}</td><td className="p-8 text-xs text-indigo-600 font-bold">{escapeHtml(lead.action)}</td><td className="p-8 text-right text-[10px] text-gray-400">{lead.time}</td></tr>))}</tbody>
+              <div className="bg-white rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-sm overflow-x-auto">
+                <div className="p-4 md:p-8 border-b flex justify-between items-center flex-wrap gap-2"><h4 className="font-bold text-[10px] md:text-xs uppercase tracking-widest text-indigo-600">{t.realtimeLogs}</h4><button onClick={clearLeads} className="text-[8px] md:text-[10px] font-bold text-red-500 uppercase hover:underline transition-all">{t.clearLogs}</button></div>
+                <table className="w-full text-left min-w-[400px]">
+                  <thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    <tr><th className="p-4 md:p-8">{t.trafficSource}</th><th className="p-4 md:p-8">{t.actionTaken}</th><th className="p-4 md:p-8 text-right">{t.timeLocal}</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {leads.map((lead) => (<tr key={lead.id}><td className="p-4 md:p-8 text-[10px] md:text-xs font-bold">{lead.source}</td><td className="p-4 md:p-8 text-[10px] md:text-xs text-indigo-600 font-bold">{lead.action}</td><td className="p-4 md:p-8 text-right text-[8px] md:text-[10px] text-gray-400">{lead.time}</td></tr>))}
+                  </tbody>
                 </table>
               </div>
             )}
