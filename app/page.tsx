@@ -131,7 +131,7 @@ const translations = {
     experience: 'Experience', driversJob: 'Drivers', babysitting: 'Baby sitting', nursesJob: 'Nurses', cooks: 'Cook', domesticWorker: 'Domestic Worker', teacher: 'Teacher',
     ourServicesTitle: 'Our Expertise', ourServicesDesc: 'Specialized recruitment solutions.',
     viewCandidates: 'View Candidates',
-    discount1: 'Welcome To ZOD MANPOWER', discount2: 'Offers Will Be Coming Soon', discount3: 'contact Us For Get More Informations', discountOffer: '🔥 LIMITED OFFER',
+    discount1: 'Welcome To ZOD MANPOWER', discount2: 'Offers Will Be Coming Soon', discount3: 'Contact Us For Get More Informations', discountOffer: '🔥 LIMITED OFFER',
     backToHome: 'Back to Home', maritalStatus: 'Marital Status', single: 'Single', married: 'Married', divorced: 'Divorced', widowed: 'Widowed',
     ourJourney: 'Our Journey', ourLocation: 'Our Location', whatClientsSay: 'What Our Clients Say',
     brandName: 'ZOD MANPOWER RECRUITMENT',
@@ -772,7 +772,7 @@ export default function Home() {
                   <div onClick={() => handleDiscountClick('Welcome To ZOD MANPOWER')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
                     <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount1}</span>
                   </div>
-                  <div onClick={() => handleDiscountClick('offers Will Be Coming Soon')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                  <div onClick={() => handleDiscountClick('Offers Will Be Coming Soon')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
                     <span className="text-white font-bold text-xs md:text-base discount-tex">🎉 {t.discount2}</span>
                   </div>
                   <div onClick={() => handleDiscountClick('Contact Us For Get More Informations')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
