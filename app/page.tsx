@@ -197,7 +197,7 @@ const translations = {
     experience: 'الخبرة', driversJob: 'سائقين', babysitting: 'رعاية أطفال', nursesJob: 'ممرضين', cooks: 'طهاة', domesticWorker: 'عمال منازل', teacher: 'معلمين',
     ourServicesTitle: 'خبراتنا', ourServicesDesc: 'حلول توظيف متخصصة.',
     viewCandidates: 'عرض المرشحين',
-    discount1: 'خصم 20% على أول تعيين', discount2: 'معالجة تأشيرة مجانية', discount3: 'خصم 15% على العقود السنوية', discountOffer: '🔥 عرض محدود',
+    discount1: 'أهلاً بكم في شركة زود للقوى العاملة', discount2: 'ستتوفر العروض قريباً', discount3: 'تواصل معنا للحصول على مزيد من المعلومات', discountOffer: '🔥 عرض محدود',
     backToHome: 'العودة إلى الرئيسية', maritalStatus: 'الحالة الاجتماعية', single: 'أعزب', married: 'متزوج', divorced: 'مطلق', widowed: 'أرمل',
     ourJourney: 'رحلتنا', ourLocation: 'موقعنا', whatClientsSay: 'ماذا يقول عملاؤنا',
     brandName: 'زود مان باور للتوظيف',
