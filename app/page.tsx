@@ -823,6 +823,9 @@ export default function Home() {
           </div>
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
+          {/* Rest of the content remains exactly the same as your original */}
+          {/* I'm including the complete structure below */}
+          
           {showOurTeamPage ? (
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
