@@ -14,6 +14,7 @@ interface Talent {
   salary: number;
   experience: string;
   maritalStatus: string;
+  workerType: string;
   pic: string;
   cv: string;
 }
@@ -48,7 +49,7 @@ interface Toast {
 }
 
 const jobOptions = [
-  'Driver', 'Baby sitting', 'Nurse', 'Cook', 'Domestic Worker', 'Teacher'
+  'Driver', 'Baby sitting', 'Nurse', 'Cook', 'Domestic Worker', 'Teacher', 'House Maid'
 ];
 
 const countryOptions = [
@@ -60,6 +61,8 @@ const experienceOptions = [
 ];
 
 const maritalStatusOptions = ['Single', 'Married', 'Divorced', 'Widowed'];
+
+const workerTypeOptions = ['Recruitment Workers', 'Returned Housemaids'];
 
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
@@ -137,6 +140,7 @@ const translations = {
     brandName: 'ZOD MANPOWER RECRUITMENT',
     candidateAdded: 'Candidate Added Successfully!', candidateUpdated: 'Candidate Updated Successfully!', candidateDeleted: 'Candidate Deleted Successfully!',
     errorOccurred: 'An error occurred', saving: 'Saving...', deleting: 'Deleting...',
+    workerType: 'Worker Type', recruitmentWorkers: 'Recruitment Workers', returnedHousemaidsType: 'Returned Housemaids',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
@@ -203,10 +207,10 @@ const translations = {
     brandName: 'زود مان باور للتوظيف',
     candidateAdded: 'تم إضافة المرشح بنجاح!', candidateUpdated: 'تم تحديث المرشح بنجاح!', candidateDeleted: 'تم حذف المرشح بنجاح!',
     errorOccurred: 'حدث خطأ', saving: 'جاري الحفظ...', deleting: 'جاري الحذف...',
+    workerType: 'نوع العامل', recruitmentWorkers: 'عمال التوظيف', returnedHousemaidsType: 'خادمات عائدات',
   }
 };
 
-// Toast Component
 const ToastNotification = ({ toast, onClose }: { toast: Toast; onClose: (id: number) => void }) => {
   useEffect(() => {
     const timer = setTimeout(() => onClose(toast.id), 5000);
@@ -291,10 +295,10 @@ export default function Home() {
   const salaryRef = useRef<HTMLInputElement>(null);
   const experienceRef = useRef<HTMLSelectElement>(null);
   const maritalStatusRef = useRef<HTMLSelectElement>(null);
+  const workerTypeRef = useRef<HTMLSelectElement>(null);
   const picRef = useRef<HTMLInputElement>(null);
   const cvRef = useRef<HTMLInputElement>(null);
 
-  // Toast functions
   const addToast = (type: Toast['type'], message: string, title?: string) => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, type, message, title }]);
@@ -335,14 +339,9 @@ export default function Home() {
     }
   }, [t]);
 
-  // Live update polling - every 5 seconds when admin is active OR when on hire page
   useEffect(() => {
     if (!adminActive && !showHirePage && !showReturnedHousemaids) return;
-    
-    const interval = setInterval(() => {
-      fetchTalents();
-    }, 5000); // Poll every 5 seconds for live updates
-    
+    const interval = setInterval(() => { fetchTalents(); }, 5000);
     return () => clearInterval(interval);
   }, [adminActive, showHirePage, showReturnedHousemaids, fetchTalents]);
 
@@ -380,6 +379,12 @@ export default function Home() {
     addToast('success', `Inquiry sent for ${talentName}`, 'Application Started');
   };
 
+  const handleExternalLink = (url: string, source: string) => {
+    trackLead('External Link', source);
+    window.open(url, '_blank');
+    addToast('info', `Redirecting to ${source}`, 'External Link');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -395,6 +400,7 @@ export default function Home() {
     formData.append('salary', salaryRef.current!.value);
     formData.append('experience', experienceRef.current!.value);
     formData.append('maritalStatus', maritalStatusRef.current!.value);
+    formData.append('workerType', workerTypeRef.current!.value);
     if (picRef.current?.files?.[0]) formData.append('tPic', picRef.current.files[0]);
     if (cvRef.current?.files?.[0]) formData.append('tCv', cvRef.current.files[0]);
     try {
@@ -424,6 +430,7 @@ export default function Home() {
     if (salaryRef.current) salaryRef.current.value = '0';
     if (experienceRef.current) experienceRef.current.value = experienceOptions[0];
     if (maritalStatusRef.current) maritalStatusRef.current.value = maritalStatusOptions[0];
+    if (workerTypeRef.current) workerTypeRef.current.value = workerTypeOptions[0];
     if (picRef.current) picRef.current.value = '';
     if (cvRef.current) cvRef.current.value = '';
   };
@@ -440,6 +447,7 @@ export default function Home() {
     if (salaryRef.current) salaryRef.current.value = String(talent.salary || 0);
     if (experienceRef.current) experienceRef.current.value = talent.experience || experienceOptions[0];
     if (maritalStatusRef.current) maritalStatusRef.current.value = talent.maritalStatus || maritalStatusOptions[0];
+    if (workerTypeRef.current) workerTypeRef.current.value = talent.workerType || workerTypeOptions[0];
     window.scrollTo({ top: 0, behavior: 'smooth' });
     addToast('info', `Editing ${talent.name}`, 'Edit Mode');
   };
@@ -472,6 +480,8 @@ export default function Home() {
       addToast('success', 'Welcome back, Admin!', 'Login Successful');
     } else { 
       addToast('error', 'Invalid credentials. Use admin / 1978', 'Access Denied');
+      u.value = '';
+      p.value = '';
     }
   };
 
@@ -491,7 +501,7 @@ export default function Home() {
     setShowHirePage(false);
     setShowOurTeamPage(false);
     setShowAboutPage(false);
-    setJobFilter('Domestic Worker');
+    setJobFilter('');
     addToast('info', 'Viewing experienced returned housemaids', 'Experienced Candidates');
   };
 
@@ -569,14 +579,17 @@ export default function Home() {
 
   const escapeHtml = (str: string) => str.replace(/[&<>]/g, (m) => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'));
 
-  const filteredTalents = talents.filter((tal) => {
+  const returnedHousemaidsTalents = talents.filter((tal) => tal.workerType === 'Returned Housemaids');
+  const recruitmentTalents = talents.filter((tal) => tal.workerType === 'Recruitment Workers');
+  
+  const filteredTalents = (showReturnedHousemaids ? returnedHousemaidsTalents : recruitmentTalents).filter((tal) => {
     const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
     const matchCountry = !countryFilter || tal.country === countryFilter;
     const matchJob = !jobFilter || tal.job.toLowerCase().includes(jobFilter.toLowerCase());
     return matchSearch && matchCountry && matchJob;
   });
 
-  const featuredTalents = talents.slice(0, 2);
+  const featuredTalents = recruitmentTalents;
   const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
   const regularTeam = teamMembers.filter(member => !member.isTopManagement);
 
@@ -652,23 +665,19 @@ export default function Home() {
         }
       `}</style>
 
-      {/* Toast Notifications */}
       <div className="fixed top-16 right-0 z-[200] space-y-3">
         {toasts.map(toast => (
           <ToastNotification key={toast.id} toast={toast} onClose={removeToast} />
         ))}
       </div>
 
-      {/* WhatsApp Chat Button */}
       <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[100] flex flex-col items-end gap-3">
         {chatOpen && (
           <div className="w-72 sm:w-80 md:w-96 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '480px' }}>
             <div className="bg-[#002F66] px-4 py-3 md:px-5 md:py-4 flex items-center justify-between">
               <div className="flex items-center gap-2 md:gap-3">
                 <div className="w-8 h-8 md:w-9 md:h-9 bg-white/20 rounded-full flex items-center justify-center"><i className="fa-solid fa-robot text-white text-xs md:text-sm"></i></div>
-                <div>
-                  <div className="text-white font-bold text-xs md:text-sm">ZOD AI Assistant</div>
-                </div>
+                <div><div className="text-white font-bold text-xs md:text-sm">ZOD AI Assistant</div></div>
               </div>
               <button onClick={() => setChatOpen(false)} className="text-white/60 hover:text-white transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
             </div>
@@ -714,7 +723,6 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Admin Login Modal */}
       {loginModalOpen && (
         <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center backdrop-blur-sm p-4">
           <div className="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] w-full max-w-md shadow-2xl relative border border-gray-100">
@@ -733,7 +741,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
         <div className="fixed inset-0 bg-black/70 z-[150] flex items-center justify-center backdrop-blur-sm p-4">
           <div className="bg-white p-6 md:p-8 rounded-xl md:rounded-2xl max-w-md w-full shadow-2xl">
@@ -755,7 +762,6 @@ export default function Home() {
 
       {!adminActive && (
         <div className="public-section">
-          {/* Discount Banner */}
           <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-20 md:pt-24 pb-2 md:pb-3 px-4 md:px-6">
             <div className="max-w-7xl mx-auto">
               <div className="overflow-hidden whitespace-nowrap">
@@ -773,7 +779,7 @@ export default function Home() {
                     <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount1}</span>
                   </div>
                   <div onClick={() => handleDiscountClick('Offers Will Be Coming Soon')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
-                    <span className="text-white font-bold text-xs md:text-base discount-tex">🎉 {t.discount2}</span>
+                    <span className="text-white font-bold text-xs md:text-base discount-text">🎉 {t.discount2}</span>
                   </div>
                   <div onClick={() => handleDiscountClick('Contact Us For Get More Informations')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
                     <span className="text-white font-bold text-xs md:text-base discount-text">💎 {t.discount3}</span>
@@ -786,7 +792,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Navigation Bar */}
           <nav className="fixed w-full z-50 glass-nav" style={{ top: '0' }}>
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
               <div className="flex items-center space-x-2 md:space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); window.scrollTo(0, 0); }}>
@@ -806,7 +811,6 @@ export default function Home() {
             </div>
           </nav>
 
-          {/* Mobile Sidebar */}
           <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
             <div className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fa-solid fa-xmark text-[#002F66]"></i></div>
             <div className="sidebar-nav mt-8">
@@ -821,17 +825,14 @@ export default function Home() {
           </div>
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
-          {/* Our Team Page */}
           {showOurTeamPage ? (
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowOurTeamPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
-                
                 <div className="text-center mb-8 md:mb-12 reveal">
                   <h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-3 md:mb-4">{t.teamTitle}</h3>
                   <p className="text-gray-500 text-sm md:text-base max-w-2xl mx-auto">{t.teamDesc}</p>
                 </div>
-
                 <div className="mb-12 md:mb-16">
                   <h4 className="text-xl md:text-2xl font-bold text-[#002F66] text-center mb-6 md:mb-10">{t.topManagementTitle}</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
@@ -853,7 +854,6 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-
                 <div>
                   <h4 className="text-lg md:text-xl font-bold text-slate-700 text-center mb-6 md:mb-8">Our Dedicated Team</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -877,17 +877,10 @@ export default function Home() {
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowAboutPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
-                
                 <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-10 shadow-lg">
                   <div className="grid md:grid-cols-2 gap-8 md:gap-12">
-                    <div>
-                      <h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourVision}</h3>
-                      <p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.visionText}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourMission}</h3>
-                      <p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.missionText}</p>
-                    </div>
+                    <div><h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourVision}</h3><p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.visionText}</p></div>
+                    <div><h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourMission}</h3><p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.missionText}</p></div>
                   </div>
                   <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-gray-200">
                     <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-3 md:mb-4">{t.ourJourney}</h3>
@@ -904,12 +897,10 @@ export default function Home() {
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowReturnedHousemaids(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
-                
                 <div className="text-center mb-8 md:mb-10">
                   <h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-2">{t.returnedHousemaids}</h3>
                   <p className="text-gray-500 text-sm md:text-base">Experienced housemaids returning from overseas with proven track records</p>
                 </div>
-
                 {loading ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
                 ) : filteredTalents.length === 0 ? (
@@ -995,7 +986,6 @@ export default function Home() {
             </div>
           ) : (
             <>
-              {/* Hero Section */}
               <section id="home" className="relative pt-24 md:pt-32 pb-16 md:pb-32 px-4 md:px-6 qatar-gradient text-white overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[20rem] md:text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center relative z-10">
@@ -1003,21 +993,20 @@ export default function Home() {
                     <span className="inline-block px-3 md:px-4 py-1 md:py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-widest border border-white/20 animate-pulse">{t.certified}</span>
                     <h1 className="text-3xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
                     <p className="text-sm md:text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
-                    
                     <div className="flex flex-wrap gap-3 md:gap-4 justify-center md:justify-start">
-                      <button onClick={() => handleQuickHire('House Maids')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                      <button onClick={() => handleQuickHire('House Maid')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🏠 {t.houseMaids}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button onClick={() => handleQuickHire('Drivers')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                      <button onClick={() => handleQuickHire('Driver')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🚗 {t.drivers}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button onClick={() => handleQuickHire('Nurses')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                      <button onClick={() => handleQuickHire('Nurse')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🏥 {t.nurses}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button onClick={() => handleQuickHire('Monthly Cleaners')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                      <button onClick={() => handleExternalLink('https://alkhadam.net/qa/en/company/411', 'Monthly Cleaners')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🧹 {t.monthlyCleaners}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
@@ -1034,7 +1023,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Stats Section */}
               <section className="py-12 md:py-16 bg-white border-b reveal">
                 <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
                   {[{ num: '9.2K', label: t.successfulPlacements }, { num: '1.8K+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '98.2%', label: t.complianceRate }].map((s, i) => (
@@ -1046,7 +1034,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Featured Candidates Section */}
               <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-6 md:mb-8">
@@ -1054,20 +1041,30 @@ export default function Home() {
                     <button onClick={() => setShowHirePage(true)} className="text-[#002F66] font-bold text-xs md:text-sm hover:underline transition-all flex items-center gap-1">{t.viewAllCandidates}</button>
                   </div>
                   {loading ? (
-                    <div className="space-y-3 md:space-y-4">{[...Array(2)].map((_, i) => <div key={i} className="bg-white p-4 md:p-5 rounded-xl md:rounded-2xl border animate-pulse flex gap-3 md:gap-4"><div className="w-12 h-12 md:w-16 md:h-16 bg-gray-200 rounded-lg md:rounded-xl shrink-0"></div><div className="flex-1"><div className="h-3 md:h-4 bg-gray-200 rounded w-1/2 mb-2"></div><div className="h-2 md:h-3 bg-gray-200 rounded w-1/3"></div></div></div>)}</div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
+                  ) : featuredTalents.length === 0 ? (
+                    <div className="text-center py-16 md:py-24 text-gray-400"><i className="fa-solid fa-user-slash text-4xl md:text-5xl mb-4 block"></i><p className="font-bold text-sm md:text-base">No candidates available. Please check back later.</p></div>
                   ) : (
-                    <div className="space-y-3 md:space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                       {featuredTalents.map((talent) => (
-                        <div key={talent.id} className="bg-white p-4 md:p-5 rounded-xl md:rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex items-center gap-3 md:gap-5">
-                          <img src={talent.pic} className="w-12 h-12 md:w-16 md:h-16 rounded-lg md:rounded-xl object-cover border-2 border-[#002F66]/10 shrink-0" onError={(e) => (e.currentTarget.src = 'https://placehold.co/80x80?text=User')} alt={talent.name} />
-                          <div className="flex-1 min-w-0">
-                            <div className="font-bold text-slate-800 text-sm md:text-base truncate">{escapeHtml(talent.name)}</div>
-                            <div className="text-[#002F66] font-bold text-[9px] md:text-[11px] uppercase tracking-widest">{escapeHtml(talent.job)} · {escapeHtml(talent.country)}</div>
-                            <div className="text-[8px] md:text-[10px] text-gray-400 mt-1">Experience: {talent.experience || '3-5 Years'}</div>
+                        <div key={talent.id} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
+                          <div className="flex justify-between items-start mb-4 md:mb-6">
+                            <img src={talent.pic} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
+                            <span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
                           </div>
-                          <div className="flex gap-2 md:gap-3 items-center shrink-0">
-                            <span className="text-[10px] md:text-xs font-bold text-gray-500 hidden sm:block">{talent.salary || 0} QAR</span>
-                            <button onClick={() => setShowHirePage(true)} className="bg-[#002F66] text-white text-[8px] md:text-[10px] font-bold px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl hover:bg-[#002060] transition-all hover:scale-105">{t.hireBtn}</button>
+                          <div className="flex-grow">
+                            <h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight">{escapeHtml(talent.name)}</h4>
+                            <p className="text-[#002F66] font-bold text-[10px] md:text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
+                            <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-100 space-y-2 md:space-y-3 mb-6 md:mb-8">
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-4 md:w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-4 md:w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-4 md:w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-4 md:w-5 text-[#002F66]"></i><span>{talent.experience || '3-5 Years'} Exp</span></div>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 md:gap-3 mt-auto">
+                            <a href={talent.cv} target="_blank" onClick={() => trackLead('Featured CV', talent.name)} className="flex-1 py-2 md:py-4 bg-gray-100 text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
+                            <button onClick={() => handleHireClick(talent.name, 'Featured Hire')} className="flex-1 py-2 md:py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
                           </div>
                         </div>
                       ))}
@@ -1076,7 +1073,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Our Legacy Section with View More Button */}
               <section id="about" className="py-16 md:py-24 px-4 md:px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center">
                   <div className="relative group">
@@ -1095,7 +1091,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Services/Expertise Section */}
               <section id="services" className="py-16 md:py-24 px-4 md:px-6 bg-gray-50 reveal">
                 <div className="max-w-7xl mx-auto text-center mb-12 md:mb-20"><h2 className="text-sm font-bold text-red-800 uppercase tracking-[0.3em] mb-4">{t.ourExpertise}</h2><h3 className="text-2xl md:text-4xl font-bold text-slate-900">{t.comprehensiveSolutions}</h3></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6 md:gap-8">
@@ -1109,7 +1104,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Location / Google Maps Section */}
               <section className="py-12 md:py-16 px-4 md:px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="text-center mb-6 md:mb-8">
@@ -1131,7 +1125,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Testimonials Section */}
               <section className="py-16 md:py-20 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">{t.whatClientsSay}</h3>
@@ -1147,7 +1140,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* FAQ Section */}
               <section className="py-16 md:py-20 bg-white px-4 md:px-6 reveal">
                 <div className="max-w-5xl mx-auto">
                   <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">{t.faqTitle}</h3>
@@ -1162,7 +1154,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Footer */}
               <footer className="py-16 md:py-20 bg-slate-900 text-white px-4 md:px-6">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 md:gap-12 border-b border-white/5 pb-12 md:pb-16">
                   <div className="col-span-2">
@@ -1183,7 +1174,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Admin Panel */}
       {adminActive && (
         <div className="admin-section min-h-screen bg-gray-50 pb-16 md:pb-20">
           <nav className="bg-white border-b px-4 md:px-6 py-3 md:py-4 mb-6 md:mb-10 sticky top-0 z-50">
@@ -1209,32 +1199,20 @@ export default function Home() {
                   <div className="flex justify-between items-center mb-6 md:mb-8 border-b pb-3 md:pb-4"><h4 className="font-bold uppercase text-[10px] md:text-xs text-[#002F66] tracking-widest">{editTalent ? `${t.editCandidate} ${editTalent.name}` : t.newCandidate}</h4><button onClick={resetForm} className="text-[8px] md:text-[10px] text-gray-400 hover:text-red-600 transition-all hover:rotate-12"><i className="fa-solid fa-rotate-left"></i></button></div>
                   <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.fullName}</label><input ref={nameRef} type="text" className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all text-sm md:text-base" required /></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.dob}</label><input ref={dobRef} type="date" onChange={handleDobChange} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
-                    
-                    {calculatedAge !== null && (
-                      <div className="bg-blue-50 p-2 md:p-3 rounded-lg md:rounded-xl"><span className="text-[10px] md:text-xs font-bold text-blue-600">Age: {calculatedAge} years</span></div>
-                    )}
-                    
+                    {calculatedAge !== null && (<div className="bg-blue-50 p-2 md:p-3 rounded-lg md:rounded-xl"><span className="text-[10px] md:text-xs font-bold text-blue-600">Age: {calculatedAge} years</span></div>)}
                     <div className="grid grid-cols-2 gap-3 md:gap-4">
                       <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.gender}</label><select ref={genderRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option>Male</option><option>Female</option></select></div>
                       <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.maritalStatus}</label><select ref={maritalStatusRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{maritalStatusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div>
                     </div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{jobOptions.map(job => <option key={job} value={job}>{job}</option>)}</select></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.country}</label><select ref={countryRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Muslim">Muslim</option><option value="Christian">Christian</option><option value="Hindu">Hindu</option><option value="Buddhist">Buddhist</option></select></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.experience}</label><select ref={experienceRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{experienceOptions.map(exp => <option key={exp} value={exp}>{exp}</option>)}</select></div>
-                    
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.workerType}</label><select ref={workerTypeRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{workerTypeOptions.map(opt => <option key={opt} value={opt}>{opt === 'Recruitment Workers' ? t.recruitmentWorkers : t.returnedHousemaidsType}</option>)}</select></div>
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.photo}</label><input ref={picRef} type="file" accept="image/*" className="text-[10px] md:text-xs file:mr-2 md:file:mr-4 file:py-1 md:file:py-2 file:px-2 md:file:px-4 file:rounded-full file:border-0 file:text-[8px] md:file:text-[10px] file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 transition-all" /></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.cvUpload}</label><input ref={cvRef} type="file" accept=".pdf,image/*" className="text-[10px] md:text-xs file:mr-2 md:file:mr-4 file:py-1 md:file:py-2 file:px-2 md:file:px-4 file:rounded-full file:border-0 file:text-[8px] md:file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all" /></div>
-                    
                     <button type="submit" disabled={isSubmitting} className="w-full py-3 md:py-4 bg-[#002F66] text-white rounded-lg md:rounded-xl font-bold uppercase text-[8px] md:text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105 disabled:opacity-50">
                       {isSubmitting ? <i className="fa-solid fa-spinner fa-spin mr-2"></i> : null}
                       {t.saveRecord}
