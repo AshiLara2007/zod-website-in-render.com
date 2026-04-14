@@ -339,11 +339,10 @@ export default function Home() {
     }
   }, [t]);
 
-  useEffect(() => {
-    if (!adminActive && !showHirePage && !showReturnedHousemaids) return;
-    const interval = setInterval(() => { fetchTalents(); }, 5000);
-    return () => clearInterval(interval);
-  }, [adminActive, showHirePage, showReturnedHousemaids, fetchTalents]);
+useEffect(() => {
+  const interval = setInterval(() => { fetchTalents(); }, 5000);
+  return () => clearInterval(interval);
+}, [fetchTalents]);
 
   const loadLeads = () => {
     const stored = localStorage.getItem('zod_activity_leads');
@@ -561,10 +560,14 @@ export default function Home() {
     if (chatOpen) chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages, chatOpen]);
 
-  useEffect(() => {
-    const init = async () => { await fetchTalents(); loadLeads(); setTimeout(() => setIsLoading(false), 3000); };
-    init();
-  }, [fetchTalents]);
+useEffect(() => {
+  const init = async () => {
+    fetchTalents(); // await නෑ — background ෙකෙදී run වෙනවා
+    loadLeads();
+    setTimeout(() => setIsLoading(false), 3000);
+  };
+  init();
+}, [fetchTalents]);;
 
   useEffect(() => {
     const reveal = () => {
@@ -589,7 +592,7 @@ export default function Home() {
     return matchSearch && matchCountry && matchJob;
   });
 
-  const featuredTalents = recruitmentTalents;
+  const featuredTalents = recruitmentTalents.slice(0, 6);
   const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
   const regularTeam = teamMembers.filter(member => !member.isTopManagement);
 
