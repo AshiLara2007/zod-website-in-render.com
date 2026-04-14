@@ -211,7 +211,6 @@ const translations = {
   }
 };
 
-// Toast Component
 const ToastNotification = ({ toast, onClose }: { toast: Toast; onClose: (id: number) => void }) => {
   useEffect(() => {
     const timer = setTimeout(() => onClose(toast.id), 5000);
@@ -300,7 +299,6 @@ export default function Home() {
   const picRef = useRef<HTMLInputElement>(null);
   const cvRef = useRef<HTMLInputElement>(null);
 
-  // Toast functions
   const addToast = (type: Toast['type'], message: string, title?: string) => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, type, message, title }]);
@@ -343,11 +341,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!adminActive && !showHirePage && !showReturnedHousemaids) return;
-    
-    const interval = setInterval(() => {
-      fetchTalents();
-    }, 5000);
-    
+    const interval = setInterval(() => { fetchTalents(); }, 5000);
     return () => clearInterval(interval);
   }, [adminActive, showHirePage, showReturnedHousemaids, fetchTalents]);
 
@@ -583,10 +577,7 @@ export default function Home() {
 
   const escapeHtml = (str: string) => str.replace(/[&<>]/g, (m) => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'));
 
-  // Filter for Returned Housemaids page - show only candidates with workerType = 'Returned Housemaids'
   const returnedHousemaidsTalents = talents.filter((tal) => tal.workerType === 'Returned Housemaids');
-  
-  // Filter for Hire page - show only candidates with workerType = 'Recruitment Workers'
   const recruitmentTalents = talents.filter((tal) => tal.workerType === 'Recruitment Workers');
   
   const filteredTalents = (showReturnedHousemaids ? returnedHousemaidsTalents : recruitmentTalents).filter((tal) => {
@@ -596,7 +587,6 @@ export default function Home() {
     return matchSearch && matchCountry && matchJob;
   });
 
-  // Featured Candidates - show 6 candidates (all recruitment workers, limit to 6)
   const featuredTalents = recruitmentTalents.slice(0, 6);
   const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
   const regularTeam = teamMembers.filter(member => !member.isTopManagement);
@@ -673,23 +663,19 @@ export default function Home() {
         }
       `}</style>
 
-      {/* Toast Notifications */}
       <div className="fixed top-16 right-0 z-[200] space-y-3">
         {toasts.map(toast => (
           <ToastNotification key={toast.id} toast={toast} onClose={removeToast} />
         ))}
       </div>
 
-      {/* WhatsApp Chat Button */}
       <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[100] flex flex-col items-end gap-3">
         {chatOpen && (
           <div className="w-72 sm:w-80 md:w-96 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '480px' }}>
             <div className="bg-[#002F66] px-4 py-3 md:px-5 md:py-4 flex items-center justify-between">
               <div className="flex items-center gap-2 md:gap-3">
                 <div className="w-8 h-8 md:w-9 md:h-9 bg-white/20 rounded-full flex items-center justify-center"><i className="fa-solid fa-robot text-white text-xs md:text-sm"></i></div>
-                <div>
-                  <div className="text-white font-bold text-xs md:text-sm">ZOD AI Assistant</div>
-                </div>
+                <div><div className="text-white font-bold text-xs md:text-sm">ZOD AI Assistant</div></div>
               </div>
               <button onClick={() => setChatOpen(false)} className="text-white/60 hover:text-white transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
             </div>
@@ -735,7 +721,6 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Admin Login Modal */}
       {loginModalOpen && (
         <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center backdrop-blur-sm p-4">
           <div className="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] w-full max-w-md shadow-2xl relative border border-gray-100">
@@ -754,7 +739,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
         <div className="fixed inset-0 bg-black/70 z-[150] flex items-center justify-center backdrop-blur-sm p-4">
           <div className="bg-white p-6 md:p-8 rounded-xl md:rounded-2xl max-w-md w-full shadow-2xl">
@@ -776,7 +760,6 @@ export default function Home() {
 
       {!adminActive && (
         <div className="public-section">
-          {/* Discount Banner */}
           <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-20 md:pt-24 pb-2 md:pb-3 px-4 md:px-6">
             <div className="max-w-7xl mx-auto">
               <div className="overflow-hidden whitespace-nowrap">
@@ -807,7 +790,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Navigation Bar */}
           <nav className="fixed w-full z-50 glass-nav" style={{ top: '0' }}>
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
               <div className="flex items-center space-x-2 md:space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); window.scrollTo(0, 0); }}>
@@ -827,7 +809,6 @@ export default function Home() {
             </div>
           </nav>
 
-          {/* Mobile Sidebar */}
           <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
             <div className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fa-solid fa-xmark text-[#002F66]"></i></div>
             <div className="sidebar-nav mt-8">
@@ -842,17 +823,14 @@ export default function Home() {
           </div>
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
-          {/* Our Team Page */}
           {showOurTeamPage ? (
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowOurTeamPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
-                
                 <div className="text-center mb-8 md:mb-12 reveal">
                   <h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-3 md:mb-4">{t.teamTitle}</h3>
                   <p className="text-gray-500 text-sm md:text-base max-w-2xl mx-auto">{t.teamDesc}</p>
                 </div>
-
                 <div className="mb-12 md:mb-16">
                   <h4 className="text-xl md:text-2xl font-bold text-[#002F66] text-center mb-6 md:mb-10">{t.topManagementTitle}</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
@@ -874,7 +852,6 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-
                 <div>
                   <h4 className="text-lg md:text-xl font-bold text-slate-700 text-center mb-6 md:mb-8">Our Dedicated Team</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -898,17 +875,10 @@ export default function Home() {
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowAboutPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
-                
                 <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-10 shadow-lg">
                   <div className="grid md:grid-cols-2 gap-8 md:gap-12">
-                    <div>
-                      <h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourVision}</h3>
-                      <p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.visionText}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourMission}</h3>
-                      <p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.missionText}</p>
-                    </div>
+                    <div><h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourVision}</h3><p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.visionText}</p></div>
+                    <div><h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourMission}</h3><p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.missionText}</p></div>
                   </div>
                   <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-gray-200">
                     <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-3 md:mb-4">{t.ourJourney}</h3>
@@ -925,12 +895,10 @@ export default function Home() {
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowReturnedHousemaids(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
-                
                 <div className="text-center mb-8 md:mb-10">
                   <h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-2">{t.returnedHousemaids}</h3>
                   <p className="text-gray-500 text-sm md:text-base">Experienced housemaids returning from overseas with proven track records</p>
                 </div>
-
                 {loading ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
                 ) : filteredTalents.length === 0 ? (
@@ -1016,7 +984,6 @@ export default function Home() {
             </div>
           ) : (
             <>
-              {/* Hero Section */}
               <section id="home" className="relative pt-24 md:pt-32 pb-16 md:pb-32 px-4 md:px-6 qatar-gradient text-white overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[20rem] md:text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center relative z-10">
@@ -1024,7 +991,6 @@ export default function Home() {
                     <span className="inline-block px-3 md:px-4 py-1 md:py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-widest border border-white/20 animate-pulse">{t.certified}</span>
                     <h1 className="text-3xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
                     <p className="text-sm md:text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
-                    
                     <div className="flex flex-wrap gap-3 md:gap-4 justify-center md:justify-start">
                       <button onClick={() => handleQuickHire('House Maid')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🏠 {t.houseMaid}</span>
@@ -1055,7 +1021,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Stats Section */}
               <section className="py-12 md:py-16 bg-white border-b reveal">
                 <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
                   {[{ num: '9.2K', label: t.successfulPlacements }, { num: '1.8K+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '98.2%', label: t.complianceRate }].map((s, i) => (
@@ -1067,7 +1032,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Featured Candidates Section - Show 6 candidates */}
               <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-6 md:mb-8">
@@ -1107,7 +1071,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Our Legacy Section with View More Button */}
               <section id="about" className="py-16 md:py-24 px-4 md:px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center">
                   <div className="relative group">
@@ -1126,7 +1089,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Services/Expertise Section */}
               <section id="services" className="py-16 md:py-24 px-4 md:px-6 bg-gray-50 reveal">
                 <div className="max-w-7xl mx-auto text-center mb-12 md:mb-20"><h2 className="text-sm font-bold text-red-800 uppercase tracking-[0.3em] mb-4">{t.ourExpertise}</h2><h3 className="text-2xl md:text-4xl font-bold text-slate-900">{t.comprehensiveSolutions}</h3></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6 md:gap-8">
@@ -1140,7 +1102,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Location / Google Maps Section */}
               <section className="py-12 md:py-16 px-4 md:px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="text-center mb-6 md:mb-8">
@@ -1162,7 +1123,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Testimonials Section */}
               <section className="py-16 md:py-20 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">{t.whatClientsSay}</h3>
@@ -1178,7 +1138,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* FAQ Section */}
               <section className="py-16 md:py-20 bg-white px-4 md:px-6 reveal">
                 <div className="max-w-5xl mx-auto">
                   <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">{t.faqTitle}</h3>
@@ -1193,7 +1152,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Footer */}
               <footer className="py-16 md:py-20 bg-slate-900 text-white px-4 md:px-6">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 md:gap-12 border-b border-white/5 pb-12 md:pb-16">
                   <div className="col-span-2">
@@ -1214,7 +1172,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Admin Panel */}
       {adminActive && (
         <div className="admin-section min-h-screen bg-gray-50 pb-16 md:pb-20">
           <nav className="bg-white border-b px-4 md:px-6 py-3 md:py-4 mb-6 md:mb-10 sticky top-0 z-50">
