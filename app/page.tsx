@@ -613,7 +613,7 @@ export default function Home() {
 
   return (
     <div dir={dir} className={isRTL ? 'rtl' : 'ltr'}>
-      <style jsx global>{`
+      <style>{`
         .rtl { direction: rtl; text-align: right; }
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
         @keyframes marquee-rtl { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
