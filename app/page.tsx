@@ -813,7 +813,7 @@ export default function Home() {
             </div>
           </nav>
 
-          {/* Mobile Sidebar - Contact Us button fixed */}
+          {/* Mobile Sidebar */}
           <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
             <div className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fa-solid fa-xmark text-[#002F66]"></i></div>
             <div className="sidebar-nav mt-8">
@@ -1218,32 +1218,19 @@ export default function Home() {
                   <div className="flex justify-between items-center mb-6 md:mb-8 border-b pb-3 md:pb-4"><h4 className="font-bold uppercase text-[10px] md:text-xs text-[#002F66] tracking-widest">{editTalent ? `${t.editCandidate} ${editTalent.name}` : t.newCandidate}</h4><button onClick={resetForm} className="text-[8px] md:text-[10px] text-gray-400 hover:text-red-600 transition-all hover:rotate-12"><i className="fa-solid fa-rotate-left"></i></button></div>
                   <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.fullName}</label><input ref={nameRef} type="text" className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all text-sm md:text-base" required /></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.dob}</label><input ref={dobRef} type="date" onChange={handleDobChange} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
-                    
-                    {calculatedAge !== null && (
-                      <div className="bg-blue-50 p-2 md:p-3 rounded-lg md:rounded-xl"><span className="text-[10px] md:text-xs font-bold text-blue-600">Age: {calculatedAge} years</span></div>
-                    )}
-                    
+                    {calculatedAge !== null && (<div className="bg-blue-50 p-2 md:p-3 rounded-lg md:rounded-xl"><span className="text-[10px] md:text-xs font-bold text-blue-600">Age: {calculatedAge} years</span></div>)}
                     <div className="grid grid-cols-2 gap-3 md:gap-4">
                       <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.gender}</label><select ref={genderRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option>Male</option><option>Female</option></select></div>
                       <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.maritalStatus}</label><select ref={maritalStatusRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{maritalStatusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div>
                     </div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{jobOptions.map(job => <option key={job} value={job}>{job}</option>)}</select></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.country}</label><select ref={countryRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Muslim">Muslim</option><option value="Christian">Christian</option><option value="Hindu">Hindu</option><option value="Buddhist">Buddhist</option></select></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.experience}</label><select ref={experienceRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{experienceOptions.map(exp => <option key={exp} value={exp}>{exp}</option>)}</select></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.photo}</label><input ref={picRef} type="file" accept="image/*" className="text-[10px] md:text-xs file:mr-2 md:file:mr-4 file:py-1 md:file:py-2 file:px-2 md:file:px-4 file:rounded-full file:border-0 file:text-[8px] md:file:text-[10px] file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 transition-all" /></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.cvUpload}</label><input ref={cvRef} type="file" accept=".pdf,image/*" className="text-[10px] md:text-xs file:mr-2 md:file:mr-4 file:py-1 md:file:py-2 file:px-2 md:file:px-4 file:rounded-full file:border-0 file:text-[8px] md:file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all" /></div>
-                    
                     <button type="submit" disabled={isSubmitting} className="w-full py-3 md:py-4 bg-[#002F66] text-white rounded-lg md:rounded-xl font-bold uppercase text-[8px] md:text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105 disabled:opacity-50">
                       {isSubmitting ? <i className="fa-solid fa-spinner fa-spin mr-2"></i> : null}
                       {t.saveRecord}
@@ -1268,7 +1255,7 @@ export default function Home() {
                         </tr>
                       ))}
                     </tbody>
-                  <tr>
+                  </table>
                 </div>
               </div>
             )}
