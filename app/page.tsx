@@ -125,7 +125,7 @@ const translations = {
     trafficSource: 'Traffic Source', actionTaken: 'Action Taken', timeLocal: 'Time (Local)',
     confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate?',
     cancel: 'Cancel', yesDelete: 'Yes, Delete', english: 'English', arabic: 'العربية',
-    houseMaids: 'House Maids', drivers: 'Drivers', nurses: 'Nurses', monthlyCleaners: 'Monthly Cleaners', returnedHousemaids: 'Returned Housemaids',
+    houseMaids: 'House Maids', drivers: 'Drivers', nurses: 'Nurses', monthlyCleaners: 'Monthly Cleaners', returnedHousemaids: 'Returned Housemaids', alMohannadi: 'Al-Mohannadi',
     ourTeam: 'Our Team', teamTitle: 'Meet Our Team', teamDesc: 'Dedicated professionals committed to excellence.',
     topManagementTitle: 'Our Top Management Team', contact: 'Contact', viewMore: 'View More',
     ourVision: 'Our Vision', ourMission: 'Our Mission',
@@ -141,6 +141,7 @@ const translations = {
     candidateAdded: 'Candidate Added Successfully!', candidateUpdated: 'Candidate Updated Successfully!', candidateDeleted: 'Candidate Deleted Successfully!',
     errorOccurred: 'An error occurred', saving: 'Saving...', deleting: 'Deleting...',
     workerType: 'Worker Type', recruitmentWorkers: 'Recruitment Workers', returnedHousemaidsType: 'Returned Housemaids',
+    showReturnedOnly: 'Show Returned Housemaids Only',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
@@ -192,7 +193,7 @@ const translations = {
     trafficSource: 'مصدر الزيارة', actionTaken: 'الإجراء المتخذ', timeLocal: 'الوقت',
     confirmDelete: 'تأكيد الحذف', deleteMsg: 'هل أنت متأكد من حذف هذا المرشح؟',
     cancel: 'إلغاء', yesDelete: 'نعم، احذف', english: 'English', arabic: 'العربية',
-    houseMaids: 'خادمات منازل', drivers: 'سائقين', nurses: 'ممرضين', monthlyCleaners: 'عمال نظافة شهري', returnedHousemaids: 'خادمات عائدات',
+    houseMaids: 'خادمات منازل', drivers: 'سائقين', nurses: 'ممرضين', monthlyCleaners: 'عمال نظافة شهري', returnedHousemaids: 'خادمات عائدات', alMohannadi: 'المهندي',
     ourTeam: 'فريقنا', teamTitle: 'تعرف على فريقنا', teamDesc: 'محترفون ملتزمون بالتميز.',
     topManagementTitle: 'فريق الإدارة العليا', contact: 'اتصل', viewMore: 'اقرأ المزيد',
     ourVision: 'رؤيتنا', ourMission: 'مهمتنا',
@@ -208,6 +209,7 @@ const translations = {
     candidateAdded: 'تم إضافة المرشح بنجاح!', candidateUpdated: 'تم تحديث المرشح بنجاح!', candidateDeleted: 'تم حذف المرشح بنجاح!',
     errorOccurred: 'حدث خطأ', saving: 'جاري الحفظ...', deleting: 'جاري الحذف...',
     workerType: 'نوع العامل', recruitmentWorkers: 'عمال التوظيف', returnedHousemaidsType: 'خادمات عائدات',
+    showReturnedOnly: 'إظهار الخادمات العائدات فقط',
   }
 };
 
@@ -276,6 +278,7 @@ export default function Home() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showReturnedOnly, setShowReturnedOnly] = useState(false);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -566,8 +569,10 @@ export default function Home() {
 
   const escapeHtml = (str: string) => str.replace(/[&<>]/g, (m) => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'));
 
-  // Featured Candidates shows ALL candidates (both Recruitment Workers AND Returned Housemaids)
-  const featuredTalents = talents;
+  // Filter talents for featured section based on checkbox
+  const featuredTalents = showReturnedOnly 
+    ? talents.filter((tal) => tal.workerType === 'Returned Housemaids')
+    : talents;
   
   // Filter for Hire Talent page (shows all candidates)
   const filteredTalents = talents.filter((tal) => {
@@ -957,6 +962,10 @@ export default function Home() {
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🧹 {t.monthlyCleaners}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
+                      <button onClick={() => handleExternalLink('https://alkhadam.net/qa/en/company/7653', 'Al-Mohannadi')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                        <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🏥 {t.alMohannadi}</span>
+                        <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                      </button>
                     </div>
                   </div>
                   <div className="hidden md:flex justify-center relative">
@@ -979,9 +988,20 @@ export default function Home() {
 
               <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
-                  <div className="flex justify-between items-center mb-6 md:mb-8">
+                  <div className="flex justify-between items-center mb-6 md:mb-8 flex-wrap gap-4">
                     <h3 className="text-xl md:text-2xl font-bold text-slate-900">{t.featuredCandidates}</h3>
-                    <button onClick={() => setShowHirePage(true)} className="text-[#002F66] font-bold text-xs md:text-sm hover:underline transition-all flex items-center gap-1">{t.viewAllCandidates}</button>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={showReturnedOnly} 
+                          onChange={(e) => setShowReturnedOnly(e.target.checked)}
+                          className="w-4 h-4 text-[#002F66] rounded border-gray-300 focus:ring-[#002F66]"
+                        />
+                        <span className="text-xs md:text-sm font-medium text-gray-700">{t.showReturnedOnly}</span>
+                      </label>
+                      <button onClick={() => setShowHirePage(true)} className="text-[#002F66] font-bold text-xs md:text-sm hover:underline transition-all flex items-center gap-1">{t.viewAllCandidates}</button>
+                    </div>
                   </div>
                   {loading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
