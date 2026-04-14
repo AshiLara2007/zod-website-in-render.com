@@ -595,7 +595,8 @@ export default function Home() {
     return matchSearch && matchCountry && matchJob;
   });
 
-  const featuredTalents = recruitmentTalents.slice(0, 6);
+  // FIX: Featured Candidates shows ALL recruitment workers (not limited)
+  const featuredTalents = recruitmentTalents; // Show ALL recruitment workers, not just 6
   const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
   const regularTeam = teamMembers.filter(member => !member.isTopManagement);
 
@@ -1040,6 +1041,7 @@ export default function Home() {
                 </div>
               </section>
 
+              {/* Featured Candidates Section - Shows ALL recruitment workers */}
               <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-6 md:mb-8">
@@ -1049,7 +1051,7 @@ export default function Home() {
                   {loading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
                   ) : featuredTalents.length === 0 ? (
-                    <div className="text-center py-16 md:py-24 text-gray-400"><i className="fa-solid fa-user-slash text-4xl md:text-5xl mb-4 block"></i><p className="font-bold text-sm md:text-base">No featured candidates at the moment.</p></div>
+                    <div className="text-center py-16 md:py-24 text-gray-400"><i className="fa-solid fa-user-slash text-4xl md:text-5xl mb-4 block"></i><p className="font-bold text-sm md:text-base">No candidates available. Please check back later.</p></div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                       {featuredTalents.map((talent) => (
