@@ -893,8 +893,8 @@ export default function Home() {
                     <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-3 md:mb-4">{t.ourJourney}</h3>
                     <p className="text-gray-500 leading-relaxed text-sm md:text-base">
                       {language === 'en' 
-                        ? 'Founded in 2010, ZOD MANPOWER RECRUITMENT has grown to become one of Qatar\'s most trusted manpower agencies. With over 12 years of experience in the Doha market, we have successfully placed thousands of skilled professionals across various industries including hospitality, construction, healthcare, and domestic services. Our commitment to ethical recruitment and compliance with Qatar Labor Laws has earned us the trust of both employers and candidates alike.'
-                        : 'تأسست شركة زود مان باور للتوظيف في عام 2010، وأصبحت واحدة من أكثر وكالات القوى العاملة الموثوقة في قطر. مع أكثر من 12 عاماً من الخبرة في سوق الدوحة، قمنا بنجاح بتوظيف آلاف المهنيين المهرة في مختلف القطاعات بما في ذلك الضيافة والبناء والرعاية الصحية والخدمات المنزلية. لقد أكسبنا التزامنا بالتوظيف الأخلاقي والامتثال لقوانين العمل القطرية ثقة كل من أصحاب العمل والمرشحين على حد سواء.'}
+                        ? 'ZOD Manpower, located in Doha, Qatar, is a recruitment agency specializing in supplying staff, including housemaids, nurses, and office boys from countries like the Philippines, Sri Lanka, Kenya, and India. We offer various staffing solutions and are listed as a recruitment agency in Qatar. '
+                        : 'شركة زود للتوظيف، ومقرها الدوحة، قطر، هي وكالة توظيف متخصصة في توفير الكوادر البشرية، بما في ذلك عاملات المنازل والممرضات وعمال المكاتب، من دول مثل الفلبين وسريلانكا وكينيا والهند. نقدم حلولاً متنوعة للتوظيف، ونحن مسجلون كوكالة توظيف معتمدة في قطر.'}
                     </p>
                   </div>
                 </div>
