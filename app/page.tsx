@@ -476,10 +476,15 @@ export default function Home() {
     const p = document.getElementById('adminPass') as HTMLInputElement;
     if (!u || !p) return;
     if (u.value === 'admin' && p.value === '1978') {
-      setAdminActive(true); setLoginModalOpen(false); u.value = ''; p.value = '';
+      setAdminActive(true);
+      setLoginModalOpen(false);
+      u.value = '';
+      p.value = '';
       addToast('success', 'Welcome back, Admin!', 'Login Successful');
-    } else { 
+    } else {
       addToast('error', 'Invalid credentials. Use admin / 1978', 'Access Denied');
+      u.value = '';
+      p.value = '';
     }
   };
 
@@ -489,7 +494,7 @@ export default function Home() {
     setShowOurTeamPage(false);
     setShowAboutPage(false);
     setShowReturnedHousemaids(false);
-    setSearchQuery(category.toLowerCase());
+    setSearchQuery(category);
     addToast('info', `Browsing ${category} candidates`, 'Category Selected');
   };
 
@@ -552,7 +557,10 @@ export default function Home() {
   };
 
   const handleChatKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') sendChatMessage();
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sendChatMessage();
+    }
   };
 
   useEffect(() => {
@@ -823,9 +831,6 @@ export default function Home() {
           </div>
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
-          {/* Rest of the content remains exactly the same as your original */}
-          {/* I'm including the complete structure below */}
-          
           {showOurTeamPage ? (
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
@@ -1250,7 +1255,13 @@ export default function Home() {
                     <tr><th className="p-4 md:p-8">{t.trafficSource}</th><th className="p-4 md:p-8">{t.actionTaken}</th><th className="p-4 md:p-8 text-right">{t.timeLocal}</th></tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {leads.map((lead) => (<tr key={lead.id}><td className="p-4 md:p-8 text-[10px] md:text-xs font-bold">{lead.source}</td><td className="p-4 md:p-8 text-[10px] md:text-xs text-indigo-600 font-bold">{lead.action}</td><td className="p-4 md:p-8 text-right text-[8px] md:text-[10px] text-gray-400">{lead.time}</td></td>))}
+                    {leads.map((lead) => (
+                      <tr key={lead.id}>
+                        <td className="p-4 md:p-8 text-[10px] md:text-xs font-bold">{lead.source}</td>
+                        <td className="p-4 md:p-8 text-[10px] md:text-xs text-indigo-600 font-bold">{lead.action}</td>
+                        <td className="p-4 md:p-8 text-right text-[8px] md:text-[10px] text-gray-400">{lead.time}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
