@@ -122,13 +122,13 @@ const translations = {
     trafficSource: 'Traffic Source', actionTaken: 'Action Taken', timeLocal: 'Time (Local)',
     confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate?',
     cancel: 'Cancel', yesDelete: 'Yes, Delete', english: 'English', arabic: 'العربية',
-    houseMaids: 'House Maids', drivers: 'Drivers', nurses: 'Nurses', monthlyCleaners: 'Monthly Cleaners', returnedHousemaids: 'Returned Housemaids',
+    houseMaids: 'House Maids', drivers: 'Drivers', nurses: 'Al-Mohannadi', monthlyCleaners: 'Monthly Cleaners', returnedHousemaids: 'Returned Housemaids',
     ourTeam: 'Our Team', teamTitle: 'Meet Our Team', teamDesc: 'Dedicated professionals committed to excellence.',
     topManagementTitle: 'Our Top Management Team', contact: 'Contact', viewMore: 'View More',
     ourVision: 'Our Vision', ourMission: 'Our Mission',
     visionText: 'To be the most trusted manpower solutions provider in the Middle East.',
     missionText: 'To provide ethical, transparent, and efficient recruitment services.',
-    experience: 'Experience', driversJob: 'Drivers', babysitting: 'Baby sitting', nursesJob: 'Nurses', cooks: 'Cook', domesticWorker: 'Domestic Worker', teacher: 'Teacher',
+    experience: 'Experience', driversJob: 'Drivers', babysitting: 'Baby sitting', nursesJob: 'Al-Mohannadi', cooks: 'Cook', domesticWorker: 'Domestic Worker', teacher: 'Teacher',
     ourServicesTitle: 'Our Expertise', ourServicesDesc: 'Specialized recruitment solutions.',
     viewCandidates: 'View Candidates',
     discount1: 'Welcome To ZOD MANPOWER', discount2: 'Offers Will Be Coming Soon', discount3: 'Contact Us For Get More Informations', discountOffer: '🔥 LIMITED OFFER',
@@ -188,13 +188,13 @@ const translations = {
     trafficSource: 'مصدر الزيارة', actionTaken: 'الإجراء المتخذ', timeLocal: 'الوقت',
     confirmDelete: 'تأكيد الحذف', deleteMsg: 'هل أنت متأكد من حذف هذا المرشح؟',
     cancel: 'إلغاء', yesDelete: 'نعم، احذف', english: 'English', arabic: 'العربية',
-    houseMaids: 'خادمات منازل', drivers: 'سائقين', nurses: 'ممرضين', monthlyCleaners: 'عمال نظافة شهري', returnedHousemaids: 'خادمات عائدات',
+    houseMaids: 'خادمات منازل', drivers: 'سائقين', nurses: 'المهندي', monthlyCleaners: 'عمال نظافة شهري', returnedHousemaids: 'خادمات عائدات',
     ourTeam: 'فريقنا', teamTitle: 'تعرف على فريقنا', teamDesc: 'محترفون ملتزمون بالتميز.',
     topManagementTitle: 'فريق الإدارة العليا', contact: 'اتصل', viewMore: 'اقرأ المزيد',
     ourVision: 'رؤيتنا', ourMission: 'مهمتنا',
     visionText: 'أن نكون مزود حلول القوى العاملة الأكثر ثقة.',
     missionText: 'تقديم خدمات توظيف أخلاقية وشفافة.',
-    experience: 'الخبرة', driversJob: 'سائقين', babysitting: 'رعاية أطفال', nursesJob: 'ممرضين', cooks: 'طهاة', domesticWorker: 'عمال منازل', teacher: 'معلمين',
+    experience: 'الخبرة', driversJob: 'سائقين', babysitting: 'رعاية أطفال', nursesJob: 'المهندي', cooks: 'طهاة', domesticWorker: 'عمال منازل', teacher: 'معلمين',
     ourServicesTitle: 'خبراتنا', ourServicesDesc: 'حلول توظيف متخصصة.',
     viewCandidates: 'عرض المرشحين',
     discount1: 'أهلاً بكم في شركة زود للقوى العاملة', discount2: 'ستتوفر العروض قريباً', discount3: 'تواصل معنا للحصول على مزيد من المعلومات', discountOffer: '🔥 عرض محدود',
@@ -341,7 +341,7 @@ export default function Home() {
     
     const interval = setInterval(() => {
       fetchTalents();
-    }, 5000); // Poll every 5 seconds for live updates
+    }, 5000);
     
     return () => clearInterval(interval);
   }, [adminActive, showHirePage, showReturnedHousemaids, fetchTalents]);
@@ -378,6 +378,13 @@ export default function Home() {
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
     trackLead(source, `Hire: ${talentName}`);
     addToast('success', `Inquiry sent for ${talentName}`, 'Application Started');
+  };
+
+  // Handle external link clicks for Monthly Cleaners and Al-Mohannadi
+  const handleExternalLink = (url: string, source: string) => {
+    trackLead('External Link', source);
+    window.open(url, '_blank');
+    addToast('info', `Redirecting to ${source}`, 'External Link');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -631,7 +638,7 @@ export default function Home() {
         .sidebar-close { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; }
         .sidebar-nav { display: flex; flex-direction: column; gap: 20px; margin-top: 60px; }
         .sidebar-nav a, .sidebar-nav button { font-size: 16px; font-weight: 600; text-transform: uppercase; color: #333; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .sidebar-apply { background: #002F66; color: white; padding: 12px; border-radius: 30px; text-align: center; margin-top: 20px; }
+        .sidebar-apply { background: #002F66; color: white; padding: 12px; border-radius: 30px; text-align: center; margin-top: 20px; display: block; width: 100%; font-size: 14px; font-weight: bold; }
         .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
         .sidebar-overlay.active { opacity: 1; visibility: visible; }
         .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
@@ -773,7 +780,7 @@ export default function Home() {
                     <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount1}</span>
                   </div>
                   <div onClick={() => handleDiscountClick('Offers Will Be Coming Soon')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
-                    <span className="text-white font-bold text-xs md:text-base discount-tex">🎉 {t.discount2}</span>
+                    <span className="text-white font-bold text-xs md:text-base discount-text">🎉 {t.discount2}</span>
                   </div>
                   <div onClick={() => handleDiscountClick('Contact Us For Get More Informations')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
                     <span className="text-white font-bold text-xs md:text-base discount-text">💎 {t.discount3}</span>
@@ -806,7 +813,7 @@ export default function Home() {
             </div>
           </nav>
 
-          {/* Mobile Sidebar */}
+          {/* Mobile Sidebar - Contact Us button fixed */}
           <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
             <div className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fa-solid fa-xmark text-[#002F66]"></i></div>
             <div className="sidebar-nav mt-8">
@@ -815,7 +822,7 @@ export default function Home() {
               <a href="#services" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.services}</a>
               <button onClick={() => { setShowOurTeamPage(true); setShowHirePage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.ourTeam}</button>
               <button onClick={() => { setShowHirePage(true); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.hireNav}</button>
-              <a href="https://wa.me/97455355206" onClick={() => { trackLead('Mobile Nav Apply', 'Global Apply'); setSidebarOpen(false); }} target="_blank" className="sidebar-apply" style={{ backgroundColor: '#002F66' }}>{t.contactUs}</a>
+              <a href="https://wa.me/97455355206" onClick={() => { trackLead('Mobile Nav Apply', 'Global Apply'); setSidebarOpen(false); }} target="_blank" className="sidebar-apply" style={{ backgroundColor: '#002F66', display: 'block', width: '100%', textAlign: 'center', padding: '12px', borderRadius: '30px', color: 'white', marginTop: '20px' }}>{t.contactUs}</a>
               <button onClick={() => { setLanguage(language === 'en' ? 'ar' : 'en'); setSidebarOpen(false); }} className="mt-4 w-full py-2 bg-gray-100 rounded-full text-sm font-bold text-[#002F66] hover:bg-gray-200 transition-all flex items-center justify-center gap-2"><i className="fa-solid fa-globe text-xs"></i>{language === 'en' ? 'العربية' : 'English'}</button>
             </div>
           </div>
@@ -995,7 +1002,7 @@ export default function Home() {
             </div>
           ) : (
             <>
-              {/* Hero Section */}
+              {/* Hero Section with modified buttons */}
               <section id="home" className="relative pt-24 md:pt-32 pb-16 md:pb-32 px-4 md:px-6 qatar-gradient text-white overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[20rem] md:text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center relative z-10">
@@ -1013,11 +1020,13 @@ export default function Home() {
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🚗 {t.drivers}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button onClick={() => handleQuickHire('Nurses')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                      {/* Al-Mohannadi button - external link */}
+                      <button onClick={() => handleExternalLink('https://alkhadam.net/qa/en/company/7653', 'Al-Mohannadi')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🏥 {t.nurses}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button onClick={() => handleQuickHire('Monthly Cleaners')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                      {/* Monthly Cleaners button - external link */}
+                      <button onClick={() => handleExternalLink('https://alkhadam.net/qa/en/company/411', 'Monthly Cleaners')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🧹 {t.monthlyCleaners}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
@@ -1259,7 +1268,7 @@ export default function Home() {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                  <tr>
                 </div>
               </div>
             )}
