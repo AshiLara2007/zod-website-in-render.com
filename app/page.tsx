@@ -213,7 +213,7 @@ const translations = {
 
 const ToastNotification = ({ toast, onClose }: { toast: Toast; onClose: (id: number) => void }) => {
   useEffect(() => {
-    const timer = setTimeout(() => onClose(toast.id), 5000);
+    const timer = setTimeout(() => onClose(toast.id), 3000);
     return () => clearTimeout(timer);
   }, [toast.id, onClose]);
 
@@ -339,10 +339,11 @@ export default function Home() {
     }
   }, [t]);
 
-useEffect(() => {
-  const interval = setInterval(() => { fetchTalents(); }, 5000);
-  return () => clearInterval(interval);
-}, [fetchTalents]);
+  useEffect(() => {
+    if (!adminActive && !showHirePage && !showReturnedHousemaids) return;
+    const interval = setInterval(() => { fetchTalents(); }, 5000);
+    return () => clearInterval(interval);
+  }, [adminActive, showHirePage, showReturnedHousemaids, fetchTalents]);
 
   const loadLeads = () => {
     const stored = localStorage.getItem('zod_activity_leads');
@@ -490,7 +491,7 @@ useEffect(() => {
     setShowOurTeamPage(false);
     setShowAboutPage(false);
     setShowReturnedHousemaids(false);
-    setSearchQuery(category.toLowerCase());
+    setSearchQuery(category);
     addToast('info', `Browsing ${category} candidates`, 'Category Selected');
   };
 
@@ -560,14 +561,10 @@ useEffect(() => {
     if (chatOpen) chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages, chatOpen]);
 
-useEffect(() => {
-  const init = async () => {
-    fetchTalents(); // await නෑ — background ෙකෙදී run වෙනවා
-    loadLeads();
-    setTimeout(() => setIsLoading(false), 3000);
-  };
-  init();
-}, [fetchTalents]);;
+  useEffect(() => {
+    const init = async () => { await fetchTalents(); loadLeads(); setTimeout(() => setIsLoading(false), 3000); };
+    init();
+  }, [fetchTalents]);
 
   useEffect(() => {
     const reveal = () => {
@@ -592,7 +589,7 @@ useEffect(() => {
     return matchSearch && matchCountry && matchJob;
   });
 
-  const featuredTalents = recruitmentTalents.slice(0, 6);
+  const featuredTalents = recruitmentTalents;
   const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
   const regularTeam = teamMembers.filter(member => !member.isTopManagement);
 
@@ -618,7 +615,7 @@ useEffect(() => {
 
   return (
     <div dir={dir} className={isRTL ? 'rtl' : 'ltr'}>
-      <style jsx global>{`
+      <style>{`
         .rtl { direction: rtl; text-align: right; }
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
         @keyframes marquee-rtl { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
@@ -903,6 +900,19 @@ useEffect(() => {
                 <div className="text-center mb-8 md:mb-10">
                   <h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-2">{t.returnedHousemaids}</h3>
                   <p className="text-gray-500 text-sm md:text-base">Experienced housemaids returning from overseas with proven track records</p>
+                </div>
+                <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-10 gap-4 md:gap-6">
+                  <div className="flex gap-2 md:gap-3 w-full md:w-auto flex-wrap">
+                    <div className="relative flex-1 min-w-[150px] md:min-w-[180px]">
+                      <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t.searchPlaceholder} className="w-full p-3 md:p-4 pl-8 md:pl-12 bg-white border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-sm md:text-base" />
+                      <i className="fa-solid fa-magnifying-glass absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-sm"></i>
+                    </div>
+                    <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="p-3 md:p-4 bg-white border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-xs md:text-sm font-bold text-gray-700">
+                      <option value="">{t.allCountries}</option>
+                      {countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <button onClick={fetchTalents} className="px-4 md:px-5 py-3 md:py-4 bg-gray-200 rounded-xl md:rounded-2xl hover:bg-gray-300 transition-all hover:scale-105" title={t.refresh}><i className="fa-solid fa-rotate-right text-xs md:text-sm"></i></button>
+                  </div>
                 </div>
                 {loading ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
