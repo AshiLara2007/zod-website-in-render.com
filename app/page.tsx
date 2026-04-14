@@ -595,8 +595,7 @@ export default function Home() {
     return matchSearch && matchCountry && matchJob;
   });
 
-  // FIX: Featured Candidates shows ALL recruitment workers (not limited)
-  const featuredTalents = recruitmentTalents; // Show ALL recruitment workers, not just 6
+  const featuredTalents = recruitmentTalents;
   const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
   const regularTeam = teamMembers.filter(member => !member.isTopManagement);
 
@@ -1041,7 +1040,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Featured Candidates Section - Shows ALL recruitment workers */}
               <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-6 md:mb-8">
