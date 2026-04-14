@@ -14,6 +14,7 @@ interface Talent {
   salary: number;
   experience: string;
   maritalStatus: string;
+  workerType: string;
   pic: string;
   cv: string;
 }
@@ -40,8 +41,15 @@ interface ChatMessage {
   cvCards?: Talent[];
 }
 
+interface Toast {
+  id: number;
+  type: 'success' | 'error' | 'info' | 'warning';
+  message: string;
+  title?: string;
+}
+
 const jobOptions = [
-  'Driver', 'Baby sitting', 'Nurse', 'Cook', 'Domestic Worker', 'Teacher'
+  'Driver', 'Baby sitting', 'Nurse', 'Cook', 'Domestic Worker', 'Teacher', 'House Maid'
 ];
 
 const countryOptions = [
@@ -53,6 +61,8 @@ const experienceOptions = [
 ];
 
 const maritalStatusOptions = ['Single', 'Married', 'Divorced', 'Widowed'];
+
+const workerTypeOptions = ['Recruitment Workers', 'Returned Housemaids'];
 
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
@@ -77,29 +87,29 @@ const translations = {
     successfulPlacements: 'Successful Placements', corporateClients: 'Corporate Clients',
     responseTime: 'Candidate Response Time', complianceRate: 'Compliance Rate',
     ourLegacy: 'Our Legacy', aboutTitle: "Leading Doha's Recruitment Evolution for Over a Decade.",
-    aboutDesc: "ZOD Manpower is not just a recruitment firm; we are a strategic partner in Qatar's national growth. From the towering skyscrapers of Lusail to the bustling streets of Msheireb, our talent drives the nation forward.",
+    aboutDesc: "ZOD Manpower is not just a recruitment firm; we are a strategic partner in Qatar's national growth.",
     personalizedMatching: 'Personalized Candidate Matching', directLiaison: 'Direct Qatar Government Liaison',
     multiIndustry: 'Multi-Industry Expertise', ourExpertise: 'Our Expertise',
     comprehensiveSolutions: 'Comprehensive Recruitment Solutions',
-    visaTitle: 'Visa & Documentation', visaDesc: 'End-to-end handling of Qatar work permits, QID processing, and professional licensing for international talent.',
-    techTitle: 'Technical Screening', techDesc: "Rigorous multi-stage skill testing and background checks to ensure every candidate is ready for Doha's competitive market.",
-    projectsTitle: 'Lusail & Doha Projects', projectsDesc: 'Specialized large-scale staffing solutions for major national infrastructure, hospitality, and oil & gas sectors.',
+    visaTitle: 'Visa & Documentation', visaDesc: 'End-to-end handling of Qatar work permits, QID processing.',
+    techTitle: 'Technical Screening', techDesc: 'Rigorous multi-stage skill testing and background checks.',
+    projectsTitle: 'Lusail & Doha Projects', projectsDesc: 'Specialized large-scale staffing solutions.',
     applyViaWhatsapp: 'APPLY VIA WHATSAPP',
-    hireTitle: 'Hire Top Talent Instantly', hireDesc: 'Employers can browse our pre-vetted candidates and request CVs directly.',
+    hireTitle: 'Hire Top Talent Instantly', hireDesc: 'Employers can browse our pre-vetted candidates.',
     searchPlaceholder: 'Search Skill (e.g. Driver, Nurse)...', refresh: 'Refresh', ready: 'Ready', viewCV: 'View CV', hireBtn: 'Hire',
     allCountries: 'All Countries', featuredCandidates: 'Featured Candidates', viewAllCandidates: 'View All Candidates →',
-    testimonial1: '"ZOD Manpower found us 50+ staff for our luxury hotel in Lusail within 30 days. Their document processing is unmatched in Qatar."',
-    author1: '— HR Director, Doha Regency',
-    testimonial2: '"I came from Sri Lanka through ZOD and now work in a top company. They were honest and helped with everything."',
+    testimonial1: '"I came to Qatar through ZOD MANPOWER RECRUITMENT, and they found me a good place to work in Doha."',
+    author1: '— Muhammad Ikmar., Sri Lanka',
+    testimonial2: '"I came from Sri Lanka through ZOD and now work in a top company."',
     author2: '— Mohamed R., Office Admin',
-    testimonial3: '"Professional, reliable and very transparent. The best manpower agency I have worked with in the Middle East."',
-    author3: '— Sarah K., Hospitality Manager',
+    testimonial3: '"ZOD Manpower found us 50+ staff for our hotel"',
+    author3: '— Fathima Sarah., Manager',
     faqTitle: 'Recruitment FAQ',
-    faqQ1: 'What is the typical visa processing time?', faqA1: 'Standard processing takes 15-45 business days depending on documentation, medicals, and embassy approvals.',
-    faqQ2: 'Are there any upfront fees for candidates?', faqA2: 'No. We strictly follow Qatar Labor Laws and Ethical Recruitment standards. Candidates should not pay for jobs.',
-    faqQ3: 'What industries do you specialize in?', faqA3: 'We specialize in hospitality, construction, healthcare, domestic services, security, retail, and oil & gas sectors across Qatar.',
-    faqQ4: 'How do employers request candidates?', faqA4: 'Employers can browse our pre-vetted talent on this website and contact us directly via WhatsApp to request CVs or arrange interviews.',
-    footerText: "Qatar's leading licensed manpower recruitment agency. Connecting global talent to the heart of the Middle East.",
+    faqQ1: 'What is the typical visa processing time?', faqA1: 'Standard processing takes 15-45 business days.',
+    faqQ2: 'Are there any upfront fees for candidates?', faqA2: 'No. We follow Qatar Labor Laws.',
+    faqQ3: 'What industries do you specialize in?', faqA3: 'Hospitality, construction, healthcare, domestic services.',
+    faqQ4: 'How do employers request candidates?', faqA4: 'Contact us directly via WhatsApp.',
+    footerText: "Qatar's leading licensed manpower recruitment agency.",
     quickLinks: 'Quick Links', aboutDoha: 'About Doha Agency', clientServices: 'Client Services', browseCVs: 'Browse CVs',
     internal: 'Internal', copyright: '© 2026 ZOD MANPOWER RECRUITMENT.',
     privacyPolicy: 'Privacy Policy', terms: 'Terms of Service',
@@ -113,21 +123,24 @@ const translations = {
     candidateDetails: 'Candidate Details', position: 'Position', salary: 'Salary', actions: 'Actions',
     realtimeLogs: 'Real-time Activity Logs', clearLogs: 'Clear All Logs',
     trafficSource: 'Traffic Source', actionTaken: 'Action Taken', timeLocal: 'Time (Local)',
-    confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate? This action cannot be undone.',
+    confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate?',
     cancel: 'Cancel', yesDelete: 'Yes, Delete', english: 'English', arabic: 'العربية',
     houseMaids: 'House Maids', drivers: 'Drivers', nurses: 'Nurses', monthlyCleaners: 'Monthly Cleaners', returnedHousemaids: 'Returned Housemaids',
-    ourTeam: 'Our Team', teamTitle: 'Meet Our Team', teamDesc: 'Dedicated professionals committed to excellence in recruitment.',
+    ourTeam: 'Our Team', teamTitle: 'Meet Our Team', teamDesc: 'Dedicated professionals committed to excellence.',
     topManagementTitle: 'Our Top Management Team', contact: 'Contact', viewMore: 'View More',
     ourVision: 'Our Vision', ourMission: 'Our Mission',
-    visionText: 'To be the most trusted and innovative manpower solutions provider in the Middle East, connecting global talent with opportunities that drive economic growth.',
-    missionText: 'To provide ethical, transparent, and efficient recruitment services that empower businesses and transform lives through quality employment.',
+    visionText: 'To be the most trusted manpower solutions provider in the Middle East.',
+    missionText: 'To provide ethical, transparent, and efficient recruitment services.',
     experience: 'Experience', driversJob: 'Drivers', babysitting: 'Baby sitting', nursesJob: 'Nurses', cooks: 'Cook', domesticWorker: 'Domestic Worker', teacher: 'Teacher',
-    ourServicesTitle: 'Our Expertise', ourServicesDesc: 'Specialized recruitment solutions tailored to Qatar\'s diverse needs.',
+    ourServicesTitle: 'Our Expertise', ourServicesDesc: 'Specialized recruitment solutions.',
     viewCandidates: 'View Candidates',
-    discount1: '20% OFF on First Placement', discount2: 'Free Visa Processing for Group Hiring (10+)', discount3: '15% Discount for Annual Contracts', discountOffer: '🔥 LIMITED OFFER',
+    discount1: 'Welcome To ZOD MANPOWER', discount2: 'Offers Will Be Coming Soon', discount3: 'Contact Us For Get More Informations', discountOffer: '🔥 LIMITED OFFER',
     backToHome: 'Back to Home', maritalStatus: 'Marital Status', single: 'Single', married: 'Married', divorced: 'Divorced', widowed: 'Widowed',
     ourJourney: 'Our Journey', ourLocation: 'Our Location', whatClientsSay: 'What Our Clients Say',
     brandName: 'ZOD MANPOWER RECRUITMENT',
+    candidateAdded: 'Candidate Added Successfully!', candidateUpdated: 'Candidate Updated Successfully!', candidateDeleted: 'Candidate Deleted Successfully!',
+    errorOccurred: 'An error occurred', saving: 'Saving...', deleting: 'Deleting...',
+    workerType: 'Worker Type', recruitmentWorkers: 'Recruitment Workers', returnedHousemaidsType: 'Returned Housemaids',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
@@ -140,28 +153,28 @@ const translations = {
     successfulPlacements: 'تعيين ناجح', corporateClients: 'عميل من الشركات',
     responseTime: 'وقت الاستجابة للمرشح', complianceRate: 'معدل الامتثال',
     ourLegacy: 'إرثنا', aboutTitle: 'ريادة تطور التوظيف في الدوحة لأكثر من عقد.',
-    aboutDesc: 'زود مان باور ليست مجرد شركة توظيف؛ نحن شريك استراتيجي في النمو الوطني لقطر.',
+    aboutDesc: 'زود مان باور ليست مجرد شركة توظيف؛ نحن شريك استراتيجي.',
     personalizedMatching: 'مطابقة مرشحين مخصصة', directLiaison: 'اتصال مباشر مع حكومة قطر',
     multiIndustry: 'خبرة متعددة الصناعات', ourExpertise: 'خبراتنا',
     comprehensiveSolutions: 'حلول توظيف شاملة',
-    visaTitle: 'التأشيرات والوثائق', visaDesc: 'معالجة شاملة لتصاريح العمل القطرية ومعالجة QID.',
-    techTitle: 'الفحص التقني', techDesc: 'اختبارات مهارات متعددة لضمان جاهزية كل مرشح.',
+    visaTitle: 'التأشيرات والوثائق', visaDesc: 'معالجة شاملة لتصاريح العمل القطرية.',
+    techTitle: 'الفحص التقني', techDesc: 'اختبارات مهارات متعددة.',
     projectsTitle: 'مشاريع لوسيل والدوحة', projectsDesc: 'حلول توظيف واسعة النطاق.',
     applyViaWhatsapp: 'قدم عبر واتساب',
-    hireTitle: 'وظف أفضل المواهب فوراً', hireDesc: 'تصفح مرشحينا المعتمدين مسبقاً.',
+    hireTitle: 'وظف أفضل المواهب فوراً', hireDesc: 'تصفح مرشحينا المعتمدين.',
     searchPlaceholder: 'ابحث عن مهارة...', refresh: 'تحديث', ready: 'جاهز', viewCV: 'عرض السيرة', hireBtn: 'توظيف',
     allCountries: 'كل الدول', featuredCandidates: 'المرشحون المميزون', viewAllCandidates: 'عرض كل المرشحين ←',
-    testimonial1: '"وجدت لنا زود مان باور أكثر من 50 موظفاً خلال 30 يوماً."',
-    author1: '— مدير الموارد البشرية، فندق الدوحة ريجنسي',
+    testimonial1: '"وجدت لنا زود مان باور أكثر من 50 موظفاً."',
+    author1: '— مدير الموارد البشرية',
     testimonial2: '"جئت من سريلانكا عبر زود والآن أعمل في شركة كبرى."',
-    author2: '— محمد ر.، مساعد إداري',
-    testimonial3: '"محترفون وموثوقون وشفافون جداً."',
-    author3: '— سارة ك.، مديرة الضيافة',
+    author2: '— محمد ر.',
+    testimonial3: '"محترفون وموثوقون وشفافون."',
+    author3: '— سارة ك.',
     faqTitle: 'الأسئلة الشائعة',
     faqQ1: 'ما وقت معالجة التأشيرة؟', faqA1: 'من 15 إلى 45 يوم عمل.',
     faqQ2: 'هل هناك رسوم للمرشحين؟', faqA2: 'لا. لا ينبغي للمرشحين دفع أي رسوم.',
-    faqQ3: 'ما القطاعات التي تتخصصون فيها؟', faqA3: 'الضيافة والبناء والرعاية الصحية والنفط والغاز.',
-    faqQ4: 'كيف يطلب أصحاب العمل المرشحين؟', faqA4: 'عبر واتساب أو من خلال الموقع مباشرة.',
+    faqQ3: 'ما القطاعات التي تتخصصون فيها؟', faqA3: 'الضيافة والبناء والرعاية الصحية.',
+    faqQ4: 'كيف يطلب أصحاب العمل المرشحين؟', faqA4: 'عبر واتساب مباشرة.',
     footerText: 'وكالة التوظيف المرخصة الرائدة في قطر.',
     quickLinks: 'روابط سريعة', aboutDoha: 'عن وكالة الدوحة', clientServices: 'خدمات العملاء', browseCVs: 'تصفح السير الذاتية',
     internal: 'داخلي', copyright: '© 2026 زود مانباور للتوظيف.',
@@ -173,26 +186,71 @@ const translations = {
     inventoryManagement: 'إدارة المخزون', visitorLogs: 'سجلات الزوار',
     newCandidate: 'مرشح جديد', editCandidate: 'تعديل:', fullName: 'الاسم الكامل', age: 'العمر', dob: 'تاريخ الميلاد', gender: 'الجنس',
     jobDesignation: 'المسمى الوظيفي', country: 'البلد', religion: 'الدين', salaryQAR: 'الراتب (ريال قطري)',
-    photo: 'الصورة', cvUpload: 'السيرة الذاتية (PDF/صورة)', saveRecord: 'حفظ بيانات المرشح',
+    photo: 'الصورة', cvUpload: 'السيرة الذاتية', saveRecord: 'حفظ بيانات المرشح',
     candidateDetails: 'تفاصيل المرشح', position: 'الوظيفة', salary: 'الراتب', actions: 'إجراءات',
-    realtimeLogs: 'سجلات النشاط الفورية', clearLogs: 'مسح جميع السجلات',
-    trafficSource: 'مصدر الزيارة', actionTaken: 'الإجراء المتخذ', timeLocal: 'الوقت (محلي)',
+    realtimeLogs: 'سجلات النشاط', clearLogs: 'مسح جميع السجلات',
+    trafficSource: 'مصدر الزيارة', actionTaken: 'الإجراء المتخذ', timeLocal: 'الوقت',
     confirmDelete: 'تأكيد الحذف', deleteMsg: 'هل أنت متأكد من حذف هذا المرشح؟',
     cancel: 'إلغاء', yesDelete: 'نعم، احذف', english: 'English', arabic: 'العربية',
     houseMaids: 'خادمات منازل', drivers: 'سائقين', nurses: 'ممرضين', monthlyCleaners: 'عمال نظافة شهري', returnedHousemaids: 'خادمات عائدات',
-    ourTeam: 'فريقنا', teamTitle: 'تعرف على فريقنا', teamDesc: 'محترفون ملتزمون بالتميز في التوظيف.',
-    topManagementTitle: 'فريق الإدارة العليا لدينا', contact: 'اتصل', viewMore: 'اقرأ المزيد',
+    ourTeam: 'فريقنا', teamTitle: 'تعرف على فريقنا', teamDesc: 'محترفون ملتزمون بالتميز.',
+    topManagementTitle: 'فريق الإدارة العليا', contact: 'اتصل', viewMore: 'اقرأ المزيد',
     ourVision: 'رؤيتنا', ourMission: 'مهمتنا',
-    visionText: 'أن نكون مزود حلول القوى العاملة الأكثر ثقة وابتكاراً في الشرق الأوسط، نربط المواهب العالمية بالفرص التي تدفع النمو الاقتصادي.',
-    missionText: 'تقديم خدمات توظيف أخلاقية وشفافة وفعالة تمكّن الشركات وتحول حياة الأفراد من خلال فرص العمل الجيدة.',
+    visionText: 'أن نكون مزود حلول القوى العاملة الأكثر ثقة.',
+    missionText: 'تقديم خدمات توظيف أخلاقية وشفافة.',
     experience: 'الخبرة', driversJob: 'سائقين', babysitting: 'رعاية أطفال', nursesJob: 'ممرضين', cooks: 'طهاة', domesticWorker: 'عمال منازل', teacher: 'معلمين',
-    ourServicesTitle: 'خبراتنا', ourServicesDesc: 'حلول توظيف متخصصة مصممة خصيصاً لتلبية احتياجات قطر المتنوعة.',
+    ourServicesTitle: 'خبراتنا', ourServicesDesc: 'حلول توظيف متخصصة.',
     viewCandidates: 'عرض المرشحين',
-    discount1: 'خصم 20% على أول تعيين', discount2: 'معالجة تأشيرة مجانية للتعيين الجماعي (10+)', discount3: 'خصم 15% على العقود السنوية', discountOffer: '🔥 عرض محدود',
+    discount1: 'أهلاً بكم في شركة زود للقوى العاملة', discount2: 'ستتوفر العروض قريباً', discount3: 'تواصل معنا للحصول على مزيد من المعلومات', discountOffer: '🔥 عرض محدود',
     backToHome: 'العودة إلى الرئيسية', maritalStatus: 'الحالة الاجتماعية', single: 'أعزب', married: 'متزوج', divorced: 'مطلق', widowed: 'أرمل',
     ourJourney: 'رحلتنا', ourLocation: 'موقعنا', whatClientsSay: 'ماذا يقول عملاؤنا',
     brandName: 'زود مان باور للتوظيف',
+    candidateAdded: 'تم إضافة المرشح بنجاح!', candidateUpdated: 'تم تحديث المرشح بنجاح!', candidateDeleted: 'تم حذف المرشح بنجاح!',
+    errorOccurred: 'حدث خطأ', saving: 'جاري الحفظ...', deleting: 'جاري الحذف...',
+    workerType: 'نوع العامل', recruitmentWorkers: 'عمال التوظيف', returnedHousemaidsType: 'خادمات عائدات',
   }
+};
+
+const ToastNotification = ({ toast, onClose }: { toast: Toast; onClose: (id: number) => void }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => onClose(toast.id), 3000);
+    return () => clearTimeout(timer);
+  }, [toast.id, onClose]);
+
+  const getIcon = () => {
+    switch (toast.type) {
+      case 'success': return 'fa-circle-check';
+      case 'error': return 'fa-circle-exclamation';
+      case 'warning': return 'fa-triangle-exclamation';
+      default: return 'fa-circle-info';
+    }
+  };
+
+  const getBgColor = () => {
+    switch (toast.type) {
+      case 'success': return 'bg-gradient-to-r from-green-500 to-green-600';
+      case 'error': return 'bg-gradient-to-r from-red-500 to-red-600';
+      case 'warning': return 'bg-gradient-to-r from-amber-500 to-amber-600';
+      default: return 'bg-gradient-to-r from-blue-500 to-blue-600';
+    }
+  };
+
+  return (
+    <div className={`fixed top-20 right-4 z-[200] animate-slide-in-right ${toast.type === 'error' ? 'animate-shake' : ''}`}>
+      <div className={`${getBgColor()} text-white rounded-xl shadow-2xl p-4 min-w-[280px] max-w-md flex items-start gap-3 backdrop-blur-sm`}>
+        <div className="flex-shrink-0">
+          <i className={`fa-solid ${getIcon()} text-xl`}></i>
+        </div>
+        <div className="flex-1">
+          {toast.title && <h4 className="font-bold text-sm mb-1">{toast.title}</h4>}
+          <p className="text-sm opacity-90">{toast.message}</p>
+        </div>
+        <button onClick={() => onClose(toast.id)} className="flex-shrink-0 text-white/70 hover:text-white transition-colors">
+          <i className="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default function Home() {
@@ -217,6 +275,9 @@ export default function Home() {
   const [showReturnedHousemaids, setShowReturnedHousemaids] = useState(false);
   const [jobFilter, setJobFilter] = useState('');
   const [calculatedAge, setCalculatedAge] = useState<number | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -234,8 +295,18 @@ export default function Home() {
   const salaryRef = useRef<HTMLInputElement>(null);
   const experienceRef = useRef<HTMLSelectElement>(null);
   const maritalStatusRef = useRef<HTMLSelectElement>(null);
+  const workerTypeRef = useRef<HTMLSelectElement>(null);
   const picRef = useRef<HTMLInputElement>(null);
   const cvRef = useRef<HTMLInputElement>(null);
+
+  const addToast = (type: Toast['type'], message: string, title?: string) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, type, message, title }]);
+  };
+
+  const removeToast = (id: number) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
 
   const calculateAge = (dob: string) => {
     if (!dob) return null;
@@ -262,10 +333,17 @@ export default function Home() {
       setTalents(data);
     } catch (err) {
       console.error('Fetch error', err);
+      addToast('error', t.errorOccurred, 'Network Error');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
+
+  useEffect(() => {
+    if (!adminActive && !showHirePage && !showReturnedHousemaids) return;
+    const interval = setInterval(() => { fetchTalents(); }, 5000);
+    return () => clearInterval(interval);
+  }, [adminActive, showHirePage, showReturnedHousemaids, fetchTalents]);
 
   const loadLeads = () => {
     const stored = localStorage.getItem('zod_activity_leads');
@@ -282,7 +360,7 @@ export default function Home() {
   };
 
   const clearLeads = () => {
-    if (confirm(t.clearLogs)) { setLeads([]); localStorage.setItem('zod_activity_leads', '[]'); }
+    if (confirm(t.clearLogs)) { setLeads([]); localStorage.setItem('zod_activity_leads', '[]'); addToast('info', 'Logs cleared successfully'); }
   };
 
   const handleDiscountClick = (discountText: string) => {
@@ -290,6 +368,7 @@ export default function Home() {
     const message = `Hi! I'm interested in the offer: ${discountText}. Can you please provide more details?`;
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
     trackLead('Discount Banner', discountText);
+    addToast('info', `Redirecting to WhatsApp for ${discountText}`, 'Special Offer');
   };
 
   const handleHireClick = (talentName: string, source: string) => {
@@ -297,10 +376,18 @@ export default function Home() {
     const message = `Hi! I'm interested in hiring ${talentName}. Can you please provide more details?`;
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
     trackLead(source, `Hire: ${talentName}`);
+    addToast('success', `Inquiry sent for ${talentName}`, 'Application Started');
+  };
+
+  const handleExternalLink = (url: string, source: string) => {
+    trackLead('External Link', source);
+    window.open(url, '_blank');
+    addToast('info', `Redirecting to ${source}`, 'External Link');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const formData = new FormData();
     if (editTalent) formData.append('id', editTalent.id);
     formData.append('name', nameRef.current!.value);
@@ -313,13 +400,22 @@ export default function Home() {
     formData.append('salary', salaryRef.current!.value);
     formData.append('experience', experienceRef.current!.value);
     formData.append('maritalStatus', maritalStatusRef.current!.value);
+    formData.append('workerType', workerTypeRef.current!.value);
     if (picRef.current?.files?.[0]) formData.append('tPic', picRef.current.files[0]);
     if (cvRef.current?.files?.[0]) formData.append('tCv', cvRef.current.files[0]);
     try {
       const res = await fetch('/api/talents', { method: 'POST', body: formData });
-      if (res.ok) { resetForm(); await fetchTalents(); alert('Candidate saved successfully!'); }
-      else { const err = await res.json(); alert('Error: ' + (err.error || 'Unknown error')); }
-    } catch { alert('Network error.'); }
+      if (res.ok) { 
+        resetForm(); 
+        await fetchTalents(); 
+        addToast('success', editTalent ? t.candidateUpdated : t.candidateAdded, 'Success');
+      }
+      else { const err = await res.json(); addToast('error', err.error || t.errorOccurred, 'Error'); }
+    } catch { 
+      addToast('error', 'Network error. Please try again.', 'Connection Error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -334,6 +430,7 @@ export default function Home() {
     if (salaryRef.current) salaryRef.current.value = '0';
     if (experienceRef.current) experienceRef.current.value = experienceOptions[0];
     if (maritalStatusRef.current) maritalStatusRef.current.value = maritalStatusOptions[0];
+    if (workerTypeRef.current) workerTypeRef.current.value = workerTypeOptions[0];
     if (picRef.current) picRef.current.value = '';
     if (cvRef.current) cvRef.current.value = '';
   };
@@ -350,17 +447,27 @@ export default function Home() {
     if (salaryRef.current) salaryRef.current.value = String(talent.salary || 0);
     if (experienceRef.current) experienceRef.current.value = talent.experience || experienceOptions[0];
     if (maritalStatusRef.current) maritalStatusRef.current.value = talent.maritalStatus || maritalStatusOptions[0];
+    if (workerTypeRef.current) workerTypeRef.current.value = talent.workerType || workerTypeOptions[0];
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    addToast('info', `Editing ${talent.name}`, 'Edit Mode');
   };
 
   const confirmDelete = (id: string) => { setDeleteTargetId(id); setDeleteModalOpen(true); };
 
   const performDelete = async () => {
     if (!deleteTargetId) return;
-    await fetch(`/api/talents/${deleteTargetId}`, { method: 'DELETE' });
-    await fetchTalents();
-    setDeleteModalOpen(false);
-    setDeleteTargetId(null);
+    setIsDeleting(true);
+    try {
+      await fetch(`/api/talents/${deleteTargetId}`, { method: 'DELETE' });
+      await fetchTalents();
+      addToast('success', t.candidateDeleted, 'Deleted');
+    } catch (err) {
+      addToast('error', t.errorOccurred, 'Delete Failed');
+    } finally {
+      setDeleteModalOpen(false);
+      setDeleteTargetId(null);
+      setIsDeleting(false);
+    }
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -370,7 +477,12 @@ export default function Home() {
     if (!u || !p) return;
     if (u.value === 'admin' && p.value === '1978') {
       setAdminActive(true); setLoginModalOpen(false); u.value = ''; p.value = '';
-    } else { alert('Invalid credentials. Use admin / 1978'); }
+      addToast('success', 'Welcome back, Admin!', 'Login Successful');
+    } else { 
+      addToast('error', 'Invalid credentials. Use admin / 1978', 'Access Denied');
+      u.value = '';
+      p.value = '';
+    }
   };
 
   const handleQuickHire = (category: string) => {
@@ -379,7 +491,8 @@ export default function Home() {
     setShowOurTeamPage(false);
     setShowAboutPage(false);
     setShowReturnedHousemaids(false);
-    setSearchQuery(category.toLowerCase());
+    setSearchQuery(category);
+    addToast('info', `Browsing ${category} candidates`, 'Category Selected');
   };
 
   const handleReturnedHousemaids = () => {
@@ -388,7 +501,8 @@ export default function Home() {
     setShowHirePage(false);
     setShowOurTeamPage(false);
     setShowAboutPage(false);
-    setJobFilter('Domestic Worker');
+    setJobFilter('');
+    addToast('info', 'Viewing experienced returned housemaids', 'Experienced Candidates');
   };
 
   const startChat = (lang: 'en' | 'ar') => {
@@ -465,14 +579,17 @@ export default function Home() {
 
   const escapeHtml = (str: string) => str.replace(/[&<>]/g, (m) => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'));
 
-  const filteredTalents = talents.filter((tal) => {
+  const returnedHousemaidsTalents = talents.filter((tal) => tal.workerType === 'Returned Housemaids');
+  const recruitmentTalents = talents.filter((tal) => tal.workerType === 'Recruitment Workers');
+  
+  const filteredTalents = (showReturnedHousemaids ? returnedHousemaidsTalents : recruitmentTalents).filter((tal) => {
     const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
     const matchCountry = !countryFilter || tal.country === countryFilter;
     const matchJob = !jobFilter || tal.job.toLowerCase().includes(jobFilter.toLowerCase());
     return matchSearch && matchCountry && matchJob;
   });
 
-  const featuredTalents = talents.slice(0, 2);
+  const featuredTalents = recruitmentTalents;
   const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
   const regularTeam = teamMembers.filter(member => !member.isTopManagement);
 
@@ -498,7 +615,7 @@ export default function Home() {
 
   return (
     <div dir={dir} className={isRTL ? 'rtl' : 'ltr'}>
-      <style jsx global>{`
+      <style>{`
         .rtl { direction: rtl; text-align: right; }
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
         @keyframes marquee-rtl { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
@@ -511,6 +628,10 @@ export default function Home() {
         .animate-float { animation: float 3s ease-in-out infinite; }
         @keyframes shimmer { 0% { transform: translateX(-100%) skewX(-12deg); } 100% { transform: translateX(200%) skewX(-12deg); } }
         .animate-shimmer { animation: shimmer 2s infinite; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .animate-slide-in-right { animation: slideInRight 0.3s ease-out; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
         .reveal.active { opacity: 1; transform: translateY(0); }
         .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05); }
@@ -529,7 +650,6 @@ export default function Home() {
         .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
         .faq-item.active .fa-plus { transform: rotate(45deg); }
         
-        /* Mobile Responsive Styles */
         @media (max-width: 768px) {
           .container-padding { padding-left: 1rem; padding-right: 1rem; }
           .text-responsive-hero { font-size: 2rem !important; }
@@ -545,16 +665,19 @@ export default function Home() {
         }
       `}</style>
 
-      {/* WhatsApp Chat Button */}
+      <div className="fixed top-16 right-0 z-[200] space-y-3">
+        {toasts.map(toast => (
+          <ToastNotification key={toast.id} toast={toast} onClose={removeToast} />
+        ))}
+      </div>
+
       <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[100] flex flex-col items-end gap-3">
         {chatOpen && (
           <div className="w-72 sm:w-80 md:w-96 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '480px' }}>
             <div className="bg-[#002F66] px-4 py-3 md:px-5 md:py-4 flex items-center justify-between">
               <div className="flex items-center gap-2 md:gap-3">
                 <div className="w-8 h-8 md:w-9 md:h-9 bg-white/20 rounded-full flex items-center justify-center"><i className="fa-solid fa-robot text-white text-xs md:text-sm"></i></div>
-                <div>
-                  <div className="text-white font-bold text-xs md:text-sm">ZOD AI Assistant</div>
-                </div>
+                <div><div className="text-white font-bold text-xs md:text-sm">ZOD AI Assistant</div></div>
               </div>
               <button onClick={() => setChatOpen(false)} className="text-white/60 hover:text-white transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
             </div>
@@ -600,7 +723,6 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Admin Login Modal */}
       {loginModalOpen && (
         <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center backdrop-blur-sm p-4">
           <div className="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] w-full max-w-md shadow-2xl relative border border-gray-100">
@@ -619,7 +741,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
         <div className="fixed inset-0 bg-black/70 z-[150] flex items-center justify-center backdrop-blur-sm p-4">
           <div className="bg-white p-6 md:p-8 rounded-xl md:rounded-2xl max-w-md w-full shadow-2xl">
@@ -629,7 +750,10 @@ export default function Home() {
               <p className="text-xs md:text-sm text-gray-500 mb-5 md:mb-6">{t.deleteMsg}</p>
               <div className="flex gap-3 justify-center">
                 <button onClick={() => setDeleteModalOpen(false)} className="px-3 md:px-4 py-1.5 md:py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-all text-sm">{t.cancel}</button>
-                <button onClick={performDelete} className="px-3 md:px-4 py-1.5 md:py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all text-sm">{t.yesDelete}</button>
+                <button onClick={performDelete} disabled={isDeleting} className="px-3 md:px-4 py-1.5 md:py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all text-sm disabled:opacity-50">
+                  {isDeleting ? <i className="fa-solid fa-spinner fa-spin mr-1"></i> : null}
+                  {t.yesDelete}
+                </button>
               </div>
             </div>
           </div>
@@ -638,27 +762,26 @@ export default function Home() {
 
       {!adminActive && (
         <div className="public-section">
-          {/* Discount Banner - Larger Size */}
           <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-20 md:pt-24 pb-2 md:pb-3 px-4 md:px-6">
             <div className="max-w-7xl mx-auto">
               <div className="overflow-hidden whitespace-nowrap">
                 <div className={`inline-flex gap-4 md:gap-8 ${isRTL ? 'animate-marquee-rtl' : 'animate-marquee'}`}>
-                  <div onClick={() => handleDiscountClick('20% OFF on First Placement')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
-                    <span className="text-white font-bold text-xs md:text-base discount-text">🎉 {t.discount1}</span>
+                  <div onClick={() => handleDiscountClick('Welcome To ZOD MANPOWER')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount1}</span>
                   </div>
-                  <div onClick={() => handleDiscountClick('Free Visa Processing for Group Hiring (10+)')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
-                    <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount2}</span>
+                  <div onClick={() => handleDiscountClick('Offers Will Be Coming Soon')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">🎉 {t.discount2}</span>
                   </div>
-                  <div onClick={() => handleDiscountClick('15% Discount for Annual Contracts')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                  <div onClick={() => handleDiscountClick('Contact Us For Get More Informations')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
                     <span className="text-white font-bold text-xs md:text-base discount-text">💎 {t.discount3}</span>
                   </div>
-                  <div onClick={() => handleDiscountClick('20% OFF on First Placement')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
-                    <span className="text-white font-bold text-xs md:text-base discount-text">🎉 {t.discount1}</span>
+                  <div onClick={() => handleDiscountClick('Welcome To ZOD MANPOWER')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount1}</span>
                   </div>
-                  <div onClick={() => handleDiscountClick('Free Visa Processing for Group Hiring (10+)')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
-                    <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount2}</span>
+                  <div onClick={() => handleDiscountClick('Offers Will Be Coming Soon')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">🎉 {t.discount2}</span>
                   </div>
-                  <div onClick={() => handleDiscountClick('15% Discount for Annual Contracts')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                  <div onClick={() => handleDiscountClick('Contact Us For Get More Informations')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
                     <span className="text-white font-bold text-xs md:text-base discount-text">💎 {t.discount3}</span>
                   </div>
                 </div>
@@ -669,7 +792,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Navigation Bar */}
           <nav className="fixed w-full z-50 glass-nav" style={{ top: '0' }}>
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
               <div className="flex items-center space-x-2 md:space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setShowReturnedHousemaids(false); window.scrollTo(0, 0); }}>
@@ -689,7 +811,6 @@ export default function Home() {
             </div>
           </nav>
 
-          {/* Mobile Sidebar */}
           <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
             <div className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fa-solid fa-xmark text-[#002F66]"></i></div>
             <div className="sidebar-nav mt-8">
@@ -704,17 +825,14 @@ export default function Home() {
           </div>
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
-          {/* Our Team Page */}
           {showOurTeamPage ? (
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowOurTeamPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
-                
                 <div className="text-center mb-8 md:mb-12 reveal">
                   <h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-3 md:mb-4">{t.teamTitle}</h3>
                   <p className="text-gray-500 text-sm md:text-base max-w-2xl mx-auto">{t.teamDesc}</p>
                 </div>
-
                 <div className="mb-12 md:mb-16">
                   <h4 className="text-xl md:text-2xl font-bold text-[#002F66] text-center mb-6 md:mb-10">{t.topManagementTitle}</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
@@ -736,7 +854,6 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-
                 <div>
                   <h4 className="text-lg md:text-xl font-bold text-slate-700 text-center mb-6 md:mb-8">Our Dedicated Team</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -760,24 +877,17 @@ export default function Home() {
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowAboutPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
-                
                 <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-10 shadow-lg">
                   <div className="grid md:grid-cols-2 gap-8 md:gap-12">
-                    <div>
-                      <h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourVision}</h3>
-                      <p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.visionText}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourMission}</h3>
-                      <p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.missionText}</p>
-                    </div>
+                    <div><h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourVision}</h3><p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.visionText}</p></div>
+                    <div><h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourMission}</h3><p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.missionText}</p></div>
                   </div>
                   <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-gray-200">
                     <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-3 md:mb-4">{t.ourJourney}</h3>
                     <p className="text-gray-500 leading-relaxed text-sm md:text-base">
                       {language === 'en' 
-                        ? 'Founded in 2010, ZOD MANPOWER RECRUITMENT has grown to become one of Qatar\'s most trusted manpower agencies. With over 12 years of experience in the Doha market, we have successfully placed thousands of skilled professionals across various industries including hospitality, construction, healthcare, and domestic services. Our commitment to ethical recruitment and compliance with Qatar Labor Laws has earned us the trust of both employers and candidates alike.'
-                        : 'تأسست شركة زود مان باور للتوظيف في عام 2010، وأصبحت واحدة من أكثر وكالات القوى العاملة الموثوقة في قطر. مع أكثر من 12 عاماً من الخبرة في سوق الدوحة، قمنا بنجاح بتوظيف آلاف المهنيين المهرة في مختلف القطاعات بما في ذلك الضيافة والبناء والرعاية الصحية والخدمات المنزلية. لقد أكسبنا التزامنا بالتوظيف الأخلاقي والامتثال لقوانين العمل القطرية ثقة كل من أصحاب العمل والمرشحين على حد سواء.'}
+                        ? 'ZOD Manpower, located in Doha, Qatar, is a recruitment agency specializing in supplying staff, including housemaids, nurses, and office boys from countries like the Philippines, Sri Lanka, Kenya, and India. We offer various staffing solutions and are listed as a recruitment agency in Qatar. '
+                        : 'شركة زود للتوظيف، ومقرها الدوحة، قطر، هي وكالة توظيف متخصصة في توفير الكوادر البشرية، بما في ذلك عاملات المنازل والممرضات وعمال المكاتب، من دول مثل الفلبين وسريلانكا وكينيا والهند. نقدم حلولاً متنوعة للتوظيف، ونحن مسجلون كوكالة توظيف معتمدة في قطر.'}
                     </p>
                   </div>
                 </div>
@@ -787,12 +897,23 @@ export default function Home() {
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowReturnedHousemaids(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
-                
                 <div className="text-center mb-8 md:mb-10">
                   <h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-2">{t.returnedHousemaids}</h3>
                   <p className="text-gray-500 text-sm md:text-base">Experienced housemaids returning from overseas with proven track records</p>
                 </div>
-
+                <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-10 gap-4 md:gap-6">
+                  <div className="flex gap-2 md:gap-3 w-full md:w-auto flex-wrap">
+                    <div className="relative flex-1 min-w-[150px] md:min-w-[180px]">
+                      <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t.searchPlaceholder} className="w-full p-3 md:p-4 pl-8 md:pl-12 bg-white border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-sm md:text-base" />
+                      <i className="fa-solid fa-magnifying-glass absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-sm"></i>
+                    </div>
+                    <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="p-3 md:p-4 bg-white border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-xs md:text-sm font-bold text-gray-700">
+                      <option value="">{t.allCountries}</option>
+                      {countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <button onClick={fetchTalents} className="px-4 md:px-5 py-3 md:py-4 bg-gray-200 rounded-xl md:rounded-2xl hover:bg-gray-300 transition-all hover:scale-105" title={t.refresh}><i className="fa-solid fa-rotate-right text-xs md:text-sm"></i></button>
+                  </div>
+                </div>
                 {loading ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
                 ) : filteredTalents.length === 0 ? (
@@ -878,7 +999,6 @@ export default function Home() {
             </div>
           ) : (
             <>
-              {/* Hero Section */}
               <section id="home" className="relative pt-24 md:pt-32 pb-16 md:pb-32 px-4 md:px-6 qatar-gradient text-white overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[20rem] md:text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center relative z-10">
@@ -886,21 +1006,20 @@ export default function Home() {
                     <span className="inline-block px-3 md:px-4 py-1 md:py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-widest border border-white/20 animate-pulse">{t.certified}</span>
                     <h1 className="text-3xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
                     <p className="text-sm md:text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
-                    
                     <div className="flex flex-wrap gap-3 md:gap-4 justify-center md:justify-start">
-                      <button onClick={() => handleQuickHire('House Maids')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                      <button onClick={() => handleQuickHire('House Maid')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🏠 {t.houseMaids}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button onClick={() => handleQuickHire('Drivers')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                      <button onClick={() => handleQuickHire('Driver')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🚗 {t.drivers}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button onClick={() => handleQuickHire('Nurses')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                      <button onClick={() => handleQuickHire('Nurse')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🏥 {t.nurses}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
-                      <button onClick={() => handleQuickHire('Monthly Cleaners')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                      <button onClick={() => handleExternalLink('https://alkhadam.net/qa/en/company/411', 'Monthly Cleaners')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
                         <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🧹 {t.monthlyCleaners}</span>
                         <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                       </button>
@@ -917,7 +1036,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Stats Section */}
               <section className="py-12 md:py-16 bg-white border-b reveal">
                 <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
                   {[{ num: '9.2K', label: t.successfulPlacements }, { num: '1.8K+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '98.2%', label: t.complianceRate }].map((s, i) => (
@@ -929,7 +1047,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Featured Candidates Section */}
               <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-6 md:mb-8">
@@ -937,20 +1054,30 @@ export default function Home() {
                     <button onClick={() => setShowHirePage(true)} className="text-[#002F66] font-bold text-xs md:text-sm hover:underline transition-all flex items-center gap-1">{t.viewAllCandidates}</button>
                   </div>
                   {loading ? (
-                    <div className="space-y-3 md:space-y-4">{[...Array(2)].map((_, i) => <div key={i} className="bg-white p-4 md:p-5 rounded-xl md:rounded-2xl border animate-pulse flex gap-3 md:gap-4"><div className="w-12 h-12 md:w-16 md:h-16 bg-gray-200 rounded-lg md:rounded-xl shrink-0"></div><div className="flex-1"><div className="h-3 md:h-4 bg-gray-200 rounded w-1/2 mb-2"></div><div className="h-2 md:h-3 bg-gray-200 rounded w-1/3"></div></div></div>)}</div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
+                  ) : featuredTalents.length === 0 ? (
+                    <div className="text-center py-16 md:py-24 text-gray-400"><i className="fa-solid fa-user-slash text-4xl md:text-5xl mb-4 block"></i><p className="font-bold text-sm md:text-base">No candidates available. Please check back later.</p></div>
                   ) : (
-                    <div className="space-y-3 md:space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                       {featuredTalents.map((talent) => (
-                        <div key={talent.id} className="bg-white p-4 md:p-5 rounded-xl md:rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex items-center gap-3 md:gap-5">
-                          <img src={talent.pic} className="w-12 h-12 md:w-16 md:h-16 rounded-lg md:rounded-xl object-cover border-2 border-[#002F66]/10 shrink-0" onError={(e) => (e.currentTarget.src = 'https://placehold.co/80x80?text=User')} alt={talent.name} />
-                          <div className="flex-1 min-w-0">
-                            <div className="font-bold text-slate-800 text-sm md:text-base truncate">{escapeHtml(talent.name)}</div>
-                            <div className="text-[#002F66] font-bold text-[9px] md:text-[11px] uppercase tracking-widest">{escapeHtml(talent.job)} · {escapeHtml(talent.country)}</div>
-                            <div className="text-[8px] md:text-[10px] text-gray-400 mt-1">Experience: {talent.experience || '3-5 Years'}</div>
+                        <div key={talent.id} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
+                          <div className="flex justify-between items-start mb-4 md:mb-6">
+                            <img src={talent.pic} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
+                            <span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
                           </div>
-                          <div className="flex gap-2 md:gap-3 items-center shrink-0">
-                            <span className="text-[10px] md:text-xs font-bold text-gray-500 hidden sm:block">{talent.salary || 0} QAR</span>
-                            <button onClick={() => setShowHirePage(true)} className="bg-[#002F66] text-white text-[8px] md:text-[10px] font-bold px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl hover:bg-[#002060] transition-all hover:scale-105">{t.hireBtn}</button>
+                          <div className="flex-grow">
+                            <h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight">{escapeHtml(talent.name)}</h4>
+                            <p className="text-[#002F66] font-bold text-[10px] md:text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
+                            <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-100 space-y-2 md:space-y-3 mb-6 md:mb-8">
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-4 md:w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-4 md:w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-4 md:w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-4 md:w-5 text-[#002F66]"></i><span>{talent.experience || '3-5 Years'} Exp</span></div>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 md:gap-3 mt-auto">
+                            <a href={talent.cv} target="_blank" onClick={() => trackLead('Featured CV', talent.name)} className="flex-1 py-2 md:py-4 bg-gray-100 text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
+                            <button onClick={() => handleHireClick(talent.name, 'Featured Hire')} className="flex-1 py-2 md:py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
                           </div>
                         </div>
                       ))}
@@ -959,7 +1086,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Our Legacy Section with View More Button */}
               <section id="about" className="py-16 md:py-24 px-4 md:px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center">
                   <div className="relative group">
@@ -978,7 +1104,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Services/Expertise Section */}
               <section id="services" className="py-16 md:py-24 px-4 md:px-6 bg-gray-50 reveal">
                 <div className="max-w-7xl mx-auto text-center mb-12 md:mb-20"><h2 className="text-sm font-bold text-red-800 uppercase tracking-[0.3em] mb-4">{t.ourExpertise}</h2><h3 className="text-2xl md:text-4xl font-bold text-slate-900">{t.comprehensiveSolutions}</h3></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6 md:gap-8">
@@ -992,7 +1117,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Location / Google Maps Section */}
               <section className="py-12 md:py-16 px-4 md:px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="text-center mb-6 md:mb-8">
@@ -1014,7 +1138,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Testimonials Section */}
               <section className="py-16 md:py-20 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">{t.whatClientsSay}</h3>
@@ -1030,7 +1153,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* FAQ Section */}
               <section className="py-16 md:py-20 bg-white px-4 md:px-6 reveal">
                 <div className="max-w-5xl mx-auto">
                   <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">{t.faqTitle}</h3>
@@ -1045,7 +1167,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Footer */}
               <footer className="py-16 md:py-20 bg-slate-900 text-white px-4 md:px-6">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 md:gap-12 border-b border-white/5 pb-12 md:pb-16">
                   <div className="col-span-2">
@@ -1066,7 +1187,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Admin Panel */}
       {adminActive && (
         <div className="admin-section min-h-screen bg-gray-50 pb-16 md:pb-20">
           <nav className="bg-white border-b px-4 md:px-6 py-3 md:py-4 mb-6 md:mb-10 sticky top-0 z-50">
@@ -1092,33 +1212,24 @@ export default function Home() {
                   <div className="flex justify-between items-center mb-6 md:mb-8 border-b pb-3 md:pb-4"><h4 className="font-bold uppercase text-[10px] md:text-xs text-[#002F66] tracking-widest">{editTalent ? `${t.editCandidate} ${editTalent.name}` : t.newCandidate}</h4><button onClick={resetForm} className="text-[8px] md:text-[10px] text-gray-400 hover:text-red-600 transition-all hover:rotate-12"><i className="fa-solid fa-rotate-left"></i></button></div>
                   <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.fullName}</label><input ref={nameRef} type="text" className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all text-sm md:text-base" required /></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.dob}</label><input ref={dobRef} type="date" onChange={handleDobChange} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
-                    
-                    {calculatedAge !== null && (
-                      <div className="bg-blue-50 p-2 md:p-3 rounded-lg md:rounded-xl"><span className="text-[10px] md:text-xs font-bold text-blue-600">Age: {calculatedAge} years</span></div>
-                    )}
-                    
+                    {calculatedAge !== null && (<div className="bg-blue-50 p-2 md:p-3 rounded-lg md:rounded-xl"><span className="text-[10px] md:text-xs font-bold text-blue-600">Age: {calculatedAge} years</span></div>)}
                     <div className="grid grid-cols-2 gap-3 md:gap-4">
                       <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.gender}</label><select ref={genderRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option>Male</option><option>Female</option></select></div>
                       <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.maritalStatus}</label><select ref={maritalStatusRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{maritalStatusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div>
                     </div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{jobOptions.map(job => <option key={job} value={job}>{job}</option>)}</select></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.country}</label><select ref={countryRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Muslim">Muslim</option><option value="Christian">Christian</option><option value="Hindu">Hindu</option><option value="Buddhist">Buddhist</option></select></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.experience}</label><select ref={experienceRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{experienceOptions.map(exp => <option key={exp} value={exp}>{exp}</option>)}</select></div>
-                    
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.workerType}</label><select ref={workerTypeRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{workerTypeOptions.map(opt => <option key={opt} value={opt}>{opt === 'Recruitment Workers' ? t.recruitmentWorkers : t.returnedHousemaidsType}</option>)}</select></div>
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.photo}</label><input ref={picRef} type="file" accept="image/*" className="text-[10px] md:text-xs file:mr-2 md:file:mr-4 file:py-1 md:file:py-2 file:px-2 md:file:px-4 file:rounded-full file:border-0 file:text-[8px] md:file:text-[10px] file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 transition-all" /></div>
-                    
                     <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.cvUpload}</label><input ref={cvRef} type="file" accept=".pdf,image/*" className="text-[10px] md:text-xs file:mr-2 md:file:mr-4 file:py-1 md:file:py-2 file:px-2 md:file:px-4 file:rounded-full file:border-0 file:text-[8px] md:file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all" /></div>
-                    
-                    <button type="submit" className="w-full py-3 md:py-4 bg-[#002F66] text-white rounded-lg md:rounded-xl font-bold uppercase text-[8px] md:text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105">{t.saveRecord}</button>
+                    <button type="submit" disabled={isSubmitting} className="w-full py-3 md:py-4 bg-[#002F66] text-white rounded-lg md:rounded-xl font-bold uppercase text-[8px] md:text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105 disabled:opacity-50">
+                      {isSubmitting ? <i className="fa-solid fa-spinner fa-spin mr-2"></i> : null}
+                      {t.saveRecord}
+                    </button>
                   </form>
                 </div>
                 <div className="lg:col-span-2 bg-white rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-sm overflow-x-auto">
