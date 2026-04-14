@@ -609,7 +609,7 @@ export default function Home() {
         </div>
       </div>
     );
-  }
+  
 
   return (
     <div dir={dir} className={isRTL ? 'rtl' : 'ltr'}>
