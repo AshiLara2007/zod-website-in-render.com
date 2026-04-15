@@ -68,12 +68,12 @@ const workerTypeOptions = ['Recruitment Workers', 'Returned Housemaids'];
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
 const teamMembers: TeamMember[] = [
-  { id: '1', name: 'Mr. Ahmed Al Thani', position: 'CEO & Founder', photo: 'https://randomuser.me/api/portraits/men/1.jpg', phone: '+97455355206', isTopManagement: true },
-  { id: '2', name: 'Ms. Fatima Al Saeed', position: 'Operations Director', photo: 'https://randomuser.me/api/portraits/women/2.jpg', phone: '+97455355206', isTopManagement: true },
-  { id: '3', name: 'Mr. Khalid Al Mansouri', position: 'Recruitment Manager', photo: 'https://randomuser.me/api/portraits/men/3.jpg', phone: '+97455355206', isTopManagement: true },
-  { id: '4', name: 'Ms. Noor Al Emadi', position: 'Client Relations Head', photo: 'https://randomuser.me/api/portraits/women/4.jpg', phone: '+97455355206', isTopManagement: true },
-  { id: '5', name: 'Mr. Youssef Hassan', position: 'Visa Processing Officer', photo: 'https://randomuser.me/api/portraits/men/5.jpg', phone: '+97455355206', isTopManagement: false },
-  { id: '6', name: 'Ms. Lina Al Kuwari', position: 'Marketing Specialist', photo: 'https://randomuser.me/api/portraits/women/6.jpg', phone: '+97455355206', isTopManagement: false },
+  { id: '1', name: 'Mr. Mohamed Razeen', position: 'CEO', photo: 'https://github.com/AshiLara2007/ZOD-Photos/blob/main/Unknown-person.gif?raw=true', phone: '+97455355206', isTopManagement: true },
+  { id: '2', name: 'Ms. Fatima Al Saeed', position: 'Operations Director', photo: 'https://github.com/AshiLara2007/ZOD-Photos/blob/main/Unknown-person.gif?raw=true', phone: '+97455355206', isTopManagement: true },
+  { id: '3', name: 'Mr. Khalid Al Mansouri', position: 'Recruitment Manager', photo: 'https://github.com/AshiLara2007/ZOD-Photos/blob/main/Unknown-person.gif?raw=true', phone: '+97455355206', isTopManagement: true },
+  { id: '4', name: 'Ms. Noor Al Emadi', position: 'Client Relations Head', photo: 'https://github.com/AshiLara2007/ZOD-Photos/blob/main/Unknown-person.gif?raw=true', phone: '+97455355206', isTopManagement: true },
+  { id: '5', name: 'Mr. Youssef Hassan', position: 'Visa Processing Officer', photo: 'https://github.com/AshiLara2007/ZOD-Photos/blob/main/Unknown-person.gif?raw=true', phone: '+97455355206', isTopManagement: false },
+  { id: '6', name: 'Ms. Lina Al Kuwari', position: 'Marketing Specialist', photo: 'https://github.com/AshiLara2007/ZOD-Photos/blob/main/Unknown-person.gif?raw=true', phone: '+97455355206', isTopManagement: false },
 ];
 
 const translations = {
