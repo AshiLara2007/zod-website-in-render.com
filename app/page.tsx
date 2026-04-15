@@ -481,7 +481,7 @@ export default function Home() {
       setAdminActive(true); setLoginModalOpen(false); u.value = ''; p.value = '';
       addToast('success', 'Welcome back, Admin!', 'Login Successful');
     } else { 
-      addToast('error', 'Invalid credentials. Use admin / 1978', 'Access Denied');
+      addToast('error', 'Invalid credentials. Try again', 'Access Denied');
       u.value = '';
       p.value = '';
     }
