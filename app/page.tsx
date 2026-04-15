@@ -17,6 +17,7 @@ interface Talent {
   workerType: string;
   pic: string;
   cv: string;
+  createdAt?: string;
 }
 
 interface Lead {
@@ -569,12 +570,22 @@ export default function Home() {
 
   const escapeHtml = (str: string) => str.replace(/[&<>]/g, (m) => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'));
 
-  // Filter talents for featured section based on checkbox
-  const featuredTalents = showReturnedOnly 
-    ? talents.filter((tal) => tal.workerType === 'Returned Housemaids')
-    : talents;
+  // Sort talents by createdAt (newest first) and take first 6 for featured
+  const sortedTalents = [...talents].sort((a, b) => {
+    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return dateB - dateA;
+  });
+
+  // Featured Candidates - last 6 uploaded
+  const featuredTalentsBase = sortedTalents.slice(0, 6);
   
-  // Filter for Hire Talent page (shows all candidates)
+  // Filter featured talents based on checkbox
+  const featuredTalents = showReturnedOnly 
+    ? featuredTalentsBase.filter((tal) => tal.workerType === 'Returned Housemaids')
+    : featuredTalentsBase;
+  
+  // Filter for Hire Talent page (shows all candidates - no limit)
   const filteredTalents = talents.filter((tal) => {
     const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
     const matchCountry = !countryFilter || tal.country === countryFilter;
