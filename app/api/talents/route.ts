@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '../../../lib/supabaseClient';;
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '../../../lib/supabaseClient';
 
 export async function GET() {
   const { data: talents, error } = await supabaseAdmin
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const salary          = parseInt(formData.get('salary') as string);
     const experience      = formData.get('experience')   as string;
     const maritalStatus   = formData.get('maritalStatus') as string;
-    const workerType      = formData.get('workerType')   as string;  // <-- ADDED workerType
+    const workerType      = formData.get('workerType')   as string;
     const picFile         = formData.get('tPic')         as File | null;
     const cvFile          = formData.get('tCv')          as File | null;
 
@@ -38,7 +38,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Upload file to Supabase Storage and return public URL
     const uploadFile = async (file: File, folder: string): Promise<string | null> => {
       if (!file || file.size === 0) return null;
       
@@ -61,14 +60,12 @@ export async function POST(req: NextRequest) {
       return urlData.publicUrl;
     };
 
-    // Upload new files if provided
     let picUrl: string | null = null;
     let cvUrl: string | null  = null;
 
     if (picFile && picFile.size > 0) picUrl = await uploadFile(picFile, 'photos');
     if (cvFile && cvFile.size > 0) cvUrl = await uploadFile(cvFile, 'cvs');
 
-    // Build talent record with ALL fields including workerType
     const talentData: Record<string, any> = {
       name,
       dob,
@@ -80,7 +77,8 @@ export async function POST(req: NextRequest) {
       salary,
       experience: experience || '',
       maritalStatus: maritalStatus || 'Single',
-      workerType: workerType || 'Recruitment Workers',  // <-- ADDED workerType with default
+      workerType: workerType || 'Recruitment Workers',
+      created_at: new Date().toISOString(),
     };
 
     if (picUrl) talentData.pic = picUrl;
@@ -88,6 +86,9 @@ export async function POST(req: NextRequest) {
 
     if (id) {
       // UPDATE existing record
+      delete talentData.created_at;
+      talentData.updated_at = new Date().toISOString();
+      
       const { error } = await supabaseAdmin
         .from('talents')
         .update(talentData)
@@ -99,7 +100,6 @@ export async function POST(req: NextRequest) {
     } else {
       // INSERT new record
       talentData.ref = '#ZOD-' + Math.floor(1000 + Math.random() * 9000);
-      talentData.created_at = new Date().toISOString();
       
       if (!talentData.pic) talentData.pic = 'https://placehold.co/150x150?text=User';
       if (!talentData.cv)  talentData.cv  = '#';
@@ -111,29 +111,6 @@ export async function POST(req: NextRequest) {
 
   } catch (error: any) {
     console.error('API error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
-
-export async function DELETE(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
-
-    if (!id) {
-      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
-    }
-
-    const { error } = await supabaseAdmin
-      .from('talents')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw new Error(error.message);
-    
-    return NextResponse.json({ message: 'Deleted successfully' });
-  } catch (error: any) {
-    console.error('Delete error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
