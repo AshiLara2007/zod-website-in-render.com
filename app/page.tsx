@@ -11,7 +11,6 @@ interface Talent {
   country: string;
   religion: string;
   salary: number;
-  workerType: string;
   pic: string;
   cv: string;
 }
@@ -42,8 +41,8 @@ const countryOptions = [
   'Sierra leone', 'Gambia'
 ];
 
-const workerTypeOptions = ['Recruitment Workers', 'Returned Housemaids'];
-
+// FIXED: Use the correct API key (starts with AIza)
+// If this key doesn't work, get a new one from https://aistudio.google.com/apikey
 const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
 
 const translations = {
@@ -58,30 +57,30 @@ const translations = {
     successfulPlacements: 'Successful Placements', corporateClients: 'Corporate Clients',
     responseTime: 'Candidate Response Time', complianceRate: 'Compliance Rate',
     ourLegacy: 'Our Legacy', aboutTitle: "Leading Doha's Recruitment Evolution for Over a Decade.",
-    aboutDesc: "ZOD Manpower is not just a recruitment firm; we are a strategic partner in Qatar's national growth.",
+    aboutDesc: "ZOD Manpower is not just a recruitment firm; we are a strategic partner in Qatar's national growth. From the towering skyscrapers of Lusail to the bustling streets of Msheireb, our talent drives the nation forward.",
     personalizedMatching: 'Personalized Candidate Matching', directLiaison: 'Direct Qatar Government Liaison',
     multiIndustry: 'Multi-Industry Expertise', ourExpertise: 'Our Expertise',
     comprehensiveSolutions: 'Comprehensive Recruitment Solutions',
-    visaTitle: 'Visa & Documentation', visaDesc: 'End-to-end handling of Qatar work permits, QID processing.',
-    techTitle: 'Technical Screening', techDesc: "Rigorous multi-stage skill testing and background checks.",
-    projectsTitle: 'Lusail & Doha Projects', projectsDesc: 'Specialized large-scale staffing solutions.',
-    currentOpenings: 'Current Openings in Qatar', openingsDesc: 'Join our network and work with top-tier companies.',
+    visaTitle: 'Visa & Documentation', visaDesc: 'End-to-end handling of Qatar work permits, QID processing, and professional licensing for international talent.',
+    techTitle: 'Technical Screening', techDesc: "Rigorous multi-stage skill testing and background checks to ensure every candidate is ready for Doha's competitive market.",
+    projectsTitle: 'Lusail & Doha Projects', projectsDesc: 'Specialized large-scale staffing solutions for major national infrastructure, hospitality, and oil & gas sectors.',
+    currentOpenings: 'Current Openings in Qatar', openingsDesc: 'Join our network and work with top-tier companies in Doha, Al Khor, and Al Wakrah.',
     applyViaWhatsapp: 'APPLY VIA WHATSAPP',
-    hireTitle: 'Hire Top Talent Instantly', hireDesc: 'Employers can browse our pre-vetted candidates.',
+    hireTitle: 'Hire Top Talent Instantly', hireDesc: 'Employers can browse our pre-vetted candidates and request CVs directly.',
     searchPlaceholder: 'Search Skill (e.g. Driver, Nurse)...', refresh: 'Refresh', ready: 'Ready', viewCV: 'View CV', hireBtn: 'Hire',
     allCountries: 'All Countries', featuredCandidates: 'Featured Candidates', viewAllCandidates: 'View All Candidates →',
-    testimonial1: '"ZOD Manpower found us 50+ staff for our luxury hotel in Lusail within 30 days."',
+    testimonial1: '"ZOD Manpower found us 50+ staff for our luxury hotel in Lusail within 30 days. Their document processing is unmatched in Qatar."',
     author1: '— HR Director, Doha Regency',
-    testimonial2: '"I came from Sri Lanka through ZOD and now work in a top company."',
+    testimonial2: '"I came from Sri Lanka through ZOD and now work in a top company. They were honest and helped with everything."',
     author2: '— Mohamed R., Office Admin',
-    testimonial3: '"Professional, reliable and very transparent."',
+    testimonial3: '"Professional, reliable and very transparent. The best manpower agency I have worked with in the Middle East."',
     author3: '— Sarah K., Hospitality Manager',
     faqTitle: 'Recruitment FAQ',
-    faqQ1: 'What is the typical visa processing time?', faqA1: 'Standard processing takes 15-45 business days.',
-    faqQ2: 'Are there any upfront fees for candidates?', faqA2: 'No. We follow Qatar Labor Laws.',
-    faqQ3: 'What industries do you specialize in?', faqA3: 'Hospitality, construction, healthcare, domestic services.',
-    faqQ4: 'How do employers request candidates?', faqA4: 'Contact us directly via WhatsApp.',
-    footerText: "Qatar's leading licensed manpower recruitment agency.",
+    faqQ1: 'What is the typical visa processing time?', faqA1: 'Standard processing takes 15-45 business days depending on documentation, medicals, and embassy approvals.',
+    faqQ2: 'Are there any upfront fees for candidates?', faqA2: 'No. We strictly follow Qatar Labor Laws and Ethical Recruitment standards. Candidates should not pay for jobs.',
+    faqQ3: 'What industries do you specialize in?', faqA3: 'We specialize in hospitality, construction, healthcare, domestic services, security, retail, and oil & gas sectors across Qatar.',
+    faqQ4: 'How do employers request candidates?', faqA4: 'Employers can browse our pre-vetted talent on this website and contact us directly via WhatsApp to request CVs or arrange interviews.',
+    footerText: "Qatar's leading licensed manpower recruitment agency. Connecting global talent to the heart of the Middle East.",
     quickLinks: 'Quick Links', aboutDoha: 'About Doha Agency', clientServices: 'Client Services', browseCVs: 'Browse CVs',
     internal: 'Internal', copyright: '© 2026 ZOD MANPOWER.',
     privacyPolicy: 'Privacy Policy', terms: 'Terms of Service',
@@ -95,10 +94,8 @@ const translations = {
     candidateDetails: 'Candidate Details', position: 'Position', salary: 'Salary', actions: 'Actions',
     realtimeLogs: 'Real-time Activity Logs', clearLogs: 'Clear All Logs',
     trafficSource: 'Traffic Source', actionTaken: 'Action Taken', timeLocal: 'Time (Local)',
-    confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate?',
+    confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate? This action cannot be undone.',
     cancel: 'Cancel', yesDelete: 'Yes, Delete', english: 'English', arabic: 'العربية',
-    workerType: 'Worker Type', recruitmentWorkers: 'Recruitment Workers', returnedHousemaids: 'Returned Housemaids',
-    searchCandidates: 'Search Candidates...', searchByName: 'Search by name, job, or country',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور',
@@ -111,29 +108,29 @@ const translations = {
     successfulPlacements: 'تعيين ناجح', corporateClients: 'عميل من الشركات',
     responseTime: 'وقت الاستجابة للمرشح', complianceRate: 'معدل الامتثال',
     ourLegacy: 'إرثنا', aboutTitle: 'ريادة تطور التوظيف في الدوحة لأكثر من عقد.',
-    aboutDesc: 'زود مان باور ليست مجرد شركة توظيف؛ نحن شريك استراتيجي.',
+    aboutDesc: 'زود مان باور ليست مجرد شركة توظيف؛ نحن شريك استراتيجي في النمو الوطني لقطر.',
     personalizedMatching: 'مطابقة مرشحين مخصصة', directLiaison: 'اتصال مباشر مع حكومة قطر',
     multiIndustry: 'خبرة متعددة الصناعات', ourExpertise: 'خبراتنا',
     comprehensiveSolutions: 'حلول توظيف شاملة',
-    visaTitle: 'التأشيرات والوثائق', visaDesc: 'معالجة شاملة لتصاريح العمل القطرية.',
-    techTitle: 'الفحص التقني', techDesc: 'اختبارات مهارات متعددة.',
+    visaTitle: 'التأشيرات والوثائق', visaDesc: 'معالجة شاملة لتصاريح العمل القطرية ومعالجة QID.',
+    techTitle: 'الفحص التقني', techDesc: 'اختبارات مهارات متعددة لضمان جاهزية كل مرشح.',
     projectsTitle: 'مشاريع لوسيل والدوحة', projectsDesc: 'حلول توظيف واسعة النطاق.',
     currentOpenings: 'الوظائف الشاغرة حالياً في قطر', openingsDesc: 'انضم إلى شبكتنا.',
     applyViaWhatsapp: 'قدم عبر واتساب',
-    hireTitle: 'وظف أفضل المواهب فوراً', hireDesc: 'تصفح مرشحينا المعتمدين.',
+    hireTitle: 'وظف أفضل المواهب فوراً', hireDesc: 'تصفح مرشحينا المعتمدين مسبقاً.',
     searchPlaceholder: 'ابحث عن مهارة...', refresh: 'تحديث', ready: 'جاهز', viewCV: 'عرض السيرة', hireBtn: 'توظيف',
     allCountries: 'كل الدول', featuredCandidates: 'المرشحون المميزون', viewAllCandidates: 'عرض كل المرشحين ←',
     testimonial1: '"وجدت لنا زود مان باور أكثر من 50 موظفاً خلال 30 يوماً."',
-    author1: '— مدير الموارد البشرية',
+    author1: '— مدير الموارد البشرية، فندق الدوحة ريجنسي',
     testimonial2: '"جئت من سريلانكا عبر زود والآن أعمل في شركة كبرى."',
-    author2: '— محمد ر.',
+    author2: '— محمد ر.، مساعد إداري',
     testimonial3: '"محترفون وموثوقون وشفافون جداً."',
-    author3: '— سارة ك.',
+    author3: '— سارة ك.، مديرة الضيافة',
     faqTitle: 'الأسئلة الشائعة',
     faqQ1: 'ما وقت معالجة التأشيرة؟', faqA1: 'من 15 إلى 45 يوم عمل.',
     faqQ2: 'هل هناك رسوم للمرشحين؟', faqA2: 'لا. لا ينبغي للمرشحين دفع أي رسوم.',
-    faqQ3: 'ما القطاعات التي تتخصصون فيها؟', faqA3: 'الضيافة والبناء والرعاية الصحية.',
-    faqQ4: 'كيف يطلب أصحاب العمل المرشحين؟', faqA4: 'عبر واتساب مباشرة.',
+    faqQ3: 'ما القطاعات التي تتخصصون فيها؟', faqA3: 'الضيافة والبناء والرعاية الصحية والنفط والغاز.',
+    faqQ4: 'كيف يطلب أصحاب العمل المرشحين؟', faqA4: 'عبر واتساب أو من خلال الموقع مباشرة.',
     footerText: 'وكالة التوظيف المرخصة الرائدة في قطر.',
     quickLinks: 'روابط سريعة', aboutDoha: 'عن وكالة الدوحة', clientServices: 'خدمات العملاء', browseCVs: 'تصفح السير الذاتية',
     internal: 'داخلي', copyright: '© 2026 زود مانباور.',
@@ -145,14 +142,12 @@ const translations = {
     inventoryManagement: 'إدارة المخزون', visitorLogs: 'سجلات الزوار',
     newCandidate: 'مرشح جديد', editCandidate: 'تعديل:', fullName: 'الاسم الكامل', age: 'العمر', gender: 'الجنس',
     jobDesignation: 'المسمى الوظيفي', country: 'البلد', religion: 'الدين', salaryQAR: 'الراتب (ريال قطري)',
-    photo: 'الصورة', cvUpload: 'السيرة الذاتية', saveRecord: 'حفظ بيانات المرشح',
+    photo: 'الصورة', cvUpload: 'السيرة الذاتية (PDF/صورة)', saveRecord: 'حفظ بيانات المرشح',
     candidateDetails: 'تفاصيل المرشح', position: 'الوظيفة', salary: 'الراتب', actions: 'إجراءات',
-    realtimeLogs: 'سجلات النشاط', clearLogs: 'مسح جميع السجلات',
-    trafficSource: 'مصدر الزيارة', actionTaken: 'الإجراء المتخذ', timeLocal: 'الوقت',
+    realtimeLogs: 'سجلات النشاط الفورية', clearLogs: 'مسح جميع السجلات',
+    trafficSource: 'مصدر الزيارة', actionTaken: 'الإجراء المتخذ', timeLocal: 'الوقت (محلي)',
     confirmDelete: 'تأكيد الحذف', deleteMsg: 'هل أنت متأكد من حذف هذا المرشح؟',
     cancel: 'إلغاء', yesDelete: 'نعم، احذف', english: 'English', arabic: 'العربية',
-    workerType: 'نوع العامل', recruitmentWorkers: 'عمال التوظيف', returnedHousemaids: 'خادمات عائدات',
-    searchCandidates: 'ابحث عن مرشحين...', searchByName: 'ابحث بالاسم أو الوظيفة أو البلد',
   }
 };
 
@@ -168,13 +163,13 @@ export default function Home() {
   const [editTalent, setEditTalent] = useState<Talent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
-  const [adminSearchQuery, setAdminSearchQuery] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [showHirePage, setShowHirePage] = useState(false);
 
+  // Chatbot states
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
@@ -189,7 +184,6 @@ export default function Home() {
   const countryRef = useRef<HTMLSelectElement>(null);
   const religionRef = useRef<HTMLSelectElement>(null);
   const salaryRef = useRef<HTMLInputElement>(null);
-  const workerTypeRef = useRef<HTMLSelectElement>(null);
   const picRef = useRef<HTMLInputElement>(null);
   const cvRef = useRef<HTMLInputElement>(null);
 
@@ -235,7 +229,6 @@ export default function Home() {
     formData.append('country', countryRef.current!.value);
     formData.append('religion', religionRef.current!.value);
     formData.append('salary', salaryRef.current!.value);
-    formData.append('workerType', workerTypeRef.current!.value);
     if (picRef.current?.files?.[0]) formData.append('tPic', picRef.current.files[0]);
     if (cvRef.current?.files?.[0]) formData.append('tCv', cvRef.current.files[0]);
     try {
@@ -254,7 +247,6 @@ export default function Home() {
     if (countryRef.current) countryRef.current.value = countryOptions[0];
     if (religionRef.current) religionRef.current.value = 'Muslim';
     if (salaryRef.current) salaryRef.current.value = '0';
-    if (workerTypeRef.current) workerTypeRef.current.value = workerTypeOptions[0];
     if (picRef.current) picRef.current.value = '';
     if (cvRef.current) cvRef.current.value = '';
   };
@@ -268,7 +260,6 @@ export default function Home() {
     if (countryRef.current) countryRef.current.value = talent.country;
     if (religionRef.current) religionRef.current.value = talent.religion || 'Muslim';
     if (salaryRef.current) salaryRef.current.value = String(talent.salary || 0);
-    if (workerTypeRef.current) workerTypeRef.current.value = talent.workerType || workerTypeOptions[0];
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -292,11 +283,12 @@ export default function Home() {
     } else { alert('Invalid credentials. Use admin / 1978'); }
   };
 
+  // ========== GEMINI CHATBOT WITH LANGUAGE SELECTION ==========
   const startChat = (lang: 'en' | 'ar') => {
     setChatLanguageSelected(lang);
     const welcomeMsg = lang === 'en'
-      ? 'Hello! 👋 I am ZOD AI Assistant. Ask me about jobs, visa, hiring!'
-      : 'مرحباً! 👋 أنا مساعد ZOD AI. اسألني عن الوظائف!';
+      ? 'Hello! 👋 I am ZOD AI Assistant. Ask me about jobs, visa, hiring, or mention a country to see available CVs!'
+      : 'مرحباً! 👋 أنا مساعد ZOD AI. اسألني عن الوظائف، التأشيرات، التوظيف، أو اذكر دولة لمشاهدة السير الذاتية المتاحة!';
     setChatMessages([{ role: 'bot', text: welcomeMsg }]);
   };
 
@@ -309,10 +301,54 @@ export default function Home() {
     setChatLoading(true);
     trackLead('Chatbot', msg.slice(0, 40));
 
+    const detectedCountry = countryOptions.find((c) =>
+      msg.toLowerCase().includes(c.toLowerCase())
+    );
+    let cvCards: Talent[] = [];
+    if (detectedCountry) {
+      cvCards = talents.filter((tal) => tal.country.toLowerCase() === detectedCountry.toLowerCase()).slice(0, 3);
+    }
+
+    const simpleGreetings = ['hey', 'hi', 'hello', 'hola', 'salam', 'مرحبا'];
+    if (simpleGreetings.includes(msg.trim().toLowerCase())) {
+      const greetingResponse = chatLanguageSelected === 'en'
+        ? 'Hey there! 👋 How can I help you today? Ask me about jobs, visa, or mention a country to see CVs.'
+        : 'مرحباً! 👋 كيف يمكنني مساعدتك اليوم؟ اسأل عن الوظائف، التأشيرات، أو اذكر دولة لمشاهدة السير الذاتية.';
+      setChatMessages((prev) => [...prev, { role: 'bot', text: greetingResponse, cvCards: cvCards.length > 0 ? cvCards : undefined }]);
+      setChatLoading(false);
+      return;
+    }
+
     try {
       const systemPrompt = chatLanguageSelected === 'en'
-        ? `You are ZOD Assistant for ZOD Manpower. Answer concisely. User: ${msg}`
-        : `أنت مساعد ZOD. أجب باختصار. المستخدم: ${msg}`;
+        ? `You are ZOD Assistant, the official AI chatbot for ZOD Manpower — Qatar's leading licensed recruitment agency (ISO 9001:2015 certified, licensed by Qatar Ministry of Labor).
+
+Key facts:
+- We recruit from: ${countryOptions.join(', ')}
+- Job categories: ${jobOptions.join(', ')}
+- WhatsApp contact: +94729204485
+- Visa processing: 15-45 business days
+- Zero fees for candidates (Qatar Labor Law compliant)
+- Salary range: 800-3000 QAR/month
+- Active in Doha, Al Khor, Al Wakrah, Lusail
+
+Answer the user helpfully, professionally, and concisely. If they ask about CVs from a specific country, acknowledge you are checking the database.
+
+User question: ${msg}`
+        : `أنت مساعد ZOD، بوت الدردشة الرسمي لشركة زود مان باور — وكالة التوظيف المرخصة الرائدة في قطر (معتمدة ISO 9001:2015، مرخصة من وزارة العمل القطرية).
+
+حقائق رئيسية:
+- نوظف من: ${countryOptions.join(', ')}
+- فئات الوظائف: ${jobOptions.join(', ')}
+- واتساب: +94729204485
+- معالجة التأشيرة: 15-45 يوم عمل
+- لا توجد رسوم للمرشحين (وفقاً لقانون العمل القطري)
+- نطاق الرواتب: 800-3000 ريال قطري/شهر
+- نعمل في الدوحة، الخور، الوكرة، لوسيل
+
+أجب المستخدم بشكل مفيد ومهني ومختصر. إذا سأل عن السير الذاتية من بلد معين، أقر بأنك تتحقق من قاعدة البيانات.
+
+سؤال المستخدم: ${msg}`;
 
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -321,20 +357,35 @@ export default function Home() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: systemPrompt }] }],
-            generationConfig: { maxOutputTokens: 200, temperature: 0.7 }
+            generationConfig: { maxOutputTokens: 350, temperature: 0.7 }
           })
         }
       );
 
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Gemini API error:', response.status, errorData);
+        throw new Error(`API returned ${response.status}`);
+      }
+
       const data = await response.json();
       const botText = data?.candidates?.[0]?.content?.parts?.[0]?.text ||
         (chatLanguageSelected === 'en'
-          ? "Please contact us via WhatsApp at +94729204485"
-          : "يرجى الاتصال بنا على واتساب +94729204485");
+          ? "I'm not sure how to answer that. Please contact us via WhatsApp at +94729204485."
+          : "لست متأكداً من الإجابة. يرجى الاتصال بنا عبر واتساب +94729204485.");
 
-      setChatMessages((prev) => [...prev, { role: 'bot', text: botText }]);
+      setChatMessages((prev) => [...prev, { role: 'bot', text: botText, cvCards: cvCards.length > 0 ? cvCards : undefined }]);
     } catch (err) {
-      setChatMessages((prev) => [...prev, { role: 'bot', text: chatLanguageSelected === 'en' ? "Please contact us on WhatsApp +94729204485" : "يرجى الاتصال بنا على واتساب +94729204485" }]);
+      console.error('Chatbot error:', err);
+      let fallbackText = chatLanguageSelected === 'en'
+        ? "Sorry, I'm having trouble connecting to my AI brain right now. Please contact us directly on WhatsApp at +94729204485 or use the 'Apply Now' button. 😊"
+        : "عذراً، أواجه مشكلة في الاتصال بالذكاء الاصطناعي حالياً. يرجى الاتصال بنا مباشرة على واتساب +94729204485 أو استخدام زر 'قدم الآن'. 😊";
+      if (detectedCountry) {
+        fallbackText = chatLanguageSelected === 'en'
+          ? `We have ${cvCards.length} candidate(s) from ${detectedCountry} in our database! You can browse them below or contact us on WhatsApp.`
+          : `لدينا ${cvCards.length} مرشح(ين) من ${detectedCountry} في قاعدة بياناتنا! يمكنك تصفحهم أدناه أو الاتصال بنا على واتساب.`;
+      }
+      setChatMessages((prev) => [...prev, { role: 'bot', text: fallbackText, cvCards: cvCards.length > 0 ? cvCards : undefined }]);
     } finally {
       setChatLoading(false);
     }
@@ -349,7 +400,7 @@ export default function Home() {
   }, [chatMessages, chatOpen]);
 
   useEffect(() => {
-    const init = async () => { await fetchTalents(); loadLeads(); setTimeout(() => setIsLoading(false), 3000); };
+    const init = async () => { await fetchTalents(); loadLeads(); setTimeout(() => setIsLoading(false), 5000); };
     init();
   }, [fetchTalents]);
 
@@ -366,20 +417,10 @@ export default function Home() {
 
   const escapeHtml = (str: string) => str.replace(/[&<>]/g, (m) => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'));
 
-  // Filter for Homepage hire page
   const filteredTalents = talents.filter((tal) => {
-    const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchSearch = tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
     const matchCountry = !countryFilter || tal.country === countryFilter;
     return matchSearch && matchCountry;
-  });
-
-  // Filter for Admin panel with search
-  const adminFilteredTalents = talents.filter((tal) => {
-    const matchSearch = adminSearchQuery === '' || 
-      tal.name.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
-      tal.job.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
-      tal.country.toLowerCase().includes(adminSearchQuery.toLowerCase());
-    return matchSearch;
   });
 
   const featuredTalents = talents.slice(0, 2);
@@ -390,7 +431,7 @@ export default function Home() {
         <div className="text-center">
           <img src="/logo/logo.jpeg" alt="ZOD MANPOWER" className="w-24 h-24 rounded-full mx-auto mb-8 object-cover shadow-lg animate-pulse" onError={(e) => (e.currentTarget.style.display = 'none')} />
           <h1 className="text-4xl md:text-5xl font-bold text-[#002F66] mb-4 animate-bounce">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-8">{t.brandLoading}</p>
+          <p className="text-xl md:text-2xl text-gray-600 mb-8">{language === 'en' ? 'ZOD MANPOWER' : 'زود مان باور'}</p>
           <div className="flex gap-4 justify-center">
             <button onClick={() => setLanguage('en')} className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${language === 'en' ? 'bg-[#002F66] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>English</button>
             <button onClick={() => setLanguage('ar')} className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${language === 'ar' ? 'bg-[#002F66] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>العربية</button>
@@ -403,7 +444,7 @@ export default function Home() {
 
   return (
     <>
-      {/* Chatbot */}
+      {/* ========== GEMINI CHATBOT ========== */}
       <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-3">
         {chatOpen && (
           <div className="w-80 sm:w-96 bg-white rounded-[2rem] shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '520px' }}>
@@ -429,8 +470,28 @@ export default function Home() {
               ) : (
                 <>
                   {chatMessages.map((msg, i) => (
-                    <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-[#002F66] text-white rounded-br-sm' : 'bg-white text-gray-700 rounded-bl-sm border border-gray-100'}`}>{msg.text}</div>
+                    <div key={i} className="space-y-2">
+                      <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-[#002F66] text-white rounded-br-sm' : 'bg-white text-gray-700 rounded-bl-sm border border-gray-100'}`}>{msg.text}</div>
+                      </div>
+                      {msg.cvCards && msg.cvCards.length > 0 && (
+                        <div className="space-y-2 ml-1">
+                          <p className="text-[10px] font-bold text-[#002F66] uppercase tracking-widest">
+                            {chatLanguageSelected === 'en' ? 'Available CVs from our database:' : 'السير الذاتية المتاحة من قاعدة بياناتنا:'}
+                          </p>
+                          {msg.cvCards.map((talent) => (
+                            <div key={talent.id} className="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex items-center gap-3">
+                              <img src={talent.pic} className="w-10 h-10 rounded-lg object-cover shrink-0" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50?text=User')} alt={talent.name} />
+                              <div className="flex-1 min-w-0">
+                                <div className="font-bold text-slate-800 text-xs truncate">{escapeHtml(talent.name)}</div>
+                                <div className="text-[10px] text-[#002F66] font-bold">{escapeHtml(talent.job)}</div>
+                                <div className="text-[10px] text-gray-400">{talent.salary} QAR · {talent.gender}, {talent.age}y</div>
+                              </div>
+                              <a href={`https://wa.me/94729204485?text=Interested in ${encodeURIComponent(talent.name)}`} target="_blank" onClick={() => trackLead('Chatbot CV', talent.name)} className="shrink-0 bg-[#002F66] text-white text-[9px] font-bold px-2 py-1.5 rounded-lg hover:bg-[#002060] transition-all">Hire</a>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                   {chatLoading && (
@@ -567,7 +628,6 @@ export default function Home() {
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
-                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-tag w-5 text-[#002F66]"></i><span>{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</span></div>
                           </div>
                         </div>
                         <div className="flex gap-3 mt-auto">
@@ -582,7 +642,6 @@ export default function Home() {
             </div>
           ) : (
             <>
-              {/* Hero Section */}
               <section id="home" className="relative pt-48 pb-32 px-6 qatar-gradient text-white overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center relative z-10">
@@ -602,7 +661,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Stats */}
               <section className="py-16 bg-white border-b reveal">
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-10">
                   {[{ num: '5.2K', label: t.successfulPlacements }, { num: '180+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '100%', label: t.complianceRate }].map((s, i) => (
@@ -614,7 +672,7 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Featured Candidates */}
+              {/* Featured CV Preview - 2 lines */}
               <section className="py-16 bg-gray-50 px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-8">
@@ -631,7 +689,6 @@ export default function Home() {
                           <div className="flex-1 min-w-0">
                             <div className="font-bold text-slate-800 text-base truncate">{escapeHtml(talent.name)}</div>
                             <div className="text-[#002F66] font-bold text-[11px] uppercase tracking-widest">{escapeHtml(talent.job)} · {escapeHtml(talent.country)}</div>
-                            <div className="text-[10px] text-gray-400 mt-1">{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</div>
                           </div>
                           <div className="flex gap-3 items-center shrink-0">
                             <span className="text-xs font-bold text-gray-500 hidden sm:block">{talent.salary || 0} QAR</span>
@@ -644,7 +701,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* About */}
               <section id="about" className="py-24 px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
                   <div className="relative group">
@@ -660,7 +716,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Services */}
               <section id="services" className="py-24 px-6 bg-gray-50 reveal">
                 <div className="max-w-7xl mx-auto text-center mb-20"><h2 className="text-sm font-bold text-red-800 uppercase tracking-[0.3em] mb-4">{t.ourExpertise}</h2><h3 className="text-4xl font-bold text-slate-900">{t.comprehensiveSolutions}</h3></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
@@ -674,7 +729,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Vacancies */}
               <section id="vacancies" className="py-24 px-6 bg-slate-900 text-white relative reveal">
                 <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden"><i className="fa-solid fa-briefcase text-[50rem] absolute -bottom-40 -left-40 animate-spin-slow"></i></div>
                 <div className="max-w-7xl mx-auto relative z-10">
@@ -692,7 +746,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Testimonials */}
               <section className="py-24 bg-gray-50 px-6 reveal">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12">
                   {[{ text: t.testimonial1, author: t.author1 }, { text: t.testimonial2, author: t.author2 }, { text: t.testimonial3, author: t.author3 }].map((item, i) => (
@@ -705,7 +758,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* FAQ */}
               <section className="py-24 bg-white px-6 reveal">
                 <div className="max-w-5xl mx-auto">
                   <h3 className="text-3xl font-bold text-center mb-12">{t.faqTitle}</h3>
@@ -720,7 +772,6 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* Footer */}
               <footer className="py-24 bg-slate-900 text-white px-6">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 border-b border-white/5 pb-16">
                   <div className="col-span-2"><div className="text-2xl font-black uppercase mb-6 tracking-tighter">ZOD<span className="text-[#002F66]"> MANPOWER</span></div><p className="text-slate-500 text-sm leading-relaxed max-w-sm mb-6">{t.footerText}</p><div className="flex space-x-4"><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-facebook-f"></i></a><a href="#" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-linkedin-in"></i></a></div></div>
@@ -734,7 +785,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Admin Panel */}
       {adminActive && (
         <div className="admin-section min-h-screen bg-gray-50 pb-20">
           <nav className="bg-white border-b px-6 py-4 mb-10 sticky top-0 z-50">
@@ -750,27 +800,10 @@ export default function Home() {
               <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{t.activeVacancies}</p><div className="text-4xl font-bold text-[#002F66]">4</div></div>
               <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center justify-center"><button onClick={fetchTalents} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all duration-300 hover:scale-105"><i className="fa-solid fa-rotate-right mr-2"></i> {t.refresh}</button></div>
             </div>
-
-            {/* Admin Search Bar */}
-            <div className="mb-8">
-              <div className="relative max-w-md">
-                <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                <input
-                  type="text"
-                  value={adminSearchQuery}
-                  onChange={(e) => setAdminSearchQuery(e.target.value)}
-                  placeholder={t.searchCandidates}
-                  className="w-full p-4 pl-12 bg-white border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-sm"
-                />
-              </div>
-              <p className="text-xs text-gray-400 mt-2 ml-2">{t.searchByName}</p>
-            </div>
-
             <div className="flex space-x-6 mb-8 border-b">
               <button onClick={() => setActiveTab('candidates')} className={`pb-4 border-b-2 font-bold text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === 'candidates' ? 'border-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{t.inventoryManagement}</button>
               <button onClick={() => setActiveTab('leads')} className={`pb-4 border-b-2 font-bold text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === 'leads' ? 'border-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{t.visitorLogs}</button>
             </div>
-
             {activeTab === 'candidates' && (
               <div className="grid lg:grid-cols-3 gap-8">
                 <div className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm h-fit">
@@ -783,42 +816,32 @@ export default function Home() {
                     </div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{jobOptions.map(job => <option key={job} value={job}>{job}</option>)}</select></div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.country}</label><select ref={countryRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Muslim">Muslim</option><option value="Christian">Christian</option><option value="Hindu">Hindu</option><option value="Buddhist">Buddhist</option></select></div>
+                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Muslim">Muslim</option><option value="Christian">Christian</option></select></div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
-                    <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.workerType}</label><select ref={workerTypeRef} className="w-full p-4 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">
-                      {workerTypeOptions.map(opt => <option key={opt} value={opt}>{opt === 'Recruitment Workers' ? t.recruitmentWorkers : t.returnedHousemaids}</option>)}
-                    </select></div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-2">{t.photo}</label><input ref={picRef} type="file" accept="image/*" className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 transition-all" /></div>
                     <div><label className="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-2">{t.cvUpload}</label><input ref={cvRef} type="file" accept=".pdf,image/*" className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all" /></div>
                     <button type="submit" className="w-full py-4 bg-[#002F66] text-white rounded-xl font-bold uppercase text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105">{t.saveRecord}</button>
                   </form>
                 </div>
                 <div className="lg:col-span-2 bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left min-w-[800px]">
-                      <thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b">
-                        <tr><th className="p-6">{t.candidateDetails}</th><th className="p-6">{t.position}</th><th className="p-6">{t.salary}</th><th className="p-6">{t.workerType}</th><th className="p-6 text-right">{t.actions}</th></tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {adminFilteredTalents.map((talent) => (
-                          <tr key={talent.id} className="hover:bg-gray-50 transition-all duration-200">
-                            <td className="p-6"><div className="flex items-center space-x-3"><img src={talent.pic} className="w-10 h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-sm">{escapeHtml(talent.name)}</div><div className="text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div></div></div></td>
-                            <td className="p-6"><div className="text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td>
-                            <td className="p-6"><div className="text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td>
-                            <td className="p-6"><div className="text-xs font-bold text-gray-600">{talent.workerType === 'Returned Housemaids' ? '🔄 Returned' : '📋 Recruitment'}</div></td>
-                            <td className="p-6 text-right">
-                              <button onClick={() => editHandler(talent)} className="text-blue-500 p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen"></i></button>
-                              <button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash"></i></button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  <table className="w-full text-left"><thead className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b"><tr><th className="p-6">{t.candidateDetails}</th><th className="p-6">{t.position}</th><th className="p-6">{t.salary}</th><th className="p-6 text-right">{t.actions}</th></tr></thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {talents.map((talent) => (
+                        <tr key={talent.id} className="hover:bg-gray-50 transition-all duration-200">
+                          <td className="p-6"><div className="flex items-center space-x-3"><img src={talent.pic} className="w-10 h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-sm">{escapeHtml(talent.name)}</div><div className="text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div></div></div></td>
+                          <td className="p-6"><div className="text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td>
+                          <td className="p-6"><div className="text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td>
+                          <td className="p-6 text-right">
+                            <button onClick={() => editHandler(talent)} className="text-blue-500 p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen"></i></button>
+                            <button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash"></i></button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
-
             {activeTab === 'leads' && (
               <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
                 <div className="p-8 border-b flex justify-between items-center"><h4 className="font-bold text-xs uppercase tracking-widest text-indigo-600">{t.realtimeLogs}</h4><button onClick={clearLeads} className="text-[10px] font-bold text-red-500 uppercase hover:underline transition-all">{t.clearLogs}</button></div>
