@@ -18,19 +18,20 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
 
-    const id         = formData.get('id')           as string | null;
-    const name       = formData.get('name')         as string;
-    const dob        = formData.get('dob')          as string;
-    const age        = parseInt(formData.get('age') as string);
-    const gender     = formData.get('gender')       as string;
-    const job        = formData.get('job')          as string;
-    const country    = formData.get('country')      as string;
-    const religion   = formData.get('religion')     as string;
-    const salary     = parseInt(formData.get('salary') as string);
-    const experience = formData.get('experience')   as string;
-    const maritalStatus = formData.get('maritalStatus') as string;
-    const picFile    = formData.get('tPic')         as File | null;
-    const cvFile     = formData.get('tCv')          as File | null;
+    const id              = formData.get('id')           as string | null;
+    const name            = formData.get('name')         as string;
+    const dob             = formData.get('dob')          as string;
+    const age             = parseInt(formData.get('age') as string);
+    const gender          = formData.get('gender')       as string;
+    const job             = formData.get('job')          as string;
+    const country         = formData.get('country')      as string;
+    const religion        = formData.get('religion')     as string;
+    const salary          = parseInt(formData.get('salary') as string);
+    const experience      = formData.get('experience')   as string;
+    const maritalStatus   = formData.get('maritalStatus') as string;
+    const workerType      = formData.get('workerType')   as string;  // <-- ADDED workerType
+    const picFile         = formData.get('tPic')         as File | null;
+    const cvFile          = formData.get('tCv')          as File | null;
 
     // Validate required fields
     if (!name || isNaN(age) || !gender || !job || !country || !religion || isNaN(salary)) {
@@ -39,6 +40,8 @@ export async function POST(req: NextRequest) {
 
     // Upload file to Supabase Storage and return public URL
     const uploadFile = async (file: File, folder: string): Promise<string | null> => {
+      if (!file || file.size === 0) return null;
+      
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
       const fileName = `${folder}/${Date.now()}-${safeName}`;
 
@@ -63,9 +66,9 @@ export async function POST(req: NextRequest) {
     let cvUrl: string | null  = null;
 
     if (picFile && picFile.size > 0) picUrl = await uploadFile(picFile, 'photos');
-    if (cvFile  && cvFile.size  > 0) cvUrl  = await uploadFile(cvFile,  'cvs');
+    if (cvFile && cvFile.size > 0) cvUrl = await uploadFile(cvFile, 'cvs');
 
-    // Build talent record with ALL fields
+    // Build talent record with ALL fields including workerType
     const talentData: Record<string, any> = {
       name,
       dob,
@@ -75,8 +78,9 @@ export async function POST(req: NextRequest) {
       country,
       religion,
       salary,
-      experience:    experience    || '',
+      experience: experience || '',
       maritalStatus: maritalStatus || 'Single',
+      workerType: workerType || 'Recruitment Workers',  // <-- ADDED workerType with default
     };
 
     if (picUrl) talentData.pic = picUrl;
@@ -95,6 +99,8 @@ export async function POST(req: NextRequest) {
     } else {
       // INSERT new record
       talentData.ref = '#ZOD-' + Math.floor(1000 + Math.random() * 9000);
+      talentData.created_at = new Date().toISOString();
+      
       if (!talentData.pic) talentData.pic = 'https://placehold.co/150x150?text=User';
       if (!talentData.cv)  talentData.cv  = '#';
 
@@ -105,6 +111,29 @@ export async function POST(req: NextRequest) {
 
   } catch (error: any) {
     console.error('API error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
+
+    const { error } = await supabaseAdmin
+      .from('talents')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw new Error(error.message);
+    
+    return NextResponse.json({ message: 'Deleted successfully' });
+  } catch (error: any) {
+    console.error('Delete error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
