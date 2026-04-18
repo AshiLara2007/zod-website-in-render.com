@@ -143,6 +143,9 @@ const translations = {
     errorOccurred: 'An error occurred', saving: 'Saving...', deleting: 'Deleting...',
     workerType: 'Worker Type', recruitmentWorkers: 'Recruitment Workers', returnedHousemaidsType: 'Returned Housemaids',
     showReturnedOnly: 'Show Returned Housemaids Only',
+    adminSearch: 'Search Candidates...',
+    searchByName: 'Search by name, job, or country',
+    workerTypeColumn: 'Worker Type',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
@@ -211,6 +214,9 @@ const translations = {
     errorOccurred: 'حدث خطأ', saving: 'جاري الحفظ...', deleting: 'جاري الحذف...',
     workerType: 'نوع العامل', recruitmentWorkers: 'عمال التوظيف', returnedHousemaidsType: 'خادمات عائدات',
     showReturnedOnly: 'إظهار الخادمات العائدات فقط',
+    adminSearch: 'ابحث عن مرشحين...',
+    searchByName: 'ابحث بالاسم أو الوظيفة أو البلد',
+    workerTypeColumn: 'نوع العامل',
   }
 };
 
@@ -268,6 +274,7 @@ export default function Home() {
   const [editTalent, setEditTalent] = useState<Talent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
+  const [adminSearchQuery, setAdminSearchQuery] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -590,6 +597,15 @@ export default function Home() {
     const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
     const matchCountry = !countryFilter || tal.country === countryFilter;
     return matchSearch && matchCountry;
+  });
+
+  // Filter for Admin panel
+  const adminFilteredTalents = talents.filter((tal) => {
+    const matchSearch = adminSearchQuery === '' || 
+      tal.name.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
+      tal.job.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
+      tal.country.toLowerCase().includes(adminSearchQuery.toLowerCase());
+    return matchSearch;
   });
 
   const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
@@ -1164,10 +1180,27 @@ export default function Home() {
               <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.activeVacancies}</p><div className="text-2xl md:text-4xl font-bold text-[#002F66]">0</div></div>
               <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center justify-center"><button onClick={fetchTalents} className="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold uppercase transition-all duration-300 hover:scale-105"><i className="fa-solid fa-rotate-right mr-1 md:mr-2"></i> {t.refresh}</button></div>
             </div>
+
+            {/* Admin Search Bar */}
+            <div className="mb-6 md:mb-8">
+              <div className="relative max-w-md">
+                <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input
+                  type="text"
+                  value={adminSearchQuery}
+                  onChange={(e) => setAdminSearchQuery(e.target.value)}
+                  placeholder={t.adminSearch}
+                  className="w-full p-4 pl-12 bg-white border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-sm"
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-2 ml-2">{t.searchByName}</p>
+            </div>
+
             <div className="flex space-x-4 md:space-x-6 mb-6 md:mb-8 border-b">
               <button onClick={() => setActiveTab('candidates')} className={`pb-3 md:pb-4 border-b-2 font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === 'candidates' ? 'border-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{t.inventoryManagement}</button>
               <button onClick={() => setActiveTab('leads')} className={`pb-3 md:pb-4 border-b-2 font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === 'leads' ? 'border-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{t.visitorLogs}</button>
             </div>
+
             {activeTab === 'candidates' && (
               <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
                 <div className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-sm h-fit">
@@ -1195,27 +1228,37 @@ export default function Home() {
                   </form>
                 </div>
                 <div className="lg:col-span-2 bg-white rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-sm overflow-x-auto">
-                  <table className="w-full text-left min-w-[500px]">
-                    <thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b">
-                      <tr><th className="p-4 md:p-6">{t.candidateDetails}</th><th className="p-4 md:p-6">{t.position}</th><th className="p-4 md:p-6">{t.salary}</th><th className="p-4 md:p-6 text-right">{t.actions}</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {talents.map((talent) => (
-                        <tr key={talent.id} className="hover:bg-gray-50 transition-all duration-200">
-                          <td className="p-4 md:p-6"><div className="flex items-center space-x-2 md:space-x-3"><img src={talent.pic} className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-xs md:text-sm">{escapeHtml(talent.name)}</div><div className="text-[8px] md:text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div><div className="text-[8px] md:text-[9px] text-gray-400">{talent.workerType === 'Returned Housemaids' ? '🔄 Returned' : '📋 Recruitment'}</div></div></div></td>
-                          <td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td>
-                          <td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td>
-                          <td className="p-4 md:p-6 text-right">
-                            <button onClick={() => editHandler(talent)} className="text-blue-500 p-1 md:p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen text-xs md:text-sm"></i></button>
-                            <button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-1 md:p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash text-xs md:text-sm"></i></button>
-                          </td>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left min-w-[800px]">
+                      <thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b">
+                        <tr>
+                          <th className="p-4 md:p-6">{t.candidateDetails}</th>
+                          <th className="p-4 md:p-6">{t.position}</th>
+                          <th className="p-4 md:p-6">{t.salary}</th>
+                          <th className="p-4 md:p-6">{t.workerTypeColumn}</th>
+                          <th className="p-4 md:p-6 text-right">{t.actions}</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {adminFilteredTalents.map((talent) => (
+                          <tr key={talent.id} className="hover:bg-gray-50 transition-all duration-200">
+                            <td className="p-4 md:p-6"><div className="flex items-center space-x-2 md:space-x-3"><img src={talent.pic} className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-xs md:text-sm">{escapeHtml(talent.name)}</div><div className="text-[8px] md:text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div></div></div></td>
+                            <td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td>
+                            <td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td>
+                            <td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</div></td>
+                            <td className="p-4 md:p-6 text-right">
+                              <button onClick={() => editHandler(talent)} className="text-blue-500 p-1 md:p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen text-xs md:text-sm"></i></button>
+                              <button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-1 md:p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash text-xs md:text-sm"></i></button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             )}
+
             {activeTab === 'leads' && (
               <div className="bg-white rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-sm overflow-x-auto">
                 <div className="p-4 md:p-8 border-b flex justify-between items-center flex-wrap gap-2"><h4 className="font-bold text-[10px] md:text-xs uppercase tracking-widest text-indigo-600">{t.realtimeLogs}</h4><button onClick={clearLeads} className="text-[8px] md:text-[10px] font-bold text-red-500 uppercase hover:underline transition-all">{t.clearLogs}</button></div>
