@@ -1,1464 +1,1274 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View, Text, TouchableOpacity, FlatList, Image,
-  StyleSheet, ScrollView, Switch, ActivityIndicator,
-  Alert, Linking, RefreshControl, TextInput, Share,
-  Animated, Dimensions, Platform, Modal
-} from 'react-native';
-import * as WebBrowser from 'expo-web-browser';
-import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
-import * as MailComposer from 'expo-mail-composer';
-import * as MediaLibrary from 'expo-media-library';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+'use client';
 
-const { width } = Dimensions.get('window');
-const API_URL = 'https://zodmanpower.info/api/talents';
-const LOGO_URL = 'https://raw.githubusercontent.com/AshiLara2007/ZOD-Photos/main/ZOD%20LOGO%20(1).png';
-const APP_VERSION = '1.0.8';
-const ADMIN_EMAIL = 'zodmanpower1978@gmail.com';
-const WHATSAPP_NUMBER = '97455355206';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 
-// Cache keys
-const CACHE_KEYS = {
-  CANDIDATES: '@zod_candidates_cache',
-  LAST_UPDATE: '@zod_last_update',
-  OFFLINE_MODE: '@zod_offline_mode',
-  SAVED_PROFILES: '@zod_saved_profiles'
-};
+interface Talent {
+  id: string;
+  name: string;
+  age: number;
+  dob: string;
+  gender: string;
+  job: string;
+  country: string;
+  religion: string;
+  salary: number;
+  experience: string;
+  maritalStatus: string;
+  workerType: string;
+  pic: string;
+  cv: string;
+  createdAt?: string;
+}
 
-// ------------------- TRANSLATIONS -------------------
+interface Lead {
+  id: number;
+  source: string;
+  action: string;
+  time: string;
+}
+
+interface TeamMember {
+  id: string;
+  name: string;
+  position: string;
+  photo: string;
+  phone: string;
+  isTopManagement: boolean;
+}
+
+interface ChatMessage {
+  role: 'user' | 'bot';
+  text: string;
+  cvCards?: Talent[];
+}
+
+interface Toast {
+  id: number;
+  type: 'success' | 'error' | 'info' | 'warning';
+  message: string;
+  title?: string;
+}
+
+const jobOptions = [
+  'Driver', 'Baby sitting', 'Nurse', 'Cook', 'Domestic Worker', 'Teacher', 'House Maid'
+];
+
+const countryOptions = [
+  'Indonesia', 'Sri Lanka', 'Philippines', 'Bangladesh', 'India', 'Ethiopia', 'Kenya', 'Uganda'
+];
+
+const experienceOptions = [
+  '0-1 Year', '1-2 Years', '2-3 Years', '3-4 Years', '4-5 Years', '5-7 Years', '7-10 Years', '10+ Years'
+];
+
+const maritalStatusOptions = ['Single', 'Married', 'Divorced', 'Widowed'];
+
+const workerTypeOptions = ['Recruitment Workers', 'Returned Housemaids'];
+
+const GEMINI_API_KEY = 'AIzaSyCG3HaU5TO4nbtEgkzwii585nB2hcDTkW0';
+
+const teamMembers: TeamMember[] = [
+  { id: '1', name: 'Mr. Mohamed Razeen', position: 'CEO', photo: 'https://github.com/AshiLara2007/ZOD-Photos/blob/main/Unknown-person.gif?raw=true', phone: '+97455355206', isTopManagement: true },
+  { id: '2', name: 'Ms. Fatima Al Saeed', position: 'Operations Director', photo: 'https://github.com/AshiLara2007/ZOD-Photos/blob/main/Unknown-person.gif?raw=true', phone: '+97455355206', isTopManagement: true },
+  { id: '3', name: 'Mr. Khalid Al Mansouri', position: 'Recruitment Manager', photo: 'https://github.com/AshiLara2007/ZOD-Photos/blob/main/Unknown-person.gif?raw=true', phone: '+97455355206', isTopManagement: true },
+  { id: '4', name: 'Ms. Noor Al Emadi', position: 'Client Relations Head', photo: 'https://github.com/AshiLara2007/ZOD-Photos/blob/main/Unknown-person.gif?raw=true', phone: '+97455355206', isTopManagement: true },
+  { id: '5', name: 'Mr. Youssef Hassan', position: 'Visa Processing Officer', photo: 'https://github.com/AshiLara2007/ZOD-Photos/blob/main/Unknown-person.gif?raw=true', phone: '+97455355206', isTopManagement: false },
+  { id: '6', name: 'Ms. Lina Al Kuwari', position: 'Marketing Specialist', photo: 'https://github.com/AshiLara2007/ZOD-Photos/blob/main/Unknown-person.gif?raw=true', phone: '+97455355206', isTopManagement: false },
+];
+
 const translations = {
   en: {
-    app_name: 'ZOD MANPOWER',
-    tagline: 'Your Trusted Recruitment Partner',
-    select: 'Choose Language',
-    settings: 'Settings',
-    dark_mode: 'Dark Mode',
-    language: 'Language',
-    version: 'Version',
-    maids: 'House Maids',
-    drivers: 'Drivers',
-    returned: 'Returned',
-    nurses: 'Nurses',
-    teachers: 'Teachers',
-    cooks: 'Cooks',
-    all: 'All',
-    no: 'No candidates found',
-    loading: 'Loading...',
-    details: 'Details',
-    back: 'Back',
-    name: 'Name',
-    cat: 'Category',
-    nat: 'Nationality',
-    salary: 'Salary',
-    age: 'Age',
-    gender: 'Gender',
-    status: 'Status',
-    view_cv: 'View CV',
-    hire: 'Hire Now',
-    error: 'Failed to load',
-    last_update: 'Updated',
-    total_cvs: 'Total Candidates',
-    experience: 'Experience',
-    filter_by_country: 'Country',
-    call: 'Call Us',
-    email: 'Email Us',
-    website: 'Website',
-    share: 'Share App',
-    rate: 'Rate App',
-    search: 'Search by name or country...',
-    recruit: 'Recruitment',
-    returned_label: 'Returned',
-    all_countries: 'All',
-    featured: 'Categories',
-    ready: 'Ready',
-    hire_via_whatsapp: 'Hire via WhatsApp',
-    view_full_profile: 'View Profile',
-    home: 'Home',
-    categories: 'Categories',
-    profile: 'Profile',
-    favorites: 'Favorites',
-    notifications: 'Notifications',
-    push_notifications: 'Push Notifications',
-    clear_cache: 'Clear Cache',
-    cache_cleared: 'Cache Cleared Successfully',
-    about_dev: 'About Developers',
-    developers: 'Developers',
-    developer_name: 'ZOD Tech Team',
-    developer_email: 'info@zodmanpower.info',
-    social_media: 'Social Media',
-    facebook: 'Facebook',
-    instagram: 'Instagram',
-    twitter: 'Twitter',
-    privacy_security: 'Privacy & Security',
-    privacy_policy: 'Privacy Policy',
-    terms_conditions: 'Terms & Conditions',
-    help_support: 'Help & Support',
-    faq: 'FAQ',
-    contact_support: 'Contact Support',
-    app_theme: 'App Theme',
-    light: 'Light',
-    dark: 'Dark',
-    system: 'System',
-    language_selection: 'Language Selection',
-    english: 'English',
-    arabic: 'Arabic',
-    offline_mode: 'Offline Mode',
-    enable_offline: 'Enable Offline Mode',
-    download_cv: 'Download CV',
-    download_profile: 'Download Profile',
-    view_saved_profiles: 'Saved Profiles',
-    no_saved_profiles: 'No saved profiles',
-    permission_required: 'Storage Permission Required',
-    permission_message: 'This app needs storage permission to save CVs to your device.',
-    allow: 'Allow',
-    deny: 'Deny',
-    download_success: 'Download Successful',
-    download_failed: 'Download Failed',
-    report_sent: 'Download report sent to admin',
-    file_saved: 'CV saved to Gallery → ZOD MANPOWER folder',
-    offline_available: 'Offline data available',
-    online_required: 'Internet connection required for updates',
-    saved_profiles: 'Saved Profiles',
-    profile_saved: 'Profile saved offline',
-    share_cv: 'Share CV',
+    welcome: 'Welcome To Doha, Qatar', brandLoading: 'ZOD MANPOWER RECRUITMENT',
+    home: 'Home', about: 'About', services: 'Services',
+    hireNav: 'Hire Talent', contactUs: 'Contact Us', adminPortal: 'Admin Portal',
+    certified: 'Welcome To Doha, Qatar', heroTitle: 'The Gateway to',
+    heroTitleSpan: 'Premium Talent', heroTitleEnd: 'in Doha.',
+    heroDesc: 'Expertly connecting world-class human resources to the ambitious vision of Qatar.',
+    yearsLabel: 'Years in Doha Market',
+    successfulPlacements: 'Successful Placements', corporateClients: 'Corporate Clients',
+    responseTime: 'Candidate Response Time', complianceRate: 'Compliance Rate',
+    ourLegacy: 'Our Legacy', aboutTitle: "Leading Doha's Recruitment Evolution for Over a Decade.",
+    aboutDesc: "ZOD Manpower is not just a recruitment firm; we are a strategic partner in Qatar's national growth.",
+    personalizedMatching: 'Personalized Candidate Matching', directLiaison: 'Direct Qatar Government Liaison',
+    multiIndustry: 'Multi-Industry Expertise', ourExpertise: 'Our Expertise',
+    comprehensiveSolutions: 'Comprehensive Recruitment Solutions',
+    visaTitle: 'Visa & Documentation', visaDesc: 'End-to-end handling of Qatar work permits, QID processing.',
+    techTitle: 'Technical Screening', techDesc: 'Rigorous multi-stage skill testing and background checks.',
+    projectsTitle: 'Lusail & Doha Projects', projectsDesc: 'Specialized large-scale staffing solutions.',
+    applyViaWhatsapp: 'APPLY VIA WHATSAPP',
+    hireTitle: 'Hire Top Talent Instantly', hireDesc: 'Employers can browse our pre-vetted candidates.',
+    searchPlaceholder: 'Search Skill (e.g. Driver, Nurse)...', refresh: 'Refresh', ready: 'Ready', viewCV: 'View CV', hireBtn: 'Hire',
+    allCountries: 'All Countries', featuredCandidates: 'Featured Candidates', viewAllCandidates: 'View All Candidates →',
+    testimonial1: '"I came to Qatar through ZOD MANPOWER RECRUITMENT, and they found me a good place to work in Doha."',
+    author1: '— Muhammad Ikmar., Sri Lanka',
+    testimonial2: '"I came from Sri Lanka through ZOD and now work in a top company."',
+    author2: '— Mohamed R., Office Admin',
+    testimonial3: '"ZOD Manpower found us 50+ staff for our hotel"',
+    author3: '— Fathima Sarah., Manager',
+    faqTitle: 'Recruitment FAQ',
+    faqQ1: 'What is the typical visa processing time?', faqA1: 'Standard processing takes 15-45 business days.',
+    faqQ2: 'Are there any upfront fees for candidates?', faqA2: 'No. We follow Qatar Labor Laws.',
+    faqQ3: 'What industries do you specialize in?', faqA3: 'Hospitality, construction, healthcare, domestic services.',
+    faqQ4: 'How do employers request candidates?', faqA4: 'Contact us directly via WhatsApp.',
+    footerText: "Qatar's leading licensed manpower recruitment agency.",
+    quickLinks: 'Quick Links', aboutDoha: 'About Doha Agency', clientServices: 'Client Services', browseCVs: 'Browse CVs',
+    internal: 'Internal', copyright: '© 2026 ZOD MANPOWER RECRUITMENT.',
+    privacyPolicy: 'Privacy Policy', terms: 'Terms of Service',
+    staffAuth: 'Staff Authentication', restricted: 'Restricted access for ZOD Manpower Admins',
+    username: 'Username', password: 'Password', enterAdmin: 'Enter admin', authorizedOnly: 'Authorized Access Only',
+    staffPortal: 'Staff Portal', logout: 'Logout', totalCandidates: 'Total Candidates', webLeads: 'Web Leads',
+    activeVacancies: 'Active Vacancies', inventoryManagement: 'Inventory Management', visitorLogs: 'Visitor Logs',
+    newCandidate: 'New Candidate', editCandidate: 'Edit:', fullName: 'Full Name', age: 'Age', dob: 'Date of Birth', gender: 'Gender',
+    jobDesignation: 'Job Designation', country: 'Country', religion: 'Religion', salaryQAR: 'Salary (QAR)',
+    photo: 'Photo', cvUpload: 'CV (PDF/Image)', saveRecord: 'Save Candidate Record',
+    candidateDetails: 'Candidate Details', position: 'Position', salary: 'Salary', actions: 'Actions',
+    realtimeLogs: 'Real-time Activity Logs', clearLogs: 'Clear All Logs',
+    trafficSource: 'Traffic Source', actionTaken: 'Action Taken', timeLocal: 'Time (Local)',
+    confirmDelete: 'Confirm Deletion', deleteMsg: 'Are you sure you want to delete this candidate?',
+    cancel: 'Cancel', yesDelete: 'Yes, Delete', english: 'English', arabic: 'العربية',
+    houseMaids: 'House Maids', drivers: 'Drivers', nurses: 'Nurses', monthlyCleaners: 'Monthly Cleaners', returnedHousemaids: 'Returned Housemaids', alMohannadi: 'Al-Mohannadi',
+    ourTeam: 'Our Team', teamTitle: 'Meet Our Team', teamDesc: 'Dedicated professionals committed to excellence.',
+    topManagementTitle: 'Our Top Management Team', contact: 'Contact', viewMore: 'View More',
+    ourVision: 'Our Vision', ourMission: 'Our Mission',
+    visionText: 'To be the most trusted manpower solutions provider in the Middle East.',
+    missionText: 'To provide ethical, transparent, and efficient recruitment services.',
+    experience: 'Experience', driversJob: 'Drivers', babysitting: 'Baby sitting', nursesJob: 'Nurses', cooks: 'Cook', domesticWorker: 'Domestic Worker', teacher: 'Teacher',
+    ourServicesTitle: 'Our Expertise', ourServicesDesc: 'Specialized recruitment solutions.',
+    viewCandidates: 'View Candidates',
+    discount1: 'Welcome To ZOD MANPOWER', discount2: 'Offers Will Be Coming Soon', discount3: 'Contact Us For Get More Informations', discountOffer: '🔥 LIMITED OFFER',
+    backToHome: 'Back to Home', maritalStatus: 'Marital Status', single: 'Single', married: 'Married', divorced: 'Divorced', widowed: 'Widowed',
+    ourJourney: 'Our Journey', ourLocation: 'Our Location', whatClientsSay: 'What Our Clients Say',
+    brandName: 'ZOD MANPOWER RECRUITMENT',
+    candidateAdded: 'Candidate Added Successfully!', candidateUpdated: 'Candidate Updated Successfully!', candidateDeleted: 'Candidate Deleted Successfully!',
+    errorOccurred: 'An error occurred', saving: 'Saving...', deleting: 'Deleting...',
+    workerType: 'Worker Type', recruitmentWorkers: 'Recruitment Workers', returnedHousemaidsType: 'Returned Housemaids',
+    showReturnedOnly: 'Show Returned Housemaids Only',
+    adminSearch: 'Search Candidates...',
+    searchByName: 'Search by name, job, or country',
+    workerTypeColumn: 'Worker Type',
   },
   ar: {
-    app_name: 'زود مان باور',
-    tagline: 'شريك التوظيف الموثوق',
-    select: 'اختر اللغة',
-    settings: 'الإعدادات',
-    dark_mode: 'الوضع الداكن',
-    language: 'اللغة',
-    version: 'الإصدار',
-    maids: 'خادمات',
-    drivers: 'سائقين',
-    returned: 'عائدات',
-    nurses: 'ممرضين',
-    teachers: 'معلمين',
-    cooks: 'طهاة',
-    all: 'الكل',
-    no: 'لا يوجد مرشحين',
-    loading: 'جاري التحميل...',
-    details: 'تفاصيل',
-    back: 'رجوع',
-    name: 'الاسم',
-    cat: 'التصنيف',
-    nat: 'الجنسية',
-    salary: 'الراتب',
-    age: 'العمر',
-    gender: 'الجنس',
-    status: 'الحالة',
-    view_cv: 'عرض السيرة',
-    hire: 'وظف الآن',
-    error: 'فشل التحميل',
-    last_update: 'آخر تحديث',
-    total_cvs: 'إجمالي المرشحين',
-    experience: 'الخبرة',
-    filter_by_country: 'البلد',
-    call: 'اتصل بنا',
-    email: 'راسلنا',
-    website: 'الموقع',
-    share: 'مشاركة التطبيق',
-    rate: 'تقييم التطبيق',
-    search: 'ابحث بالاسم أو البلد...',
-    recruit: 'توظيف',
-    returned_label: 'عائدات',
-    all_countries: 'الكل',
-    featured: 'التصنيفات',
-    ready: 'جاهز',
-    hire_via_whatsapp: 'وظف عبر واتساب',
-    view_full_profile: 'عرض الملف',
-    home: 'الرئيسية',
-    categories: 'التصنيفات',
-    profile: 'الملف',
-    favorites: 'المفضلة',
-    notifications: 'الإشعارات',
-    push_notifications: 'الإشعارات الفورية',
-    clear_cache: 'مسح الذاكرة المؤقتة',
-    cache_cleared: 'تم مسح الذاكرة بنجاح',
-    about_dev: 'عن المطورين',
-    developers: 'المطورين',
-    developer_name: 'فريق زود تك',
-    developer_email: 'info@zodmanpower.info',
-    social_media: 'وسائل التواصل',
-    facebook: 'فيسبوك',
-    instagram: 'انستغرام',
-    twitter: 'تويتر',
-    privacy_security: 'الخصوصية والأمان',
-    privacy_policy: 'سياسة الخصوصية',
-    terms_conditions: 'الشروط والأحكام',
-    help_support: 'المساعدة والدعم',
-    faq: 'الأسئلة الشائعة',
-    contact_support: 'اتصل بالدعم',
-    app_theme: 'ثيم التطبيق',
-    light: 'فاتح',
-    dark: 'داكن',
-    system: 'النظام',
-    language_selection: 'اختيار اللغة',
-    english: 'الإنجليزية',
-    arabic: 'العربية',
-    offline_mode: 'الوضع دون اتصال',
-    enable_offline: 'تفعيل الوضع دون اتصال',
-    download_cv: 'تحميل السيرة',
-    download_profile: 'تحميل الملف الشخصي',
-    view_saved_profiles: 'الملفات المحفوظة',
-    no_saved_profiles: 'لا توجد ملفات محفوظة',
-    permission_required: 'صلاحية التخزين مطلوبة',
-    permission_message: 'يحتاج هذا التطبيق إلى صلاحية التخزين لتحميل السير الذاتية',
-    allow: 'سماح',
-    deny: 'رفض',
-    download_success: 'تم التحميل بنجاح',
-    download_failed: 'فشل التحميل',
-    report_sent: 'تم إرسال تقرير التحميل إلى المسؤول',
-    file_saved: 'تم حفظ السيرة في المعرض → مجلد زود مان باور',
-    offline_available: 'البيانات غير المتصلة متاحة',
-    online_required: 'اتصال الإنترنت مطلوب للتحديثات',
-    saved_profiles: 'الملفات المحفوظة',
-    profile_saved: 'تم حفظ الملف الشخصي دون اتصال',
-    share_cv: 'مشاركة السيرة الذاتية',
+    welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
+    home: 'الرئيسية', about: 'من نحن', services: 'خدماتنا',
+    hireNav: 'توظيف', contactUs: 'اتصل بنا', adminPortal: 'بوابة المشرفين',
+    certified: 'مرحباً بكم في الدوحة', heroTitle: 'البوابة إلى',
+    heroTitleSpan: 'المواهب المتميزة', heroTitleEnd: 'في الدوحة.',
+    heroDesc: 'نربط بخبرة الموارد البشرية العالمية برؤية قطر الطموحة.',
+    yearsLabel: 'سنة في سوق الدوحة',
+    successfulPlacements: 'تعيين ناجح', corporateClients: 'عميل من الشركات',
+    responseTime: 'وقت الاستجابة للمرشح', complianceRate: 'معدل الامتثال',
+    ourLegacy: 'إرثنا', aboutTitle: 'ريادة تطور التوظيف في الدوحة لأكثر من عقد.',
+    aboutDesc: 'زود مان باور ليست مجرد شركة توظيف؛ نحن شريك استراتيجي.',
+    personalizedMatching: 'مطابقة مرشحين مخصصة', directLiaison: 'اتصال مباشر مع حكومة قطر',
+    multiIndustry: 'خبرة متعددة الصناعات', ourExpertise: 'خبراتنا',
+    comprehensiveSolutions: 'حلول توظيف شاملة',
+    visaTitle: 'التأشيرات والوثائق', visaDesc: 'معالجة شاملة لتصاريح العمل القطرية.',
+    techTitle: 'الفحص التقني', techDesc: 'اختبارات مهارات متعددة.',
+    projectsTitle: 'مشاريع لوسيل والدوحة', projectsDesc: 'حلول توظيف واسعة النطاق.',
+    applyViaWhatsapp: 'قدم عبر واتساب',
+    hireTitle: 'وظف أفضل المواهب فوراً', hireDesc: 'تصفح مرشحينا المعتمدين.',
+    searchPlaceholder: 'ابحث عن مهارة...', refresh: 'تحديث', ready: 'جاهز', viewCV: 'عرض السيرة', hireBtn: 'توظيف',
+    allCountries: 'كل الدول', featuredCandidates: 'المرشحون المميزون', viewAllCandidates: 'عرض كل المرشحين ←',
+    testimonial1: '"وجدت لنا زود مان باور أكثر من 50 موظفاً."',
+    author1: '— مدير الموارد البشرية',
+    testimonial2: '"جئت من سريلانكا عبر زود والآن أعمل في شركة كبرى."',
+    author2: '— محمد ر.',
+    testimonial3: '"محترفون وموثوقون وشفافون."',
+    author3: '— سارة ك.',
+    faqTitle: 'الأسئلة الشائعة',
+    faqQ1: 'ما وقت معالجة التأشيرة؟', faqA1: 'من 15 إلى 45 يوم عمل.',
+    faqQ2: 'هل هناك رسوم للمرشحين؟', faqA2: 'لا. لا ينبغي للمرشحين دفع أي رسوم.',
+    faqQ3: 'ما القطاعات التي تتخصصون فيها؟', faqA3: 'الضيافة والبناء والرعاية الصحية.',
+    faqQ4: 'كيف يطلب أصحاب العمل المرشحين؟', faqA4: 'عبر واتساب مباشرة.',
+    footerText: 'وكالة التوظيف المرخصة الرائدة في قطر.',
+    quickLinks: 'روابط سريعة', aboutDoha: 'عن وكالة الدوحة', clientServices: 'خدمات العملاء', browseCVs: 'تصفح السير الذاتية',
+    internal: 'داخلي', copyright: '© 2026 زود مانباور للتوظيف.',
+    privacyPolicy: 'سياسة الخصوصية', terms: 'شروط الخدمة',
+    staffAuth: 'مصادقة الموظفين', restricted: 'دخول مقيد لمشرفي زود مان باور',
+    username: 'اسم المستخدم', password: 'كلمة المرور', enterAdmin: 'أدخل اسم المستخدم', authorizedOnly: 'دخول مصرح به فقط',
+    staffPortal: 'بوابة الموظفين', logout: 'تسجيل الخروج', totalCandidates: 'إجمالي المرشحين',
+    webLeads: 'طلبات الويب', activeVacancies: 'الوظائف النشطة',
+    inventoryManagement: 'إدارة المخزون', visitorLogs: 'سجلات الزوار',
+    newCandidate: 'مرشح جديد', editCandidate: 'تعديل:', fullName: 'الاسم الكامل', age: 'العمر', dob: 'تاريخ الميلاد', gender: 'الجنس',
+    jobDesignation: 'المسمى الوظيفي', country: 'البلد', religion: 'الدين', salaryQAR: 'الراتب (ريال قطري)',
+    photo: 'الصورة', cvUpload: 'السيرة الذاتية', saveRecord: 'حفظ بيانات المرشح',
+    candidateDetails: 'تفاصيل المرشح', position: 'الوظيفة', salary: 'الراتب', actions: 'إجراءات',
+    realtimeLogs: 'سجلات النشاط', clearLogs: 'مسح جميع السجلات',
+    trafficSource: 'مصدر الزيارة', actionTaken: 'الإجراء المتخذ', timeLocal: 'الوقت',
+    confirmDelete: 'تأكيد الحذف', deleteMsg: 'هل أنت متأكد من حذف هذا المرشح؟',
+    cancel: 'إلغاء', yesDelete: 'نعم، احذف', english: 'English', arabic: 'العربية',
+    houseMaids: 'خادمات منازل', drivers: 'سائقين', nurses: 'ممرضين', monthlyCleaners: 'عمال نظافة شهري', returnedHousemaids: 'خادمات عائدات', alMohannadi: 'المهندي',
+    ourTeam: 'فريقنا', teamTitle: 'تعرف على فريقنا', teamDesc: 'محترفون ملتزمون بالتميز.',
+    topManagementTitle: 'فريق الإدارة العليا', contact: 'اتصل', viewMore: 'اقرأ المزيد',
+    ourVision: 'رؤيتنا', ourMission: 'مهمتنا',
+    visionText: 'أن نكون مزود حلول القوى العاملة الأكثر ثقة.',
+    missionText: 'تقديم خدمات توظيف أخلاقية وشفافة.',
+    experience: 'الخبرة', driversJob: 'سائقين', babysitting: 'رعاية أطفال', nursesJob: 'ممرضين', cooks: 'طهاة', domesticWorker: 'عمال منازل', teacher: 'معلمين',
+    ourServicesTitle: 'خبراتنا', ourServicesDesc: 'حلول توظيف متخصصة.',
+    viewCandidates: 'عرض المرشحين',
+    discount1: 'أهلاً بكم في شركة زود للقوى العاملة', discount2: 'ستتوفر العروض قريباً', discount3: 'تواصل معنا للحصول على مزيد من المعلومات', discountOffer: '🔥 عرض محدود',
+    backToHome: 'العودة إلى الرئيسية', maritalStatus: 'الحالة الاجتماعية', single: 'أعزب', married: 'متزوج', divorced: 'مطلق', widowed: 'أرمل',
+    ourJourney: 'رحلتنا', ourLocation: 'موقعنا', whatClientsSay: 'ماذا يقول عملاؤنا',
+    brandName: 'زود مان باور للتوظيف',
+    candidateAdded: 'تم إضافة المرشح بنجاح!', candidateUpdated: 'تم تحديث المرشح بنجاح!', candidateDeleted: 'تم حذف المرشح بنجاح!',
+    errorOccurred: 'حدث خطأ', saving: 'جاري الحفظ...', deleting: 'جاري الحذف...',
+    workerType: 'نوع العامل', recruitmentWorkers: 'عمال التوظيف', returnedHousemaidsType: 'خادمات عائدات',
+    showReturnedOnly: 'إظهار الخادمات العائدات فقط',
+    adminSearch: 'ابحث عن مرشحين...',
+    searchByName: 'ابحث بالاسم أو الوظيفة أو البلد',
+    workerTypeColumn: 'نوع العامل',
   }
 };
 
-const COUNTRIES = ['ALL', 'INDONESIA', 'SRI LANKA', 'PHILIPPINES', 'BANGLADESH', 'INDIA', 'ETHIOPIA', 'KENYA', 'UGANDA'];
-
-const mapJobToCategory = (talent) => {
-  if (talent.workerType === 'Returned Housemaids') return 'Returned';
-  const job = (talent.job || '').toLowerCase();
-  if (job.includes('maid') || job.includes('housemaid')) return 'House Maids';
-  if (job.includes('cook')) return 'Cooks';
-  if (job.includes('driver')) return 'Drivers';
-  if (job.includes('nurse')) return 'Nurses';
-  if (job.includes('teacher')) return 'Teachers';
-  return 'Recruitment';
-};
-
-// ==================== FETCH TALENTS WITH CORRECT CV URL ====================
-const fetchTalents = async (useOffline = false) => {
-  try {
-    const response = await fetch(API_URL);
-    if (!response.ok) throw new Error();
-    const data = await response.json();
-    let talents = Array.isArray(data) ? data : (data.data || []);
-    
-    const mappedTalents = talents.map(t => {
-      // Fix CV URL - මේකයි වැදගත්
-      let cvUrl = '';
-      if (t.cv && t.cv !== '#' && t.cv !== 'N/A' && t.cv !== '') {
-        if (t.cv.startsWith('http')) {
-          cvUrl = t.cv;
-        } else {
-          // Full URL එක හදනවා cvs folder එකට
-          cvUrl = `https://ksyxmoqzcghszrhlpaxh.supabase.co/storage/v1/object/public/zod_manpower/cvs/${t.cv}`;
-        }
-      }
-      
-      // Fix Image URL
-      let imageUrl = '';
-      if (t.pic && t.pic !== '#' && t.pic !== 'N/A' && t.pic !== '') {
-        if (t.pic.startsWith('http')) {
-          imageUrl = t.pic;
-        } else {
-          imageUrl = `https://ksyxmoqzcghszrhlpaxh.supabase.co/storage/v1/object/public/zod_manpower/photos/${t.pic}`;
-        }
-      }
-      
-      return {
-        id: t.id || t._id,
-        name: t.name || 'N/A',
-        category: mapJobToCategory(t),
-        subCategory: t.job || 'General',
-        nationality: (t.country || 'N/A').toUpperCase(),
-        gender: t.gender || 'N/A',
-        age: t.age ? `${t.age}y` : 'N/A',
-        salary: t.salary ? `${t.salary} QAR` : 'N/A',
-        experience: t.experience || 'N/A',
-        status: 'Ready',
-        imageUrl: imageUrl,
-        cvUrl: cvUrl,
-        workerType: t.workerType || 'Recruitment',
-      };
-    });
-    
-    await AsyncStorage.setItem(CACHE_KEYS.CANDIDATES, JSON.stringify(mappedTalents));
-    await AsyncStorage.setItem(CACHE_KEYS.LAST_UPDATE, new Date().toISOString());
-    
-    return mappedTalents;
-  } catch (error) {
-    if (useOffline) {
-      const cached = await AsyncStorage.getItem(CACHE_KEYS.CANDIDATES);
-      if (cached) return JSON.parse(cached);
-    }
-    return [];
-  }
-};
-
-// ==================== OPEN CV IN BROWSER ====================
-const openCV = async (url) => {
-  console.log('Opening CV URL:', url);
-  
-  if (!url || url === 'N/A' || url === '#' || url === '') {
-    Alert.alert('Info', 'CV link not available for this candidate');
-    return;
-  }
-  
-  try {
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      await WebBrowser.openBrowserAsync(url, {
-        presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
-        controlsColor: '#002F66',
-        toolbarColor: '#002F66',
-      });
-    } else {
-      Alert.alert('Error', 'Invalid URL format');
-    }
-  } catch (error) {
-    console.error('Browser error:', error);
-    Alert.alert('Error', 'Could not open CV. Please try again.');
-  }
-};
-
-// Send download report to admin email
-const sendDownloadReport = async (candidate, t, type = 'CV') => {
-  try {
-    const isAvailable = await MailComposer.isAvailableAsync();
-    if (isAvailable) {
-      await MailComposer.composeAsync({
-        recipients: [ADMIN_EMAIL],
-        subject: `${type} Download Report - ${candidate.name}`,
-        body: `
-          ${type} Download Report
-          ------------------
-          Candidate Name: ${candidate.name}
-          Candidate Category: ${candidate.subCategory}
-          Candidate Nationality: ${candidate.nationality}
-          Download Time: ${new Date().toLocaleString()}
-          App Version: ${APP_VERSION}
-          
-          This is an automated report from ZOD Manpower App.
-        `
-      });
-    }
-  } catch (error) {
-    console.log('Email send error:', error);
-  }
-};
-
-// Save profile to AsyncStorage for offline viewing
-const saveProfileToStorage = async (candidate, profileData) => {
-  try {
-    const savedProfiles = await AsyncStorage.getItem(CACHE_KEYS.SAVED_PROFILES);
-    let profiles = savedProfiles ? JSON.parse(savedProfiles) : [];
-    
-    const existingIndex = profiles.findIndex(p => p.id === candidate.id);
-    const profileEntry = {
-      id: candidate.id,
-      name: candidate.name,
-      category: candidate.subCategory,
-      nationality: candidate.nationality,
-      gender: candidate.gender,
-      age: candidate.age,
-      salary: candidate.salary,
-      experience: candidate.experience,
-      status: candidate.status,
-      imageUrl: candidate.imageUrl,
-      profileData: profileData,
-      savedAt: new Date().toISOString()
-    };
-    
-    if (existingIndex >= 0) {
-      profiles[existingIndex] = profileEntry;
-    } else {
-      profiles.push(profileEntry);
-    }
-    
-    await AsyncStorage.setItem(CACHE_KEYS.SAVED_PROFILES, JSON.stringify(profiles));
-    return true;
-  } catch (error) {
-    console.log('Save profile error:', error);
-    return false;
-  }
-};
-
-// ==================== DOWNLOAD CV TO GALLERY FOLDER ====================
-const downloadCV = async (candidate, t) => {
-  if (!candidate.cvUrl || candidate.cvUrl === 'N/A' || candidate.cvUrl === '#') {
-    Alert.alert('Info', 'CV link not available for this candidate');
-    return;
-  }
-
-  Alert.alert(
-    'Download CV',
-    `Save CV for ${candidate.name} to Gallery?`,
-    [
-      { text: 'Cancel', style: 'cancel' },
-      { 
-        text: 'Save', 
-        onPress: async () => {
-          try {
-            const { status } = await MediaLibrary.requestPermissionsAsync();
-            if (status !== 'granted') {
-              Alert.alert('Permission Required', 'Please allow access to save CVs to your gallery');
-              return;
-            }
-
-            const fileName = `${candidate.name.replace(/[^a-zA-Z0-9]/g, '_')}_CV.pdf`;
-            const fileUri = FileSystem.cacheDirectory + fileName;
-
-            Alert.alert('Downloading', 'Please wait...');
-            
-            const downloadResult = await FileSystem.downloadAsync(
-              candidate.cvUrl,
-              fileUri
-            );
-
-            if (downloadResult.status === 200 && downloadResult.uri) {
-              const asset = await MediaLibrary.createAssetAsync(downloadResult.uri);
-              
-              let album = await MediaLibrary.getAlbumAsync('ZOD MANPOWER');
-              if (album === null) {
-                album = await MediaLibrary.createAlbumAsync('ZOD MANPOWER', asset, false);
-              } else {
-                await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-              }
-              
-              await sendDownloadReport(candidate, t, 'CV');
-              
-              Alert.alert(
-                '✅ Download Successful', 
-                `CV saved to Gallery → ZOD MANPOWER folder\n\nFile: ${fileName}`,
-                [{ text: 'OK' }]
-              );
-            } else {
-              Alert.alert('Download Failed', 'Could not download the CV');
-            }
-          } catch (error) {
-            console.error('Download error:', error);
-            Alert.alert('Download Failed', error.message || 'Unknown error occurred');
-          }
-        }
-      }
-    ]
-  );
-};
-
-// Download Profile and save to offline storage
-const downloadProfile = async (candidate, t, onProfileSaved) => {
-  const profileData = `
-ZOD MANPOWER - Candidate Profile
-================================
-
-Name: ${candidate.name}
-Category: ${candidate.subCategory}
-Nationality: ${candidate.nationality}
-Gender: ${candidate.gender}
-Age: ${candidate.age}
-Salary: ${candidate.salary}
-Experience: ${candidate.experience}
-Status: ${candidate.status}
-
-CV Link: ${candidate.cvUrl || 'Not available'}
-
-Download Date: ${new Date().toLocaleString()}
-App Version: ${APP_VERSION}
-
-For more details, contact: ${ADMIN_EMAIL}
-  `;
-
-  Alert.alert(
-    'Download Profile',
-    `Save profile for ${candidate.name} offline? You can view it without internet.`,
-    [
-      { text: 'Cancel', style: 'cancel' },
-      { 
-        text: 'Save Offline', 
-        onPress: async () => {
-          try {
-            await saveProfileToStorage(candidate, profileData);
-            
-            const filePath = FileSystem.documentDirectory + `${candidate.name.replace(/[^a-zA-Z0-9]/g, '_')}_Profile.txt`;
-            await FileSystem.writeAsStringAsync(filePath, profileData);
-            
-            await sendDownloadReport(candidate, t, 'Profile');
-            Alert.alert('✅ Download Successful', 'Profile saved offline! You can view it from Saved Profiles.');
-            if (onProfileSaved) onProfileSaved();
-          } catch (error) {
-            Alert.alert('Download Failed', error.message);
-          }
-        }
-      }
-    ]
-  );
-};
-
-// View saved profiles offline
-const SavedProfilesModal = ({ visible, onClose, isDarkMode, t }) => {
-  const [savedProfiles, setSavedProfiles] = useState([]);
-  const [selectedProfile, setSelectedProfile] = useState(null);
-
+const ToastNotification = ({ toast, onClose }: { toast: Toast; onClose: (id: number) => void }) => {
   useEffect(() => {
-    if (visible) {
-      loadSavedProfiles();
-    }
-  }, [visible]);
+    const timer = setTimeout(() => onClose(toast.id), 3000);
+    return () => clearTimeout(timer);
+  }, [toast.id, onClose]);
 
-  const loadSavedProfiles = async () => {
-    try {
-      const saved = await AsyncStorage.getItem(CACHE_KEYS.SAVED_PROFILES);
-      if (saved) {
-        setSavedProfiles(JSON.parse(saved));
-      }
-    } catch (error) {
-      console.log('Load profiles error:', error);
+  const getIcon = () => {
+    switch (toast.type) {
+      case 'success': return 'fa-circle-check';
+      case 'error': return 'fa-circle-exclamation';
+      case 'warning': return 'fa-triangle-exclamation';
+      default: return 'fa-circle-info';
     }
   };
 
-  const deleteProfile = async (profileId) => {
-    Alert.alert(
-      'Delete Profile',
-      'Remove this saved profile?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            const updated = savedProfiles.filter(p => p.id !== profileId);
-            await AsyncStorage.setItem(CACHE_KEYS.SAVED_PROFILES, JSON.stringify(updated));
-            setSavedProfiles(updated);
-            Alert.alert('Deleted', 'Profile removed from saved list');
-          }
-        }
-      ]
-    );
-  };
-
-  const ProfileViewer = ({ profile, onBack }) => (
-    <ScrollView style={styles.profileViewer}>
-      <TouchableOpacity onPress={onBack} style={styles.profileViewerBack}>
-        <Text style={styles.profileViewerBackText}>← Back to list</Text>
-      </TouchableOpacity>
-      <View style={styles.profileViewerHeader}>
-        {profile.imageUrl ? (
-          <Image source={{ uri: profile.imageUrl }} style={styles.profileViewerImage} />
-        ) : (
-          <View style={styles.profileViewerImagePlaceholder}>
-            <Text style={styles.profileViewerImagePlaceholderText}>👤</Text>
-          </View>
-        )}
-        <Text style={[styles.profileViewerName, isDarkMode && styles.darkTitle]}>{profile.name}</Text>
-        <Text style={[styles.profileViewerCategory, isDarkMode && styles.darkText]}>{profile.category}</Text>
-      </View>
-      <View style={styles.profileViewerContent}>
-        <View style={styles.profileViewerRow}><Text style={styles.profileViewerLabel}>📍 Nationality:</Text><Text style={[styles.profileViewerValue, isDarkMode && styles.darkText]}>{profile.nationality}</Text></View>
-        <View style={styles.profileViewerRow}><Text style={styles.profileViewerLabel}>👤 Gender:</Text><Text style={[styles.profileViewerValue, isDarkMode && styles.darkText]}>{profile.gender}</Text></View>
-        <View style={styles.profileViewerRow}><Text style={styles.profileViewerLabel}>🎂 Age:</Text><Text style={[styles.profileViewerValue, isDarkMode && styles.darkText]}>{profile.age}</Text></View>
-        <View style={styles.profileViewerRow}><Text style={styles.profileViewerLabel}>💰 Salary:</Text><Text style={[styles.profileViewerValue, isDarkMode && styles.darkText]}>{profile.salary}</Text></View>
-        <View style={styles.profileViewerRow}><Text style={styles.profileViewerLabel}>💼 Experience:</Text><Text style={[styles.profileViewerValue, isDarkMode && styles.darkText]}>{profile.experience}</Text></View>
-        <View style={styles.profileViewerRow}><Text style={styles.profileViewerLabel}>✅ Status:</Text><Text style={[styles.profileViewerValue, styles.statusBadge]}>{profile.status}</Text></View>
-        <View style={styles.profileViewerDivider} />
-        <Text style={[styles.profileViewerSavedDate, isDarkMode && styles.darkText]}>Saved: {new Date(profile.savedAt).toLocaleString()}</Text>
-      </View>
-    </ScrollView>
-  );
-
-  if (selectedProfile) {
-    return (
-      <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-        <View style={[styles.modalContainer, isDarkMode && styles.darkContainer]}>
-          <ProfileViewer profile={selectedProfile} onBack={() => setSelectedProfile(null)} />
-        </View>
-      </Modal>
-    );
-  }
-
-  return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <View style={[styles.modalContainer, isDarkMode && styles.darkContainer]}>
-        <LinearGradient colors={['#002F66', '#004A99']} style={styles.modalHeader}>
-          <Text style={styles.modalHeaderTitle}>{t.saved_profiles}</Text>
-          <TouchableOpacity onPress={onClose} style={styles.modalCloseBtn}>
-            <Text style={styles.modalCloseText}>✕</Text>
-          </TouchableOpacity>
-        </LinearGradient>
-        
-        {savedProfiles.length === 0 ? (
-          <View style={styles.emptySavedContainer}>
-            <Text style={styles.emptySavedIcon}>📭</Text>
-            <Text style={[styles.emptySavedText, isDarkMode && styles.darkText]}>{t.no_saved_profiles}</Text>
-            <Text style={[styles.emptySavedSubText, isDarkMode && styles.darkText]}>Download profiles to view them offline</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={savedProfiles}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={[styles.savedProfileItem, isDarkMode && styles.darkCard]} onPress={() => setSelectedProfile(item)}>
-                {item.imageUrl ? (
-                  <Image source={{ uri: item.imageUrl }} style={styles.savedProfileImage} />
-                ) : (
-                  <View style={styles.savedProfileImagePlaceholder}>
-                    <Text style={styles.savedProfileImagePlaceholderText}>👤</Text>
-                  </View>
-                )}
-                <View style={styles.savedProfileInfo}>
-                  <Text style={[styles.savedProfileName, isDarkMode && styles.darkTitle]}>{item.name}</Text>
-                  <Text style={[styles.savedProfileCategory, isDarkMode && styles.darkText]}>{item.category}</Text>
-                  <Text style={[styles.savedProfileDate, isDarkMode && styles.darkText]}>{new Date(item.savedAt).toLocaleDateString()}</Text>
-                </View>
-                <TouchableOpacity style={styles.savedProfileDelete} onPress={() => deleteProfile(item.id)}>
-                  <Text style={styles.savedProfileDeleteText}>🗑️</Text>
-                </TouchableOpacity>
-              </TouchableOpacity>
-            )}
-            contentContainerStyle={styles.savedProfilesList}
-          />
-        )}
-      </View>
-    </Modal>
-  );
-};
-
-// ==================== HIRE FUNCTION WITH CV LINK ====================
-const handleHire = (candidate, t) => {
-  let message = `Hi! I'm interested in hiring ${candidate.name}`;
-  
-  if (candidate.subCategory && candidate.subCategory !== 'General') {
-    message += ` (${candidate.subCategory})`;
-  }
-  
-  if (candidate.nationality && candidate.nationality !== 'N/A') {
-    message += ` from ${candidate.nationality}`;
-  }
-  
-  message += `\n\n📋 Candidate Details:`;
-  message += `\n• Name: ${candidate.name}`;
-  message += `\n• Category: ${candidate.subCategory}`;
-  message += `\n• Nationality: ${candidate.nationality}`;
-  message += `\n• Gender: ${candidate.gender}`;
-  message += `\n• Age: ${candidate.age}`;
-  message += `\n• Salary: ${candidate.salary}`;
-  message += `\n• Experience: ${candidate.experience}`;
-  
-  if (candidate.cvUrl && candidate.cvUrl !== '#' && candidate.cvUrl !== 'N/A') {
-    message += `\n\n📄 CV Link: ${candidate.cvUrl}`;
-  }
-  
-  message += `\n\nBest regards,\nZOD Manpower User`;
-  
-  Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`);
-};
-
-// ------------------- COMPONENTS -------------------
-const CategoryIcon = ({ icon, label, color, onPress, isActive }) => {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const handlePressIn = () => Animated.spring(scaleAnim, { toValue: 0.92, useNativeDriver: true }).start();
-  const handlePressOut = () => Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true }).start();
-  
-  return (
-    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-      <TouchableOpacity onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut} activeOpacity={0.9}>
-        <LinearGradient colors={isActive ? [color, color] : ['#f0f0f0', '#f0f0f0']} style={[styles.categoryIconBtn, isActive && styles.categoryIconBtnActive]}>
-          <Text style={styles.categoryIconEmoji}>{icon}</Text>
-          <Text style={[styles.categoryIconLabel, isActive && styles.categoryIconLabelActive]}>{label}</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-    </Animated.View>
-  );
-};
-
-const CandidateCard = ({ item, onPress, isDarkMode, t, index, onDownloadCV, onDownloadProfile, onHire }) => {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const translateYAnim = useRef(new Animated.Value(30)).current;
-  
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 400, delay: index * 60, useNativeDriver: true }),
-      Animated.spring(translateYAnim, { toValue: 0, delay: index * 60, friction: 8, tension: 40, useNativeDriver: true })
-    ]).start();
-  }, []);
-
-  const handlePressIn = () => Animated.spring(scaleAnim, { toValue: 0.96, friction: 5, tension: 300, useNativeDriver: true }).start();
-  const handlePressOut = () => Animated.spring(scaleAnim, { toValue: 1, friction: 5, tension: 300, useNativeDriver: true }).start();
-
-  return (
-    <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }, { translateY: translateYAnim }], width: '48%', marginBottom: 16 }}>
-      <TouchableOpacity onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut} activeOpacity={0.9}>
-        <LinearGradient colors={isDarkMode ? ['#1e1e2e', '#2a2a3e'] : ['#ffffff', '#f8f9fa']} style={styles.card}>
-          <View style={styles.cardImageWrapper}>
-            {item.imageUrl ? (
-              <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
-            ) : (
-              <LinearGradient colors={['#e0e0e0', '#d0d0d0']} style={styles.cardImagePlaceholder}>
-                <Text style={styles.cardImagePlaceholderText}>👤</Text>
-              </LinearGradient>
-            )}
-            {item.workerType === 'Returned' && (
-              <View style={styles.cardBadgeReturned}>
-                <Text style={styles.cardBadgeReturnedText}>🔄</Text>
-              </View>
-            )}
-            <View style={styles.cardBadgeStatus}>
-              <Text style={styles.cardBadgeStatusText}>{t.ready}</Text>
-            </View>
-          </View>
-          <View style={styles.cardContent}>
-            <Text style={[styles.cardName, isDarkMode && styles.darkTitle]} numberOfLines={1}>{item.name}</Text>
-            <Text style={[styles.cardCategory, isDarkMode && styles.darkText]} numberOfLines={1}>{item.subCategory}</Text>
-            <View style={styles.cardFooter}>
-              <View style={styles.cardCountry}>
-                <Text style={styles.cardCountryText}>{item.nationality}</Text>
-              </View>
-              <Text style={[styles.cardSalary, isDarkMode && styles.darkText]}>{item.salary}</Text>
-            </View>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.hireButtonCard} onPress={() => onHire(item)}>
-                <LinearGradient colors={['#25D366', '#128C7E']} style={styles.hireButtonGradient}>
-                  <Text style={styles.hireButtonText}>💬 {t.hire}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.downloadButtonsRow}>
-              <TouchableOpacity style={styles.downloadCvBtn} onPress={() => onDownloadCV(item)}>
-                <Text style={styles.downloadCvBtnText}>📄 {t.download_cv}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.downloadProfileBtn} onPress={() => onDownloadProfile(item)}>
-                <Text style={styles.downloadProfileBtnText}>👤 {t.download_profile}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </LinearGradient>
-      </TouchableOpacity>
-    </Animated.View>
-  );
-};
-
-// ------------------- SPLASH SCREEN -------------------
-function SplashScreen({ onFinish }) {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.8)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
-      Animated.spring(scaleAnim, { toValue: 1, friction: 5, tension: 40, useNativeDriver: true }),
-    ]).start();
-    setTimeout(onFinish, 2000);
-  }, []);
-
-  return (
-    <LinearGradient colors={['#002F66', '#004A99', '#0066CC']} style={styles.splashContainer}>
-      <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }], alignItems: 'center' }}>
-        <View style={styles.splashLogoWrapper}>
-          <Image source={{ uri: LOGO_URL }} style={styles.splashLogo} />
-        </View>
-        <Text style={styles.splashTitle}>ZOD MANPOWER</Text>
-        <Text style={styles.splashSubtitle}>Recruitment Agency</Text>
-      </Animated.View>
-    </LinearGradient>
-  );
-}
-
-// ------------------- LANGUAGE SCREEN -------------------
-function LanguageScreen({ onSelect }) {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
-      Animated.spring(slideAnim, { toValue: 0, friction: 7, tension: 40, useNativeDriver: true })
-    ]).start();
-  }, []);
-
-  return (
-    <LinearGradient colors={['#f5f7fa', '#ffffff']} style={styles.container}>
-      <StatusBar style="dark" />
-      <Animated.View style={[styles.languageContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-        <View style={styles.logoWrapper}>
-          <LinearGradient colors={['#002F66', '#004A99']} style={styles.logoGradient}>
-            <Image source={{ uri: LOGO_URL }} style={styles.logo} />
-          </LinearGradient>
-        </View>
-        <Text style={styles.title}>ZOD MANPOWER</Text>
-        <Text style={styles.tagline}>{translations.en.tagline}</Text>
-        <Text style={styles.selectText}>{translations.en.select}</Text>
-
-        <TouchableOpacity style={styles.langBtn} onPress={() => onSelect('en')} activeOpacity={0.9}>
-          <LinearGradient colors={['#002F66', '#004A99']} style={styles.langBtnGradient}>
-            <Text style={styles.langBtnText}>English</Text>
-            <Text style={styles.langFlag}>🇬🇧</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.langBtn} onPress={() => onSelect('ar')} activeOpacity={0.9}>
-          <LinearGradient colors={['#002F66', '#004A99']} style={styles.langBtnGradient}>
-            <Text style={styles.langBtnText}>العربية</Text>
-            <Text style={styles.langFlag}>🇸🇦</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </Animated.View>
-    </LinearGradient>
-  );
-}
-
-// ------------------- SETTINGS SCREEN -------------------
-function SettingsScreen({ lang, onBack, onLangChange, isDarkMode, onToggleDarkMode, offlineMode, onToggleOfflineMode, onOpenSavedProfiles }) {
-  const t = translations[lang];
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
-  }, []);
-
-  const handleShare = async () => {
-    await Share.share({ message: 'Check out ZOD Manpower App! https://zodmanpower.info' });
-  };
-
-  const handleRate = () => {
-    Linking.openURL('https://play.google.com/store/apps/details?id=com.zod.manpower');
-  };
-
-  const handleClearCache = async () => {
-    try {
-      await AsyncStorage.removeItem(CACHE_KEYS.CANDIDATES);
-      await AsyncStorage.removeItem(CACHE_KEYS.LAST_UPDATE);
-      Alert.alert('Success', t.cache_cleared);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to clear cache');
+  const getBgColor = () => {
+    switch (toast.type) {
+      case 'success': return 'bg-gradient-to-r from-green-500 to-green-600';
+      case 'error': return 'bg-gradient-to-r from-red-500 to-red-600';
+      case 'warning': return 'bg-gradient-to-r from-amber-500 to-amber-600';
+      default: return 'bg-gradient-to-r from-blue-500 to-blue-600';
     }
   };
 
-  const SettingSection = ({ title, children }) => (
-    <Animated.View style={[styles.settingsCard, isDarkMode && styles.darkCard, { opacity: fadeAnim }]}>
-      <Text style={[styles.settingsSectionTitle, isDarkMode && styles.darkText]}>{title}</Text>
-      {children}
-    </Animated.View>
-  );
-
-  const SwitchItem = ({ icon, label, value, onValueChange }) => (
-    <View style={styles.settingItem}>
-      <View style={styles.settingItemLeft}>
-        <Text style={styles.settingItemIcon}>{icon}</Text>
-        <Text style={[styles.settingItemLabel, isDarkMode && styles.darkText]}>{label}</Text>
-      </View>
-      <Switch value={value} onValueChange={onValueChange} trackColor={{ false: '#ddd', true: '#004A99' }} thumbColor={value ? '#fff' : '#002F66'} />
-    </View>
-  );
-
   return (
-    <View style={[styles.container, isDarkMode && styles.darkContainer]}>
-      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
-      <LinearGradient colors={['#002F66', '#004A99']} style={styles.settingsHeader}>
-        <TouchableOpacity onPress={onBack} style={styles.settingsBackBtn}>
-          <Text style={styles.settingsBackText}>← {t.back}</Text>
-        </TouchableOpacity>
-        <Image source={{ uri: LOGO_URL }} style={styles.settingsHeaderLogo} />
-        <Text style={styles.settingsHeaderTitle}>ZOD MANPOWER</Text>
-        <Text style={styles.settingsHeaderVersion}>{t.version} {APP_VERSION}</Text>
-      </LinearGradient>
-
-      <ScrollView style={styles.settingsContent} showsVerticalScrollIndicator={false}>
-        <SettingSection title="🎨 Appearance">
-          <SwitchItem icon="🌙" label={t.dark_mode} value={isDarkMode} onValueChange={onToggleDarkMode} />
-        </SettingSection>
-
-        <SettingSection title="📱 Offline Mode">
-          <SwitchItem icon="📶" label={t.enable_offline} value={offlineMode} onValueChange={onToggleOfflineMode} />
-          <Text style={[styles.offlineNote, isDarkMode && styles.darkText]}>
-            {offlineMode ? t.offline_available : t.online_required}
-          </Text>
-        </SettingSection>
-
-        <SettingSection title="💾 Saved Data">
-          <TouchableOpacity style={styles.settingItem} onPress={onOpenSavedProfiles}>
-            <View style={styles.settingItemLeft}>
-              <Text style={styles.settingItemIcon}>📁</Text>
-              <Text style={[styles.settingItemLabel, isDarkMode && styles.darkText]}>{t.view_saved_profiles}</Text>
-            </View>
-            <Text style={styles.settingItemArrow}>→</Text>
-          </TouchableOpacity>
-        </SettingSection>
-
-        <SettingSection title="🌐 Language">
-          <View style={styles.languageSelector}>
-            <TouchableOpacity style={[styles.langSelectorBtn, lang === 'en' && styles.activeLangSelector]} onPress={() => onLangChange('en')}>
-              <Text style={[styles.langSelectorText, lang === 'en' && styles.activeLangSelectorText]}>🇬🇧 {t.english}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.langSelectorBtn, lang === 'ar' && styles.activeLangSelector]} onPress={() => onLangChange('ar')}>
-              <Text style={[styles.langSelectorText, lang === 'ar' && styles.activeLangSelectorText]}>🇸🇦 {t.arabic}</Text>
-            </TouchableOpacity>
-          </View>
-        </SettingSection>
-
-        <SettingSection title="🔔 Notifications">
-          <SwitchItem icon="🔔" label={t.push_notifications} value={notificationsEnabled} onValueChange={setNotificationsEnabled} />
-        </SettingSection>
-
-        <SettingSection title="💙 Support">
-          <TouchableOpacity style={styles.settingItem} onPress={handleShare}>
-            <View style={styles.settingItemLeft}><Text style={styles.settingItemIcon}>📤</Text><Text style={[styles.settingItemLabel, isDarkMode && styles.darkText]}>{t.share}</Text></View>
-            <Text style={styles.settingItemArrow}>→</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.settingItem} onPress={handleRate}>
-            <View style={styles.settingItemLeft}><Text style={styles.settingItemIcon}>⭐</Text><Text style={[styles.settingItemLabel, isDarkMode && styles.darkText]}>{t.rate}</Text></View>
-            <Text style={styles.settingItemArrow}>→</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.settingItem} onPress={handleClearCache}>
-            <View style={styles.settingItemLeft}><Text style={styles.settingItemIcon}>🗑️</Text><Text style={[styles.settingItemLabel, isDarkMode && styles.darkText]}>{t.clear_cache}</Text></View>
-            <Text style={styles.settingItemArrow}>→</Text>
-          </TouchableOpacity>
-        </SettingSection>
-
-        <SettingSection title="📞 Contact Us">
-          <TouchableOpacity style={styles.settingItem} onPress={() => Linking.openURL('https://zodmanpower.info')}>
-            <View style={styles.settingItemLeft}><Text style={styles.settingItemIcon}>🌐</Text><Text style={[styles.settingItemLabel, isDarkMode && styles.darkText]}>{t.website}</Text></View>
-            <Text style={styles.settingItemArrow}>→</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.settingItem} onPress={() => Linking.openURL('tel:+97455355206')}>
-            <View style={styles.settingItemLeft}><Text style={styles.settingItemIcon}>📞</Text><Text style={[styles.settingItemLabel, isDarkMode && styles.darkText]}>{t.call}</Text></View>
-            <Text style={styles.settingItemArrow}>→</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.settingItem} onPress={() => Linking.openURL('mailto:info@zodmanpower.info')}>
-            <View style={styles.settingItemLeft}><Text style={styles.settingItemIcon}>✉️</Text><Text style={[styles.settingItemLabel, isDarkMode && styles.darkText]}>{t.email}</Text></View>
-            <Text style={styles.settingItemArrow}>→</Text>
-          </TouchableOpacity>
-        </SettingSection>
-
-        <SettingSection title="ℹ️ About">
-          <TouchableOpacity style={styles.settingItem} onPress={() => Alert.alert(t.developers, `${t.developer_name}\n${t.developer_email}`)}>
-            <View style={styles.settingItemLeft}><Text style={styles.settingItemIcon}>👨‍💻</Text><Text style={[styles.settingItemLabel, isDarkMode && styles.darkText]}>{t.developers}</Text></View>
-            <Text style={styles.settingItemArrow}>→</Text>
-          </TouchableOpacity>
-          <View style={styles.settingItem}>
-            <View style={styles.settingItemLeft}><Text style={styles.settingItemIcon}>📅</Text><Text style={[styles.settingItemLabel, isDarkMode && styles.darkText]}>{t.version} {APP_VERSION}</Text></View>
-          </View>
-        </SettingSection>
-      </ScrollView>
-    </View>
+    <div className={`fixed top-20 right-4 z-[200] animate-slide-in-right ${toast.type === 'error' ? 'animate-shake' : ''}`}>
+      <div className={`${getBgColor()} text-white rounded-xl shadow-2xl p-4 min-w-[280px] max-w-md flex items-start gap-3 backdrop-blur-sm`}>
+        <div className="flex-shrink-0">
+          <i className={`fa-solid ${getIcon()} text-xl`}></i>
+        </div>
+        <div className="flex-1">
+          {toast.title && <h4 className="font-bold text-sm mb-1">{toast.title}</h4>}
+          <p className="text-sm opacity-90">{toast.message}</p>
+        </div>
+        <button onClick={() => onClose(toast.id)} className="flex-shrink-0 text-white/70 hover:text-white transition-colors">
+          <i className="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+    </div>
   );
-}
+};
 
-// ------------------- MAIN SCREEN -------------------
-function MainScreen({ lang, onOpenSettings, isDarkMode, offlineMode, onOpenSavedProfiles }) {
-  const t = translations[lang];
-  const [cvs, setCvs] = useState([]);
-  const [filteredCvs, setFilteredCvs] = useState([]);
-  const [filter, setFilter] = useState('all');
-  const [countryFilter, setCountryFilter] = useState('ALL');
+export default function Home() {
+  const [language, setLanguage] = useState<'en' | 'ar'>('en');
+  const t = translations[language];
+  const [isLoading, setIsLoading] = useState(true);
+  const [talents, setTalents] = useState<Talent[]>([]);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [adminActive, setAdminActive] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'candidates' | 'leads'>('candidates');
+  const [editTalent, setEditTalent] = useState<Talent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selected, setSelected] = useState(null);
+  const [countryFilter, setCountryFilter] = useState('');
+  const [adminSearchQuery, setAdminSearchQuery] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [lastUpdate, setLastUpdate] = useState('');
-  const [refreshKey, setRefreshKey] = useState(0);
-  const scrollY = useRef(new Animated.Value(0)).current;
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [showHirePage, setShowHirePage] = useState(false);
+  const [showOurTeamPage, setShowOurTeamPage] = useState(false);
+  const [showAboutPage, setShowAboutPage] = useState(false);
+  const [calculatedAge, setCalculatedAge] = useState<number | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showReturnedOnly, setShowReturnedOnly] = useState(false);
 
-  const categories = [
-    { key: 'all', label: t.all, icon: '🌟', color: '#6366f1' },
-    { key: 'Returned', label: t.returned, icon: '🔄', color: '#ec489a' },
-    { key: 'House Maids', label: t.maids, icon: '🏠', color: '#10b981' },
-    { key: 'Cooks', label: t.cooks, icon: '🍳', color: '#f59e0b' },
-    { key: 'Drivers', label: t.drivers, icon: '🚗', color: '#3b82f6' },
-    { key: 'Nurses', label: t.nurses, icon: '🏥', color: '#ef4444' },
-    { key: 'Teachers', label: t.teachers, icon: '📚', color: '#8b5cf6' },
-  ];
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatLanguageSelected, setChatLanguageSelected] = useState<'en' | 'ar' | null>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const countries = [
-    { key: 'ALL', label: t.all_countries, flag: '🌍' },
-    { key: 'INDONESIA', label: 'Indonesia', flag: '🇮🇩' },
-    { key: 'SRI LANKA', label: 'Sri Lanka', flag: '🇱🇰' },
-    { key: 'PHILIPPINES', label: 'Philippines', flag: '🇵🇭' },
-    { key: 'BANGLADESH', label: 'Bangladesh', flag: '🇧🇩' },
-    { key: 'INDIA', label: 'India', flag: '🇮🇳' },
-    { key: 'ETHIOPIA', label: 'Ethiopia', flag: '🇪🇹' },
-    { key: 'KENYA', label: 'Kenya', flag: '🇰🇪' },
-    { key: 'UGANDA', label: 'Uganda', flag: '🇺🇬' },
-  ];
+  const nameRef = useRef<HTMLInputElement>(null);
+  const dobRef = useRef<HTMLInputElement>(null);
+  const genderRef = useRef<HTMLSelectElement>(null);
+  const jobRef = useRef<HTMLSelectElement>(null);
+  const countryRef = useRef<HTMLSelectElement>(null);
+  const religionRef = useRef<HTMLSelectElement>(null);
+  const salaryRef = useRef<HTMLInputElement>(null);
+  const experienceRef = useRef<HTMLSelectElement>(null);
+  const maritalStatusRef = useRef<HTMLSelectElement>(null);
+  const workerTypeRef = useRef<HTMLSelectElement>(null);
+  const picRef = useRef<HTMLInputElement>(null);
+  const cvRef = useRef<HTMLInputElement>(null);
 
-  const loadCVs = async () => {
+  const addToast = (type: Toast['type'], message: string, title?: string) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, type, message, title }]);
+  };
+
+  const removeToast = (id: number) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
+
+  const calculateAge = (dob: string) => {
+    if (!dob) return null;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const handleDobChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const age = calculateAge(e.target.value);
+    setCalculatedAge(age);
+  };
+
+  const fetchTalents = useCallback(async () => {
+    setLoading(true);
     try {
-      const talents = await fetchTalents(offlineMode);
-      if (talents.length > 0) {
-        setCvs(talents);
-        setFilteredCvs(talents);
-        const lastUpdateTime = await AsyncStorage.getItem(CACHE_KEYS.LAST_UPDATE);
-        if (lastUpdateTime) {
-          const date = new Date(lastUpdateTime);
-          setLastUpdate(`${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`);
-        } else {
-          const now = new Date();
-          setLastUpdate(`${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`);
-        }
-      }
-    } catch (error) {
-      Alert.alert('Error', t.error);
+      const res = await fetch('/api/talents');
+      const data = await res.json();
+      setTalents(data);
+    } catch (err) {
+      console.error('Fetch error', err);
+      addToast('error', t.errorOccurred, 'Network Error');
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
-  };
-
-  useEffect(() => { loadCVs(); }, [offlineMode, refreshKey]);
-
-  const onRefresh = () => {
-    if (!offlineMode) {
-      setRefreshing(true);
-      loadCVs();
-    } else {
-      Alert.alert('Offline Mode', 'Please disable offline mode to refresh data');
-      setRefreshing(false);
-    }
-  };
-
-  const handleProfileSaved = () => {
-    setRefreshKey(prev => prev + 1);
-  };
-
-  const onHire = (candidate) => {
-    handleHire(candidate, t);
-  };
-
-  const onDownloadCV = (candidate) => {
-    downloadCV(candidate, t);
-  };
-
-  const onDownloadProfile = (candidate) => {
-    downloadProfile(candidate, t, handleProfileSaved);
-  };
+  }, [t]);
 
   useEffect(() => {
-    let filtered = [...cvs];
-    if (searchQuery.trim()) {
-      filtered = filtered.filter(cv => 
-        cv.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        cv.nationality.toLowerCase().includes(searchQuery.toLowerCase())
+    if (!adminActive && !showHirePage) return;
+    const interval = setInterval(() => { fetchTalents(); }, 5000);
+    return () => clearInterval(interval);
+  }, [adminActive, showHirePage, fetchTalents]);
+
+  const loadLeads = () => {
+    const stored = localStorage.getItem('zod_activity_leads');
+    if (stored) setLeads(JSON.parse(stored));
+  };
+
+  const trackLead = (source: string, action: string) => {
+    const newLead = { id: Date.now(), source, action, time: new Date().toLocaleTimeString() };
+    setLeads((prev) => {
+      const updated = [newLead, ...prev].slice(0, 50);
+      localStorage.setItem('zod_activity_leads', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const clearLeads = () => {
+    if (confirm(t.clearLogs)) { setLeads([]); localStorage.setItem('zod_activity_leads', '[]'); addToast('info', 'Logs cleared successfully'); }
+  };
+
+  const handleDiscountClick = (discountText: string) => {
+    const whatsappNumber = '97455355206';
+    const message = `Hi! I'm interested in the offer: ${discountText}. Can you please provide more details?`;
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    trackLead('Discount Banner', discountText);
+    addToast('info', `Redirecting to WhatsApp for ${discountText}`, 'Special Offer');
+  };
+
+  const handleHireClick = (talentName: string, source: string) => {
+    const whatsappNumber = '97455355206';
+    const message = `Hi! I'm interested in hiring ${talentName}. Can you please provide more details?`;
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    trackLead(source, `Hire: ${talentName}`);
+    addToast('success', `Inquiry sent for ${talentName}`, 'Application Started');
+  };
+
+  const handleExternalLink = (url: string, source: string) => {
+    trackLead('External Link', source);
+    window.open(url, '_blank');
+    addToast('info', `Redirecting to ${source}`, 'External Link');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    const formData = new FormData();
+    if (editTalent) formData.append('id', editTalent.id);
+    formData.append('name', nameRef.current!.value);
+    formData.append('dob', dobRef.current!.value);
+    formData.append('age', String(calculatedAge || 0));
+    formData.append('gender', genderRef.current!.value);
+    formData.append('job', jobRef.current!.value);
+    formData.append('country', countryRef.current!.value);
+    formData.append('religion', religionRef.current!.value);
+    formData.append('salary', salaryRef.current!.value);
+    formData.append('experience', experienceRef.current!.value);
+    formData.append('maritalStatus', maritalStatusRef.current!.value);
+    formData.append('workerType', workerTypeRef.current!.value);
+    if (picRef.current?.files?.[0]) formData.append('tPic', picRef.current.files[0]);
+    if (cvRef.current?.files?.[0]) formData.append('tCv', cvRef.current.files[0]);
+    try {
+      const res = await fetch('/api/talents', { method: 'POST', body: formData });
+      if (res.ok) { 
+        resetForm(); 
+        await fetchTalents(); 
+        addToast('success', editTalent ? t.candidateUpdated : t.candidateAdded, 'Success');
+      }
+      else { const err = await res.json(); addToast('error', err.error || t.errorOccurred, 'Error'); }
+    } catch { 
+      addToast('error', 'Network error. Please try again.', 'Connection Error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    setEditTalent(null);
+    setCalculatedAge(null);
+    if (nameRef.current) nameRef.current.value = '';
+    if (dobRef.current) dobRef.current.value = '';
+    if (genderRef.current) genderRef.current.value = 'Male';
+    if (jobRef.current) jobRef.current.value = jobOptions[0];
+    if (countryRef.current) countryRef.current.value = countryOptions[0];
+    if (religionRef.current) religionRef.current.value = 'Muslim';
+    if (salaryRef.current) salaryRef.current.value = '0';
+    if (experienceRef.current) experienceRef.current.value = experienceOptions[0];
+    if (maritalStatusRef.current) maritalStatusRef.current.value = maritalStatusOptions[0];
+    if (workerTypeRef.current) workerTypeRef.current.value = workerTypeOptions[0];
+    if (picRef.current) picRef.current.value = '';
+    if (cvRef.current) cvRef.current.value = '';
+  };
+
+  const editHandler = (talent: Talent) => {
+    setEditTalent(talent);
+    setCalculatedAge(talent.age);
+    if (nameRef.current) nameRef.current.value = talent.name;
+    if (dobRef.current) dobRef.current.value = talent.dob || '';
+    if (genderRef.current) genderRef.current.value = talent.gender;
+    if (jobRef.current) jobRef.current.value = talent.job;
+    if (countryRef.current) countryRef.current.value = talent.country;
+    if (religionRef.current) religionRef.current.value = talent.religion || 'Muslim';
+    if (salaryRef.current) salaryRef.current.value = String(talent.salary || 0);
+    if (experienceRef.current) experienceRef.current.value = talent.experience || experienceOptions[0];
+    if (maritalStatusRef.current) maritalStatusRef.current.value = talent.maritalStatus || maritalStatusOptions[0];
+    if (workerTypeRef.current) workerTypeRef.current.value = talent.workerType || workerTypeOptions[0];
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    addToast('info', `Editing ${talent.name}`, 'Edit Mode');
+  };
+
+  const confirmDelete = (id: string) => { setDeleteTargetId(id); setDeleteModalOpen(true); };
+
+  const performDelete = async () => {
+    if (!deleteTargetId) return;
+    setIsDeleting(true);
+    try {
+      await fetch(`/api/talents/${deleteTargetId}`, { method: 'DELETE' });
+      await fetchTalents();
+      addToast('success', t.candidateDeleted, 'Deleted');
+    } catch (err) {
+      addToast('error', t.errorOccurred, 'Delete Failed');
+    } finally {
+      setDeleteModalOpen(false);
+      setDeleteTargetId(null);
+      setIsDeleting(false);
+    }
+  };
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const u = document.getElementById('adminUser') as HTMLInputElement;
+    const p = document.getElementById('adminPass') as HTMLInputElement;
+    if (!u || !p) return;
+    if (u.value === 'admin' && p.value === '1978') {
+      setAdminActive(true); setLoginModalOpen(false); u.value = ''; p.value = '';
+      addToast('success', 'Welcome back, Admin!', 'Login Successful');
+    } else { 
+      addToast('error', 'Invalid credentials. Try again', 'Access Denied');
+      u.value = '';
+      p.value = '';
+    }
+  };
+
+  const handleQuickHire = (category: string) => {
+    trackLead('Quick Hire', category);
+    setShowHirePage(true);
+    setShowOurTeamPage(false);
+    setShowAboutPage(false);
+    setSearchQuery(category);
+    addToast('info', `Browsing ${category} candidates`, 'Category Selected');
+  };
+
+  const startChat = (lang: 'en' | 'ar') => {
+    setChatLanguageSelected(lang);
+    const welcomeMsg = lang === 'en'
+      ? 'Hello! 👋 I am ZOD AI Assistant. Ask me about jobs, visa, hiring!'
+      : 'مرحباً! 👋 أنا مساعد ZOD AI. اسألني عن الوظائف!';
+    setChatMessages([{ role: 'bot', text: welcomeMsg }]);
+  };
+
+  const sendChatMessage = async () => {
+    const msg = chatInput.trim();
+    if (!msg || chatLoading || !chatLanguageSelected) return;
+    const userMsg: ChatMessage = { role: 'user', text: msg };
+    setChatMessages((prev) => [...prev, userMsg]);
+    setChatInput('');
+    setChatLoading(true);
+    trackLead('Chatbot', msg.slice(0, 40));
+
+    try {
+      const systemPrompt = chatLanguageSelected === 'en'
+        ? `You are ZOD Assistant for ZOD Manpower. Answer concisely. User: ${msg}`
+        : `أنت مساعد ZOD. أجب باختصار. المستخدم: ${msg}`;
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: systemPrompt }] }],
+            generationConfig: { maxOutputTokens: 200, temperature: 0.7 }
+          })
+        }
       );
+
+      const data = await response.json();
+      const botText = data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+        (chatLanguageSelected === 'en'
+          ? "Please contact us via WhatsApp at +97455355206"
+          : "يرجى الاتصال بنا على واتساب +97455355206");
+
+      setChatMessages((prev) => [...prev, { role: 'bot', text: botText }]);
+    } catch (err) {
+      setChatMessages((prev) => [...prev, { role: 'bot', text: chatLanguageSelected === 'en' ? "Please contact us on WhatsApp +97455355206" : "يرجى الاتصال بنا على واتساب +97455355206" }]);
+    } finally {
+      setChatLoading(false);
     }
-    if (filter !== 'all') filtered = filtered.filter(cv => cv.category === filter);
-    if (countryFilter !== 'ALL') filtered = filtered.filter(cv => cv.nationality === countryFilter);
-    setFilteredCvs(filtered);
-  }, [filter, countryFilter, cvs, searchQuery]);
+  };
 
-  const stats = { total: cvs.length };
-
-  const headerHeight = scrollY.interpolate({
-    inputRange: [0, 80],
-    outputRange: [110, 70],
-    extrapolate: 'clamp',
-  });
-
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, 50, 100],
-    outputRange: [1, 0.96, 0.92],
-    extrapolate: 'clamp',
-  });
-
-  const logoScale = scrollY.interpolate({
-    inputRange: [0, 80],
-    outputRange: [1, 0.85],
-    extrapolate: 'clamp',
-  });
-
-  const titleOpacity = scrollY.interpolate({
-    inputRange: [0, 60, 80],
-    outputRange: [1, 0.6, 0],
-    extrapolate: 'clamp',
-  });
-
-  if (loading) {
-    return (
-      <LinearGradient colors={isDarkMode ? ['#121212', '#1a1a2e'] : ['#f5f7fa', '#ffffff']} style={styles.container}>
-        <StatusBar style={isDarkMode ? 'light' : 'dark'} />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#002F66" />
-          <Text style={[styles.loadingText, isDarkMode && styles.darkText]}>{t.loading}</Text>
-        </View>
-      </LinearGradient>
-    );
-  }
-
-  if (selected) {
-    return (
-      <ScrollView style={[styles.container, isDarkMode && styles.darkContainer]} showsVerticalScrollIndicator={false}>
-        <StatusBar style="light" />
-        <LinearGradient colors={['#002F66', '#004A99']} style={styles.detailHeader}>
-          <TouchableOpacity onPress={() => setSelected(null)} style={styles.detailBackBtn}>
-            <Text style={styles.detailBackText}>← {t.back}</Text>
-          </TouchableOpacity>
-        </LinearGradient>
-
-        <View style={[styles.detailCard, isDarkMode && styles.darkCard]}>
-          <View style={styles.detailImageWrapper}>
-            {selected.imageUrl ? (
-              <Image source={{ uri: selected.imageUrl }} style={styles.detailImage} />
-            ) : (
-              <LinearGradient colors={['#e0e0e0', '#d0d0d0']} style={styles.detailImagePlaceholder}>
-                <Text style={styles.detailImagePlaceholderText}>👤</Text>
-              </LinearGradient>
-            )}
-          </View>
-
-          <Text style={[styles.detailName, isDarkMode && styles.darkTitle]}>{selected.name}</Text>
-          <Text style={[styles.detailCategory, isDarkMode && styles.darkText]}>{selected.subCategory}</Text>
-
-          <View style={styles.detailInfoGrid}>
-            <View style={styles.detailInfoItem}><Text style={styles.detailIcon}>📍</Text><Text style={[styles.detailValue, isDarkMode && styles.darkText]}>{selected.nationality}</Text></View>
-            <View style={styles.detailInfoItem}><Text style={styles.detailIcon}>👤</Text><Text style={[styles.detailValue, isDarkMode && styles.darkText]}>{selected.gender}</Text></View>
-            <View style={styles.detailInfoItem}><Text style={styles.detailIcon}>🎂</Text><Text style={[styles.detailValue, isDarkMode && styles.darkText]}>{selected.age}</Text></View>
-            <View style={styles.detailInfoItem}><Text style={styles.detailIcon}>💰</Text><Text style={[styles.detailValue, isDarkMode && styles.darkText]}>{selected.salary}</Text></View>
-            <View style={styles.detailInfoItem}><Text style={styles.detailIcon}>💼</Text><Text style={[styles.detailValue, isDarkMode && styles.darkText]}>{selected.experience}</Text></View>
-          </View>
-
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.viewCVBtn} onPress={() => openCV(selected.cvUrl)}>
-              <Text style={styles.viewCVText}>📄 {t.view_cv}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.detailHireBtn} onPress={() => onHire(selected)}>
-              <LinearGradient colors={['#25D366', '#128C7E']} style={styles.hireBtnGradientDetail}>
-                <Text style={styles.hireBtnTextDetail}>💬 {t.hire}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.detailDownloadRow}>
-            <TouchableOpacity style={styles.detailCvBtn} onPress={() => onDownloadCV(selected)}>
-              <Text style={styles.detailDownloadText}>📄 {t.download_cv}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.detailProfileBtn} onPress={() => onDownloadProfile(selected)}>
-              <Text style={styles.detailDownloadText}>👤 {t.download_profile}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    );
-  }
-
-  return (
-    <View style={[styles.container, isDarkMode && styles.darkContainer]}>
-      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
-      
-      <Animated.View style={[styles.headerContainer, { height: headerHeight, opacity: headerOpacity }]}>
-        <LinearGradient colors={['#002F66', '#004A99']} style={styles.headerGradient}>
-          <View style={styles.headerContent}>
-            <Animated.Image source={{ uri: LOGO_URL }} style={[styles.headerLogo, { transform: [{ scale: logoScale }] }]} />
-            <Animated.View style={[styles.headerTextContainer, { opacity: titleOpacity }]}>
-              <Text style={styles.headerTitle}>ZOD MANPOWER</Text>
-              <Text style={styles.headerSubtitle}>{t.tagline}</Text>
-            </Animated.View>
-            <TouchableOpacity onPress={onOpenSettings} style={styles.headerSettingsBtn}>
-              <Text style={styles.headerSettingsIcon}>⚙️</Text>
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
-      </Animated.View>
-
-      <Animated.ScrollView 
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
-        scrollEventThrottle={16}
-        showsVerticalScrollIndicator={false}
-        style={styles.scrollView}
-      >
-        <View style={styles.statsGrid}>
-          <LinearGradient colors={['#002F66', '#004A99']} style={styles.statCard}>
-            <Text style={styles.statCardIcon}>👥</Text>
-            <Text style={styles.statCardNumber}>{stats.total}</Text>
-            <Text style={styles.statCardLabel}>{t.total_cvs}</Text>
-          </LinearGradient>
-        </View>
-
-        <View style={styles.searchWrapper}>
-          <LinearGradient colors={isDarkMode ? ['#1e1e2e', '#2a2a3e'] : ['#ffffff', '#f8f9fa']} style={styles.searchContainer}>
-            <Text style={styles.searchIcon}>🔍</Text>
-            <TextInput 
-              style={[styles.searchInput, isDarkMode && styles.darkText]} 
-              placeholder={t.search} 
-              placeholderTextColor="#999" 
-              value={searchQuery} 
-              onChangeText={setSearchQuery} 
-            />
-            {searchQuery !== '' && (
-              <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Text style={styles.searchClear}>✖</Text>
-              </TouchableOpacity>
-            )}
-          </LinearGradient>
-        </View>
-
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesScroll} contentContainerStyle={styles.categoriesScrollContent}>
-          {categories.map(cat => (
-            <CategoryIcon 
-              key={cat.key} 
-              icon={cat.icon} 
-              label={cat.label} 
-              color={cat.color} 
-              isActive={filter === cat.key} 
-              onPress={() => setFilter(cat.key)} 
-            />
-          ))}
-        </ScrollView>
-
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.countriesScroll} contentContainerStyle={styles.countriesScrollContent}>
-          {countries.map(c => (
-            <TouchableOpacity key={c.key} onPress={() => setCountryFilter(c.key)} style={[styles.countryChip, countryFilter === c.key && styles.activeCountryChip]}>
-              <Text style={styles.countryFlag}>{c.flag}</Text>
-              <Text style={[styles.countryName, countryFilter === c.key && styles.activeCountryName]}>{c.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        <Text style={[styles.lastUpdate, isDarkMode && styles.darkText]}>🕐 {t.last_update}: {lastUpdate}</Text>
-
-        <View style={styles.gridContainer}>
-          {filteredCvs.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyIcon}>📭</Text>
-              <Text style={[styles.emptyText, isDarkMode && styles.darkText]}>{t.no}</Text>
-            </View>
-          ) : (
-            <View style={styles.gridRow}>
-              {filteredCvs.map((item, index) => (
-                <CandidateCard 
-                  key={item.id} 
-                  item={item} 
-                  index={index} 
-                  onPress={() => setSelected(item)} 
-                  isDarkMode={isDarkMode} 
-                  t={t}
-                  onDownloadCV={onDownloadCV}
-                  onDownloadProfile={onDownloadProfile}
-                  onHire={onHire}
-                />
-              ))}
-            </View>
-          )}
-        </View>
-        
-        <View style={{ height: 30 }} />
-      </Animated.ScrollView>
-
-      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#002F66']} />
-    </View>
-  );
-}
-
-// ------------------- MAIN APP -------------------
-export default function App() {
-  const [showSplash, setShowSplash] = useState(true);
-  const [screen, setScreen] = useState('language');
-  const [lang, setLang] = useState('en');
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [offlineMode, setOfflineMode] = useState(false);
-  const [showSavedProfiles, setShowSavedProfiles] = useState(false);
+  const handleChatKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') sendChatMessage();
+  };
 
   useEffect(() => {
-    const loadOfflineMode = async () => {
-      const saved = await AsyncStorage.getItem(CACHE_KEYS.OFFLINE_MODE);
-      if (saved !== null) setOfflineMode(saved === 'true');
+    if (chatOpen) chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, chatOpen]);
+
+  useEffect(() => {
+    const init = async () => { await fetchTalents(); loadLeads(); setTimeout(() => setIsLoading(false), 3000); };
+    init();
+  }, [fetchTalents]);
+
+  useEffect(() => {
+    const reveal = () => {
+      document.querySelectorAll('.reveal').forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight - 100) el.classList.add('active');
+      });
     };
-    loadOfflineMode();
+    window.addEventListener('scroll', reveal); reveal();
+    return () => window.removeEventListener('scroll', reveal);
   }, []);
 
-  const toggleOfflineMode = async (value) => {
-    setOfflineMode(value);
-    await AsyncStorage.setItem(CACHE_KEYS.OFFLINE_MODE, value.toString());
-  };
+  const escapeHtml = (str: string) => str.replace(/[&<>]/g, (m) => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'));
 
-  if (showSplash) return <SplashScreen onFinish={() => setShowSplash(false)} />;
-  if (screen === 'language') return <LanguageScreen onSelect={(l) => { setLang(l); setScreen('main'); }} />;
-  if (screen === 'settings') return (
-    <SettingsScreen 
-      lang={lang} 
-      onBack={() => setScreen('main')} 
-      onLangChange={(l) => { setLang(l); setScreen('main'); }} 
-      isDarkMode={isDarkMode} 
-      onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-      offlineMode={offlineMode}
-      onToggleOfflineMode={toggleOfflineMode}
-      onOpenSavedProfiles={() => setShowSavedProfiles(true)}
-    />
-  );
+  const sortedTalents = [...talents].sort((a, b) => {
+    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return dateB - dateA;
+  });
+
+  const featuredTalentsBase = sortedTalents.slice(0, 6);
+  const featuredTalents = showReturnedOnly 
+    ? featuredTalentsBase.filter((tal) => tal.workerType === 'Returned Housemaids')
+    : featuredTalentsBase;
+  
+  const filteredTalents = talents.filter((tal) => {
+    const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchCountry = !countryFilter || tal.country === countryFilter;
+    return matchSearch && matchCountry;
+  });
+
+  const adminFilteredTalents = talents.filter((tal) => {
+    const matchSearch = adminSearchQuery === '' || 
+      tal.name.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
+      tal.job.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
+      tal.country.toLowerCase().includes(adminSearchQuery.toLowerCase());
+    return matchSearch;
+  });
+
+  const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
+  const regularTeam = teamMembers.filter(member => !member.isTopManagement);
+
+  const isRTL = language === 'ar';
+  const dir = isRTL ? 'rtl' : 'ltr';
+
+  if (isLoading) {
+    return (
+      <div dir={dir} className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">
+        <div className="text-center px-4">
+          <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-6 md:mb-8 object-cover shadow-lg animate-pulse" onError={(e) => (e.currentTarget.style.display = 'none')} />
+          <h1 className="text-3xl md:text-5xl font-bold text-[#002F66] mb-3 md:mb-4 animate-bounce">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
+          <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8">{t.brandLoading}</p>
+          <div className="flex gap-3 md:gap-4 justify-center flex-wrap">
+            <button onClick={() => setLanguage('en')} className={`px-4 md:px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${language === 'en' ? 'bg-[#002F66] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>English</button>
+            <button onClick={() => setLanguage('ar')} className={`px-4 md:px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${language === 'ar' ? 'bg-[#002F66] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>العربية</button>
+          </div>
+          <div className="mt-8 md:mt-12 w-10 h-10 md:w-12 md:h-12 border-4 border-[#002F66] border-t-transparent rounded-full animate-spin mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <MainScreen lang={lang} onOpenSettings={() => setScreen('settings')} isDarkMode={isDarkMode} offlineMode={offlineMode} onOpenSavedProfiles={() => setShowSavedProfiles(true)} />
-      <SavedProfilesModal visible={showSavedProfiles} onClose={() => setShowSavedProfiles(false)} isDarkMode={isDarkMode} t={translations[lang]} />
-    </>
+    <div dir={dir} className={isRTL ? 'rtl' : 'ltr'}>
+      <style>{`
+        .rtl { direction: rtl; text-align: right; }
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        @keyframes marquee-rtl { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        .animate-marquee { animation: marquee 15s linear infinite; }
+        .animate-marquee-rtl { animation: marquee-rtl 15s linear infinite; }
+        .animate-marquee:hover, .animate-marquee-rtl:hover { animation-play-state: paused; }
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        @keyframes shimmer { 0% { transform: translateX(-100%) skewX(-12deg); } 100% { transform: translateX(200%) skewX(-12deg); } }
+        .animate-shimmer { animation: shimmer 2s infinite; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .animate-slide-in-right { animation: slideInRight 0.3s ease-out; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05); }
+        .nav-link { position: relative; }
+        .nav-link::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: #002F66; transition: width 0.3s ease; }
+        .nav-link:hover::after { width: 100%; }
+        .qatar-gradient { background: linear-gradient(135deg, #002F66 0%, #0040aa 50%, #002F66 100%); }
+        .mobile-sidebar { position: fixed; top: 0; right: -280px; width: 280px; height: 100vh; background: white; z-index: 1000; transition: right 0.3s ease; box-shadow: -2px 0 20px rgba(0,0,0,0.1); padding: 20px; overflow-y: auto; }
+        .mobile-sidebar.active { right: 0; }
+        .sidebar-close { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; }
+        .sidebar-nav { display: flex; flex-direction: column; gap: 20px; margin-top: 60px; }
+        .sidebar-nav a, .sidebar-nav button { font-size: 16px; font-weight: 600; text-transform: uppercase; color: #333; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .sidebar-apply { background: #002F66; color: white; padding: 12px; border-radius: 30px; text-align: center; margin-top: 20px; }
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .faq-item.active .fa-plus { transform: rotate(45deg); }
+        
+        @media (max-width: 768px) {
+          .container-padding { padding-left: 1rem; padding-right: 1rem; }
+          .text-responsive-hero { font-size: 2rem !important; }
+          .text-responsive-title { font-size: 1.5rem !important; }
+          .grid-responsive { grid-template-columns: 1fr !important; gap: 1rem !important; }
+          .nav-text { font-size: 0.7rem !important; }
+          .discount-text { font-size: 0.75rem !important; }
+          .discount-padding { padding: 0.5rem 1rem !important; }
+        }
+        
+        @media (max-width: 1024px) and (min-width: 769px) {
+          .grid-responsive-tablet { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+      `}</style>
+
+      <div className="fixed top-16 right-0 z-[200] space-y-3">
+        {toasts.map(toast => (
+          <ToastNotification key={toast.id} toast={toast} onClose={removeToast} />
+        ))}
+      </div>
+
+      <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[100] flex flex-col items-end gap-3">
+        {chatOpen && (
+          <div className="w-72 sm:w-80 md:w-96 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '480px' }}>
+            <div className="bg-[#002F66] px-4 py-3 md:px-5 md:py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-8 h-8 md:w-9 md:h-9 bg-white/20 rounded-full flex items-center justify-center"><i className="fa-solid fa-robot text-white text-xs md:text-sm"></i></div>
+                <div><div className="text-white font-bold text-xs md:text-sm">ZOD AI Assistant</div></div>
+              </div>
+              <button onClick={() => setChatOpen(false)} className="text-white/60 hover:text-white transition-colors"><i className="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-3 py-3 md:px-4 md:py-4 space-y-3 bg-gray-50">
+              {!chatLanguageSelected ? (
+                <div className="text-center py-6 md:py-8 space-y-3 md:space-y-4">
+                  <p className="text-gray-700 font-bold text-sm md:text-base">Select Language</p>
+                  <div className="flex gap-2 md:gap-3 justify-center">
+                    <button onClick={() => startChat('en')} className="px-4 md:px-5 py-1.5 md:py-2 bg-[#002F66] text-white rounded-full text-xs md:text-sm font-bold hover:bg-[#002060] transition">English</button>
+                    <button onClick={() => startChat('ar')} className="px-4 md:px-5 py-1.5 md:py-2 bg-[#002F66] text-white rounded-full text-xs md:text-sm font-bold hover:bg-[#002060] transition">العربية</button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {chatMessages.map((msg, i) => (
+                    <div key={i} className={`flex ${msg.role === 'user' ? (isRTL ? 'justify-start' : 'justify-end') : (isRTL ? 'justify-end' : 'justify-start')}`}>
+                      <div className={`max-w-[85%] px-3 py-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl text-xs md:text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-[#002F66] text-white rounded-br-sm' : 'bg-white text-gray-700 rounded-bl-sm border border-gray-100'}`}>{msg.text}</div>
+                    </div>
+                  ))}
+                  {chatLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-white border border-gray-100 rounded-xl md:rounded-2xl px-3 py-2 md:px-4 md:py-3 rounded-bl-sm shadow-sm flex gap-1 items-center">
+                        <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#002F66] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                        <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#002F66] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                        <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#002F66] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+            {chatLanguageSelected && (
+              <div className="px-3 py-2 md:px-4 md:py-3 border-t bg-white flex gap-2">
+                <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={handleChatKey} placeholder={chatLanguageSelected === 'en' ? "Ask me anything..." : "اسألني أي شيء..."} className="flex-1 px-3 py-2 md:px-4 md:py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs md:text-sm outline-none focus:border-[#002F66] transition-all" disabled={chatLoading} />
+                <button onClick={sendChatMessage} disabled={chatLoading} className="w-8 h-8 md:w-10 md:h-10 bg-[#002F66] text-white rounded-xl flex items-center justify-center hover:bg-[#002060] transition-all hover:scale-105 active:scale-95 disabled:opacity-50"><i className="fa-solid fa-paper-plane text-xs"></i></button>
+              </div>
+            )}
+          </div>
+        )}
+        <button onClick={() => setChatOpen(!chatOpen)} className="w-12 h-12 md:w-14 md:h-14 bg-[#002F66] text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-[#002060] active:scale-95">
+          {chatOpen ? <i className="fa-solid fa-xmark text-lg md:text-xl"></i> : <i className="fa-regular fa-message text-lg md:text-xl"></i>}
+        </button>
+      </div>
+
+      {loginModalOpen && (
+        <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center backdrop-blur-sm p-4">
+          <div className="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] w-full max-w-md shadow-2xl relative border border-gray-100">
+            <button onClick={() => setLoginModalOpen(false)} className="absolute top-4 right-4 md:top-6 md:right-6 text-gray-400 hover:text-black transition-transform hover:rotate-90"><i className="fa-solid fa-circle-xmark text-xl md:text-2xl"></i></button>
+            <div className="text-center mb-6 md:mb-8">
+              <i className="fa-solid fa-user-shield text-4xl md:text-5xl text-[#002F66] mb-3 md:mb-4"></i>
+              <h2 className="text-xl md:text-2xl font-bold text-slate-900">{t.staffAuth}</h2>
+              <p className="text-xs md:text-sm text-gray-500">{t.restricted}</p>
+            </div>
+            <form onSubmit={handleLogin} className="space-y-4 md:space-y-5" autoComplete="off">
+              <div><label className="text-[10px] md:text-xs font-bold uppercase text-gray-400 ml-1">{t.username}</label><input type="text" id="adminUser" placeholder={t.enterAdmin} autoComplete="off" className="w-full p-3 md:p-4 bg-gray-50 border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all" required /></div>
+              <div><label className="text-[10px] md:text-xs font-bold uppercase text-gray-400 ml-1">{t.password}</label><input type="password" id="adminPass" placeholder="••••••••" autoComplete="new-password" className="w-full p-3 md:p-4 bg-gray-50 border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all" required /></div>
+              <button type="submit" className="w-full py-3 md:py-4 bg-[#002F66] text-white font-bold rounded-xl md:rounded-2xl hover:bg-[#002060] transition-all shadow-lg">{t.authorizedOnly}</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {deleteModalOpen && (
+        <div className="fixed inset-0 bg-black/70 z-[150] flex items-center justify-center backdrop-blur-sm p-4">
+          <div className="bg-white p-6 md:p-8 rounded-xl md:rounded-2xl max-w-md w-full shadow-2xl">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-10 w-10 md:h-12 md:w-12 rounded-full bg-red-100 mb-3 md:mb-4 animate-pulse"><i className="fa-solid fa-trash-can text-red-600 text-lg md:text-xl"></i></div>
+              <h3 className="text-base md:text-lg font-bold text-slate-900 mb-2">{t.confirmDelete}</h3>
+              <p className="text-xs md:text-sm text-gray-500 mb-5 md:mb-6">{t.deleteMsg}</p>
+              <div className="flex gap-3 justify-center">
+                <button onClick={() => setDeleteModalOpen(false)} className="px-3 md:px-4 py-1.5 md:py-2 bg-gray-200 rounded-lg font-medium hover:bg-gray-300 transition-all text-sm">{t.cancel}</button>
+                <button onClick={performDelete} disabled={isDeleting} className="px-3 md:px-4 py-1.5 md:py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all text-sm disabled:opacity-50">
+                  {isDeleting ? <i className="fa-solid fa-spinner fa-spin mr-1"></i> : null}
+                  {t.yesDelete}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!adminActive && (
+        <div className="public-section">
+          <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-20 md:pt-24 pb-2 md:pb-3 px-4 md:px-6">
+            <div className="max-w-7xl mx-auto">
+              <div className="overflow-hidden whitespace-nowrap">
+                <div className={`inline-flex gap-4 md:gap-8 ${isRTL ? 'animate-marquee-rtl' : 'animate-marquee'}`}>
+                  <div onClick={() => handleDiscountClick('Welcome To ZOD MANPOWER')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount1}</span>
+                  </div>
+                  <div onClick={() => handleDiscountClick('Offers Will Be Coming Soon')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">🎉 {t.discount2}</span>
+                  </div>
+                  <div onClick={() => handleDiscountClick('Contact Us For Get More Informations')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">💎 {t.discount3}</span>
+                  </div>
+                  <div onClick={() => handleDiscountClick('Welcome To ZOD MANPOWER')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount1}</span>
+                  </div>
+                  <div onClick={() => handleDiscountClick('Offers Will Be Coming Soon')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">🎉 {t.discount2}</span>
+                  </div>
+                  <div onClick={() => handleDiscountClick('Contact Us For Get More Informations')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
+                    <span className="text-white font-bold text-xs md:text-base discount-text">💎 {t.discount3}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
+            </div>
+          </div>
+
+          <nav className="fixed w-full z-50 glass-nav" style={{ top: '0' }}>
+            <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
+              <div className="flex items-center space-x-2 md:space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); window.scrollTo(0, 0); }}>
+                <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-8 h-8 md:w-12 md:h-12 rounded-xl object-cover shadow-lg transition-transform duration-300 group-hover:scale-110" />
+                <div className="text-sm md:text-2xl font-extrabold tracking-tighter uppercase">{t.brandName}</div>
+              </div>
+              <div className="hidden lg:flex items-center space-x-4 md:space-x-8 font-semibold text-[10px] md:text-xs uppercase tracking-widest">
+                <a href="#home" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.home}</a>
+                <a href="#about" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.about}</a>
+                <a href="#services" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.services}</a>
+                <button onClick={() => { setShowOurTeamPage(true); setShowHirePage(false); setShowAboutPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.ourTeam}</button>
+                <button onClick={() => { setShowHirePage(true); setShowOurTeamPage(false); setShowAboutPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.hireNav}</button>
+                <a href="https://wa.me/97455355206" onClick={() => trackLead('Nav Apply', 'Global Apply')} target="_blank" className="bg-[#002F66] text-white px-4 md:px-6 py-2 md:py-2.5 rounded-full shadow-md hover:bg-[#002060] transition-all hover:scale-105 active:scale-95 text-[10px] md:text-xs">{t.contactUs}</a>
+                <button onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')} className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-[#002F66] hover:bg-gray-200 transition-all"><i className="fa-solid fa-globe text-[8px] md:text-[10px]"></i><span>{language === 'en' ? 'العربية' : 'English'}</span></button>
+              </div>
+              <button className="lg:hidden text-xl md:text-2xl text-[#002F66]" onClick={() => setSidebarOpen(true)}><i className="fa-solid fa-bars-staggered"></i></button>
+            </div>
+          </nav>
+
+          <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
+            <div className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fa-solid fa-xmark text-[#002F66]"></i></div>
+            <div className="sidebar-nav mt-8">
+              <a href="#home" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.home}</a>
+              <a href="#about" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.about}</a>
+              <a href="#services" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2">{t.services}</a>
+              <button onClick={() => { setShowOurTeamPage(true); setShowHirePage(false); setShowAboutPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.ourTeam}</button>
+              <button onClick={() => { setShowHirePage(true); setShowOurTeamPage(false); setShowAboutPage(false); setSidebarOpen(false); }} className="transition-all hover:translate-x-2 text-left">{t.hireNav}</button>
+              <a href="https://wa.me/97455355206" onClick={() => { trackLead('Mobile Nav Apply', 'Global Apply'); setSidebarOpen(false); }} target="_blank" className="sidebar-apply" style={{ backgroundColor: '#002F66' }}>{t.contactUs}</a>
+              <button onClick={() => { setLanguage(language === 'en' ? 'ar' : 'en'); setSidebarOpen(false); }} className="mt-4 w-full py-2 bg-gray-100 rounded-full text-sm font-bold text-[#002F66] hover:bg-gray-200 transition-all flex items-center justify-center gap-2"><i className="fa-solid fa-globe text-xs"></i>{language === 'en' ? 'العربية' : 'English'}</button>
+            </div>
+          </div>
+          <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
+
+          {showOurTeamPage ? (
+            <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
+              <div className="max-w-7xl mx-auto">
+                <button onClick={() => setShowOurTeamPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
+                <div className="text-center mb-8 md:mb-12 reveal">
+                  <h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-3 md:mb-4">{t.teamTitle}</h3>
+                  <p className="text-gray-500 text-sm md:text-base max-w-2xl mx-auto">{t.teamDesc}</p>
+                </div>
+                <div className="mb-12 md:mb-16">
+                  <h4 className="text-xl md:text-2xl font-bold text-[#002F66] text-center mb-6 md:mb-10">{t.topManagementTitle}</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                    {topManagementTeam.map((member) => (
+                      <div key={member.id} className="bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 group">
+                        <div className="relative h-48 md:h-64 bg-gradient-to-r from-[#002F66] to-[#0040aa] flex items-center justify-center">
+                          <img src={member.photo} alt={member.name} className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover border-4 border-white shadow-lg transition-transform duration-300 group-hover:scale-105" onError={(e) => (e.currentTarget.src = 'https://placehold.co/150x150?text=User')} />
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 md:p-4">
+                            <div className="text-white font-bold text-xs md:text-sm text-center">{member.position}</div>
+                          </div>
+                        </div>
+                        <div className="p-4 md:p-6 text-center">
+                          <h4 className="text-base md:text-xl font-bold text-slate-800 mb-2 md:mb-3">{escapeHtml(member.name)}</h4>
+                          <a href={`https://wa.me/${member.phone}`} target="_blank" onClick={() => trackLead('Team Contact', member.name)} className="inline-flex items-center gap-2 bg-green-600 text-white px-4 md:px-5 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-semibold hover:bg-green-700 transition-all hover:scale-105">
+                            <i className="fa-brands fa-whatsapp text-sm md:text-base"></i> {t.contact}
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h4 className="text-lg md:text-xl font-bold text-slate-700 text-center mb-6 md:mb-8">Our Dedicated Team</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    {regularTeam.map((member) => (
+                      <div key={member.id} className="bg-white rounded-lg md:rounded-xl p-4 md:p-5 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex items-center gap-3 md:gap-4 border border-gray-100">
+                        <img src={member.photo} alt={member.name} className="w-12 h-12 md:w-16 md:h-16 rounded-full object-cover border-2 border-[#002F66]/20" onError={(e) => (e.currentTarget.src = 'https://placehold.co/80x80?text=User')} />
+                        <div className="flex-1">
+                          <h5 className="font-bold text-slate-800 text-sm md:text-base">{escapeHtml(member.name)}</h5>
+                          <p className="text-[#002F66] text-[10px] md:text-xs font-semibold">{escapeHtml(member.position)}</p>
+                        </div>
+                        <a href={`https://wa.me/${member.phone}`} target="_blank" onClick={() => trackLead('Team Contact', member.name)} className="text-green-600 hover:text-green-700 transition-all hover:scale-110">
+                          <i className="fa-brands fa-whatsapp text-lg md:text-xl"></i>
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : showAboutPage ? (
+            <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
+              <div className="max-w-7xl mx-auto">
+                <button onClick={() => setShowAboutPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
+                <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-10 shadow-lg">
+                  <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+                    <div><h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourVision}</h3><p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.visionText}</p></div>
+                    <div><h3 className="text-2xl md:text-3xl font-bold text-[#002F66] mb-4 md:mb-6">{t.ourMission}</h3><p className="text-gray-600 leading-relaxed text-sm md:text-lg">{t.missionText}</p></div>
+                  </div>
+                  <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-gray-200">
+                    <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-3 md:mb-4">{t.ourJourney}</h3>
+                    <p className="text-gray-500 leading-relaxed text-sm md:text-base">
+                      {language === 'en' 
+                        ? 'ZOD Manpower, located in Doha, Qatar, is a recruitment agency specializing in supplying staff, including housemaids, nurses, and office boys from countries like the Philippines, Sri Lanka, Kenya, and India. We offer various staffing solutions and are listed as a recruitment agency in Qatar. '
+                        : 'شركة زود للتوظيف، ومقرها الدوحة، قطر، هي وكالة توظيف متخصصة في توفير الكوادر البشرية، بما في ذلك عاملات المنازل والممرضات وعمال المكاتب، من دول مثل الفلبين وسريلانكا وكينيا والهند. نقدم حلولاً متنوعة للتوظيف، ونحن مسجلون كوكالة توظيف معتمدة في قطر.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : showHirePage ? (
+            <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
+              <div className="max-w-7xl mx-auto">
+                <button onClick={() => setShowHirePage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
+                <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-10 gap-4 md:gap-6">
+                  <div><h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-2">{t.hireTitle}</h3><p className="text-gray-500 text-sm md:text-base">{t.hireDesc}</p></div>
+                  <div className="flex gap-2 md:gap-3 w-full md:w-auto flex-wrap">
+                    <div className="relative flex-1 min-w-[150px] md:min-w-[180px]">
+                      <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t.searchPlaceholder} className="w-full p-3 md:p-4 pl-8 md:pl-12 bg-white border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-sm md:text-base" />
+                      <i className="fa-solid fa-magnifying-glass absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-sm"></i>
+                    </div>
+                    <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="p-3 md:p-4 bg-white border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-xs md:text-sm font-bold text-gray-700">
+                      <option value="">{t.allCountries}</option>
+                      {countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <button onClick={fetchTalents} className="px-4 md:px-5 py-3 md:py-4 bg-gray-200 rounded-xl md:rounded-2xl hover:bg-gray-300 transition-all hover:scale-105" title={t.refresh}><i className="fa-solid fa-rotate-right text-xs md:text-sm"></i></button>
+                  </div>
+                </div>
+                {loading ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
+                ) : filteredTalents.length === 0 ? (
+                  <div className="text-center py-16 md:py-24 text-gray-400"><i className="fa-solid fa-user-slash text-4xl md:text-5xl mb-4 block"></i><p className="font-bold text-sm md:text-base">No candidates found. Try a different search or country filter.</p></div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    {filteredTalents.map((talent) => (
+                      <div key={talent.id} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
+                        <div className="flex justify-between items-start mb-4 md:mb-6">
+                          <img src={talent.pic} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
+                          <span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
+                        </div>
+                        <div className="flex-grow">
+                          <h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight">{escapeHtml(talent.name)}</h4>
+                          <p className="text-[#002F66] font-bold text-[10px] md:text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
+                          <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-100 space-y-2 md:space-y-3 mb-6 md:mb-8">
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-4 md:w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-4 md:w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-4 md:w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-4 md:w-5 text-[#002F66]"></i><span>{talent.experience || '2-5 Years'} Exp</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-heart w-4 md:w-5 text-[#002F66]"></i><span>{talent.maritalStatus || 'Single'}</span></div>
+                            <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-tag w-4 md:w-5 text-[#002F66]"></i><span>{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</span></div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 md:gap-3 mt-auto">
+                          <a href={talent.cv} target="_blank" onClick={() => trackLead('Public CV', talent.name)} className="flex-1 py-2 md:py-4 bg-gray-100 text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
+                          <button onClick={() => handleHireClick(talent.name, 'Hire Talent')} className="flex-1 py-2 md:py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <>
+              <section id="home" className="relative pt-24 md:pt-32 pb-16 md:pb-32 px-4 md:px-6 qatar-gradient text-white overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[20rem] md:text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
+                <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center relative z-10">
+                  <div className="space-y-6 md:space-y-8 fade-in">
+                    <span className="inline-block px-3 md:px-4 py-1 md:py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-widest border border-white/20 animate-pulse">{t.certified}</span>
+                    <h1 className="text-3xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
+                    <p className="text-sm md:text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
+                    <div className="flex flex-wrap gap-3 md:gap-4 justify-center md:justify-start">
+                      <button onClick={() => handleQuickHire('House Maid')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                        <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🏠 {t.houseMaids}</span>
+                        <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                      </button>
+                      <button onClick={() => handleQuickHire('Driver')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                        <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🚗 {t.drivers}</span>
+                        <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                      </button>
+                      <button onClick={() => handleQuickHire('Nurse')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                        <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🏥 {t.nurses}</span>
+                        <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                      </button>
+                      <button onClick={() => handleExternalLink('https://alkhadam.net/qa/en/company/411', 'Monthly Cleaners')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                        <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🧹 {t.monthlyCleaners}</span>
+                        <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                      </button>
+                      <button onClick={() => handleExternalLink('https://alkhadam.net/qa/en/company/7653', 'Al-Mohannadi')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
+                        <span className="relative z-10 flex items-center gap-1 md:gap-2 text-xs md:text-sm">🏥 {t.alMohannadi}</span>
+                        <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="hidden md:flex justify-center relative">
+                    <div className="w-64 h-64 md:w-80 md:h-80 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[3rem] md:rounded-[4rem] rotate-12 flex items-center justify-center shadow-2xl hover:rotate-0 transition-transform duration-700 hover:scale-105"><i className="fa-solid fa-building-columns text-[6rem] md:text-[10rem] opacity-20 -rotate-12"></i></div>
+                    <div className="absolute -bottom-6 md:-bottom-10 -left-6 md:-left-10 p-4 md:p-8 bg-amber-400 rounded-2xl md:rounded-3xl shadow-2xl text-[#002F66] animate-float" style={{ animationDuration: '3s' }}><div className="text-2xl md:text-4xl font-bold">12+</div><div className="text-[8px] md:text-[10px] font-bold uppercase tracking-tighter leading-none">{t.yearsLabel}</div></div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="py-12 md:py-16 bg-white border-b reveal">
+                <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
+                  {[{ num: '9.2K', label: t.successfulPlacements }, { num: '1.8K+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '98.2%', label: t.complianceRate }].map((s, i) => (
+                    <div key={i} className="flex items-center space-x-2 md:space-x-4 border-r border-gray-100 last:border-0 hover:translate-x-2 transition-all duration-300 group">
+                      <div className="text-2xl md:text-4xl text-[#002F66] font-black group-hover:scale-110 transition-transform">{s.num}</div>
+                      <div className="text-[8px] md:text-[10px] uppercase font-bold text-gray-400 tracking-widest">{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
+                <div className="max-w-7xl mx-auto">
+                  <div className="flex justify-between items-center mb-6 md:mb-8 flex-wrap gap-4">
+                    <h3 className="text-xl md:text-2xl font-bold text-slate-900">{t.featuredCandidates}</h3>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={showReturnedOnly} 
+                          onChange={(e) => setShowReturnedOnly(e.target.checked)}
+                          className="w-4 h-4 text-[#002F66] rounded border-gray-300 focus:ring-[#002F66]"
+                        />
+                        <span className="text-xs md:text-sm font-medium text-gray-700">{t.showReturnedOnly}</span>
+                      </label>
+                      <button onClick={() => setShowHirePage(true)} className="text-[#002F66] font-bold text-xs md:text-sm hover:underline transition-all flex items-center gap-1">{t.viewAllCandidates}</button>
+                    </div>
+                  </div>
+                  {loading ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
+                  ) : featuredTalents.length === 0 ? (
+                    <div className="text-center py-16 md:py-24 text-gray-400"><i className="fa-solid fa-user-slash text-4xl md:text-5xl mb-4 block"></i><p className="font-bold text-sm md:text-base">No candidates available. Please check back later.</p></div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                      {featuredTalents.map((talent) => (
+                        <div key={talent.id} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
+                          <div className="flex justify-between items-start mb-4 md:mb-6">
+                            <img src={talent.pic} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
+                            <span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
+                          </div>
+                          <div className="flex-grow">
+                            <h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight">{escapeHtml(talent.name)}</h4>
+                            <p className="text-[#002F66] font-bold text-[10px] md:text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
+                            <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-100 space-y-2 md:space-y-3 mb-6 md:mb-8">
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-4 md:w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-4 md:w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div>
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-4 md:w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div>
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-4 md:w-5 text-[#002F66]"></i><span>{talent.experience || '3-5 Years'} Exp</span></div>
+                              <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-tag w-4 md:w-5 text-[#002F66]"></i><span>{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</span></div>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 md:gap-3 mt-auto">
+                            <a href={talent.cv} target="_blank" onClick={() => trackLead('Featured CV', talent.name)} className="flex-1 py-2 md:py-4 bg-gray-100 text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
+                            <button onClick={() => handleHireClick(talent.name, 'Featured Hire')} className="flex-1 py-2 md:py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section id="about" className="py-16 md:py-24 px-4 md:px-6 bg-white reveal">
+                <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center">
+                  <div className="relative group">
+                    <div className="aspect-square bg-gray-200 rounded-[2rem] md:rounded-[4rem] overflow-hidden shadow-inner"><img src="https://raw.githubusercontent.com/AshiLara2007/ZOD-Photos/main/ZOD.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="About" /></div>
+                    <div className="absolute -bottom-4 md:-bottom-8 -right-4 md:-right-8 p-6 md:p-10 bg-[#002F66] rounded-[2rem] md:rounded-[3rem] text-white shadow-2xl hidden md:block transition-all duration-300 hover:scale-105"><i className="fa-solid fa-quote-left text-3xl md:text-4xl opacity-20 mb-4 block"></i><p className="font-bold text-base md:text-lg italic">"Connecting People, <br />Empowering Visions."</p></div>
+                  </div>
+                  <div className="space-y-6 md:space-y-8">
+                    <h2 className="text-sm font-bold text-red-800 uppercase tracking-[0.3em]">{t.ourLegacy}</h2>
+                    <h3 className="text-2xl md:text-4xl font-bold text-slate-900 leading-tight">{t.aboutTitle}</h3>
+                    <p className="text-gray-500 leading-relaxed text-sm md:text-base">{t.aboutDesc}</p>
+                    <ul className="space-y-3 md:space-y-4">{[t.personalizedMatching, t.directLiaison, t.multiIndustry].map((item, i) => (<li key={i} className="flex items-center space-x-2 md:space-x-3 font-bold text-xs md:text-sm text-slate-700 group cursor-pointer"><i className="fa-solid fa-check-circle text-[#002F66] transition-transform group-hover:scale-110"></i><span className="group-hover:translate-x-1 transition-transform">{item}</span></li>))}</ul>
+                    <button onClick={() => setShowAboutPage(true)} className="inline-flex items-center gap-2 bg-[#002F66] text-white px-6 md:px-8 py-2 md:py-3 rounded-lg md:rounded-xl font-bold text-xs md:text-sm hover:bg-[#002060] transition-all hover:scale-105 shadow-md">
+                      {t.viewMore} <i className="fa-solid fa-arrow-right"></i>
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              <section id="services" className="py-16 md:py-24 px-4 md:px-6 bg-gray-50 reveal">
+                <div className="max-w-7xl mx-auto text-center mb-12 md:mb-20"><h2 className="text-sm font-bold text-red-800 uppercase tracking-[0.3em] mb-4">{t.ourExpertise}</h2><h3 className="text-2xl md:text-4xl font-bold text-slate-900">{t.comprehensiveSolutions}</h3></div>
+                <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6 md:gap-8">
+                  {[{ icon: 'passport', title: t.visaTitle, desc: t.visaDesc }, { icon: 'users-gear', title: t.techTitle, desc: t.techDesc }, { icon: 'city', title: t.projectsTitle, desc: t.projectsDesc }].map((s, i) => (
+                    <div key={i} className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-sm hover:shadow-xl transition-all duration-500 group hover:-translate-y-3 border border-gray-100 cursor-pointer">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-red-50 rounded-xl md:rounded-2xl flex items-center justify-center mb-6 md:mb-8 group-hover:bg-[#002F66] group-hover:text-white transition-all duration-500 group-hover:rotate-6"><i className={`fa-solid fa-${s.icon} text-xl md:text-2xl`}></i></div>
+                      <h4 className="text-base md:text-xl font-bold mb-3 md:mb-4 text-slate-900 group-hover:text-[#002F66] transition-colors">{s.title}</h4>
+                      <p className="text-gray-500 text-xs md:text-sm leading-relaxed">{s.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="py-12 md:py-16 px-4 md:px-6 bg-white reveal">
+                <div className="max-w-7xl mx-auto">
+                  <div className="text-center mb-6 md:mb-8">
+                    <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">{t.ourLocation}</h3>
+                    <p className="text-gray-500 text-sm md:text-base">ZOD MANPOWER RECRUITMENT, Doha, Qatar</p>
+                  </div>
+                  <div className="w-full h-[250px] md:h-[400px] rounded-xl md:rounded-2xl overflow-hidden shadow-xl border-4 border-white">
+                    <iframe 
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3608.756850059207!2d51.451755486019955!3d25.24511337222303!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e45da725e22a337%3A0xbea50deacb9863fc!2sZOD%20MANPOWER%20RECRUITMENT!5e0!3m2!1sen!2sqa!4v1776013064557!5m2!1sen!2sqa" 
+                      width="100%" 
+                      height="100%" 
+                      style={{ border: 0 }} 
+                      allowFullScreen 
+                      loading="lazy" 
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="ZOD MANPOWER RECRUITMENT Location"
+                    ></iframe>
+                  </div>
+                </div>
+              </section>
+
+              <section className="py-16 md:py-20 bg-gray-50 px-4 md:px-6 reveal">
+                <div className="max-w-7xl mx-auto">
+                  <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">{t.whatClientsSay}</h3>
+                  <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+                    {[{ text: t.testimonial1, author: t.author1 }, { text: t.testimonial2, author: t.author2 }, { text: t.testimonial3, author: t.author3 }].map((tst, i) => (
+                      <div key={i} className="bg-white p-6 md:p-8 rounded-xl md:rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-2">
+                        <i className="fa-solid fa-quote-left text-2xl md:text-3xl text-[#002F66]/20 mb-3 md:mb-4 block"></i>
+                        <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-4 md:mb-6">{tst.text}</p>
+                        <p className="font-bold text-slate-800 text-xs md:text-sm">{tst.author}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              <section className="py-16 md:py-20 bg-white px-4 md:px-6 reveal">
+                <div className="max-w-5xl mx-auto">
+                  <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">{t.faqTitle}</h3>
+                  <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+                    {[{ q: t.faqQ1, a: t.faqA1 }, { q: t.faqQ2, a: t.faqA2 }, { q: t.faqQ3, a: t.faqA3 }, { q: t.faqQ4, a: t.faqA4 }].map((faq, i) => (
+                      <div key={i} className="bg-gray-50 p-4 md:p-6 rounded-xl md:rounded-2xl border shadow-sm faq-item cursor-pointer transition-all duration-300 hover:shadow-md" onClick={(e) => { const parent = e.currentTarget; parent.classList.toggle('active'); const answer = parent.querySelector('.faq-answer') as HTMLElement; if (parent.classList.contains('active')) answer.style.maxHeight = answer.scrollHeight + 'px'; else answer.style.maxHeight = '0px'; }}>
+                        <h5 className="font-bold text-xs md:text-sm flex justify-between items-center uppercase tracking-tight">{faq.q}<i className="fa-solid fa-plus text-[10px] md:text-xs transition-transform duration-300 ml-2 shrink-0"></i></h5>
+                        <div className="faq-answer text-gray-500 text-xs md:text-sm leading-relaxed">{faq.a}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              <footer className="py-16 md:py-20 bg-slate-900 text-white px-4 md:px-6">
+                <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 md:gap-12 border-b border-white/5 pb-12 md:pb-16">
+                  <div className="col-span-2">
+                    <div className="flex items-center gap-3 mb-6">
+                      <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover shadow-lg" />
+                      <div className="text-lg md:text-2xl font-black uppercase tracking-tighter">{t.brandName}</div>
+                    </div>
+                    <p className="text-slate-500 text-xs md:text-sm leading-relaxed max-w-sm mb-6">{t.footerText}</p>
+                    <div className="flex space-x-3 md:space-x-4"><a href="#" className="w-8 h-8 md:w-10 md:h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-facebook-f text-sm md:text-base"></i></a><a href="#" className="w-8 h-8 md:w-10 md:h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-[#002F66] transition-all duration-300 hover:scale-110"><i className="fa-brands fa-linkedin-in text-sm md:text-base"></i></a></div>
+                  </div>
+                  <div><h6 className="font-bold uppercase text-[10px] md:text-xs tracking-widest mb-4 md:mb-6 text-slate-300">{t.quickLinks}</h6><ul className="space-y-3 md:space-y-4 text-[10px] md:text-xs text-slate-500 font-bold uppercase"><li><a href="#about" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.aboutDoha}</a></li><li><a href="#services" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.clientServices}</a></li><li><button onClick={() => setShowHirePage(true)} className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">{t.browseCVs}</button></li></ul></div>
+                  <div><h6 className="font-bold uppercase text-[10px] md:text-xs tracking-widest mb-4 md:mb-6 text-slate-300">{t.internal}</h6><button onClick={() => setLoginModalOpen(true)} className="group flex items-center space-x-2 md:space-x-3 px-4 md:px-6 py-2 md:py-3 border border-white/10 rounded-xl md:rounded-2xl hover:bg-white hover:text-slate-900 transition-all duration-300 hover:scale-105"><i className="fa-solid fa-lock text-[8px] md:text-[10px] group-hover:rotate-12 transition-transform"></i><span className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest">{t.adminPortal}</span></button></div>
+                </div>
+                <div className="max-w-7xl mx-auto pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6 text-[8px] md:text-[10px] text-slate-700 tracking-widest uppercase font-bold"><p>{t.copyright}</p><div className="flex space-x-4 md:space-x-6"><a href="#" className="hover:text-white transition-colors">{t.privacyPolicy}</a><a href="#" className="hover:text-white transition-colors">{t.terms}</a></div></div>
+              </footer>
+            </>
+          )}
+        </div>
+      )}
+
+      {adminActive && (
+        <div className="admin-section min-h-screen bg-gray-50 pb-16 md:pb-20">
+          <nav className="bg-white border-b px-4 md:px-6 py-3 md:py-4 mb-6 md:mb-10 sticky top-0 z-50">
+            <div className="max-w-7xl mx-auto flex justify-between items-center">
+              <div className="flex items-center space-x-2 md:space-x-3"><div className="w-6 h-6 md:w-8 md:h-8 bg-[#002F66] rounded-lg flex items-center justify-center text-white"><i className="fa-solid fa-gears text-[8px] md:text-[10px]"></i></div><span className="font-bold text-xs md:text-sm tracking-widest uppercase text-slate-900">{t.staffPortal}</span></div>
+              <button onClick={() => setAdminActive(false)} className="bg-red-600 text-white px-4 md:px-6 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[8px] md:text-[10px] font-bold uppercase tracking-widest shadow-lg hover:bg-red-700 transition-all duration-300 hover:scale-105">{t.logout}</button>
+            </div>
+          </nav>
+          <div className="max-w-7xl mx-auto px-4 md:px-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-10">
+              <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.totalCandidates}</p><div className="text-2xl md:text-4xl font-bold text-slate-800">{talents.length}</div></div>
+              <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.webLeads}</p><div className="text-2xl md:text-4xl font-bold text-indigo-600">{leads.length}</div></div>
+              <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.activeVacancies}</p><div className="text-2xl md:text-4xl font-bold text-[#002F66]">0</div></div>
+              <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center justify-center"><button onClick={fetchTalents} className="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold uppercase transition-all duration-300 hover:scale-105"><i className="fa-solid fa-rotate-right mr-1 md:mr-2"></i> {t.refresh}</button></div>
+            </div>
+
+            {/* Admin Search Bar */}
+            <div className="mb-6 md:mb-8">
+              <div className="relative max-w-md">
+                <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input
+                  type="text"
+                  value={adminSearchQuery}
+                  onChange={(e) => setAdminSearchQuery(e.target.value)}
+                  placeholder={t.adminSearch}
+                  className="w-full p-4 pl-12 bg-white border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-sm"
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-2 ml-2">{t.searchByName}</p>
+            </div>
+
+            <div className="flex space-x-4 md:space-x-6 mb-6 md:mb-8 border-b">
+              <button onClick={() => setActiveTab('candidates')} className={`pb-3 md:pb-4 border-b-2 font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === 'candidates' ? 'border-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{t.inventoryManagement}</button>
+              <button onClick={() => setActiveTab('leads')} className={`pb-3 md:pb-4 border-b-2 font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === 'leads' ? 'border-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{t.visitorLogs}</button>
+            </div>
+
+            {activeTab === 'candidates' && (
+              <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
+                <div className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-sm h-fit">
+                  <div className="flex justify-between items-center mb-6 md:mb-8 border-b pb-3 md:pb-4"><h4 className="font-bold uppercase text-[10px] md:text-xs text-[#002F66] tracking-widest">{editTalent ? `${t.editCandidate} ${editTalent.name}` : t.newCandidate}</h4><button onClick={resetForm} className="text-[8px] md:text-[10px] text-gray-400 hover:text-red-600 transition-all hover:rotate-12"><i className="fa-solid fa-rotate-left"></i></button></div>
+                  <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.fullName}</label><input ref={nameRef} type="text" className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all text-sm md:text-base" required /></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.dob}</label><input ref={dobRef} type="date" onChange={handleDobChange} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
+                    {calculatedAge !== null && (<div className="bg-blue-50 p-2 md:p-3 rounded-lg md:rounded-xl"><span className="text-[10px] md:text-xs font-bold text-blue-600">Age: {calculatedAge} years</span></div>)}
+                    <div className="grid grid-cols-2 gap-3 md:gap-4">
+                      <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.gender}</label><select ref={genderRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option>Male</option><option>Female</option></select></div>
+                      <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.maritalStatus}</label><select ref={maritalStatusRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{maritalStatusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div>
+                    </div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{jobOptions.map(job => <option key={job} value={job}>{job}</option>)}</select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.country}</label><select ref={countryRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all"><option value="Muslim">Muslim</option><option value="Christian">Christian</option><option value="Hindu">Hindu</option><option value="Buddhist">Buddhist</option></select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all" required /></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.experience}</label><select ref={experienceRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{experienceOptions.map(exp => <option key={exp} value={exp}>{exp}</option>)}</select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.workerType}</label><select ref={workerTypeRef} className="w-full p-3 md:p-4 bg-gray-50 border border-transparent rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition-all">{workerTypeOptions.map(opt => <option key={opt} value={opt}>{opt === 'Recruitment Workers' ? t.recruitmentWorkers : t.returnedHousemaidsType}</option>)}</select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.photo}</label><input ref={picRef} type="file" accept="image/*" className="text-[10px] md:text-xs file:mr-2 md:file:mr-4 file:py-1 md:file:py-2 file:px-2 md:file:px-4 file:rounded-full file:border-0 file:text-[8px] md:file:text-[10px] file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 transition-all" /></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.cvUpload}</label><input ref={cvRef} type="file" accept=".pdf,image/*" className="text-[10px] md:text-xs file:mr-2 md:file:mr-4 file:py-1 md:file:py-2 file:px-2 md:file:px-4 file:rounded-full file:border-0 file:text-[8px] md:file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all" /></div>
+                    <button type="submit" disabled={isSubmitting} className="w-full py-3 md:py-4 bg-[#002F66] text-white rounded-lg md:rounded-xl font-bold uppercase text-[8px] md:text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105 disabled:opacity-50">
+                      {isSubmitting ? <i className="fa-solid fa-spinner fa-spin mr-2"></i> : null}
+                      {t.saveRecord}
+                    </button>
+                  </form>
+                </div>
+                <div className="lg:col-span-2 bg-white rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-sm overflow-x-auto">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left min-w-[800px]">
+                      <thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b">
+                        <tr>
+                          <th className="p-4 md:p-6">{t.candidateDetails}</th>
+                          <th className="p-4 md:p-6">{t.position}</th>
+                          <th className="p-4 md:p-6">{t.salary}</th>
+                          <th className="p-4 md:p-6">{t.workerTypeColumn}</th>
+                          <th className="p-4 md:p-6 text-right">{t.actions}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {adminFilteredTalents.map((talent) => (
+                          <tr key={talent.id} className="hover:bg-gray-50 transition-all duration-200">
+                            <td className="p-4 md:p-6"><div className="flex items-center space-x-2 md:space-x-3"><img src={talent.pic} className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-xs md:text-sm">{escapeHtml(talent.name)}</div><div className="text-[8px] md:text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div></div></div></td>
+                            <td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td>
+                            <td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td>
+                            <td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</div></td>
+                            <td className="p-4 md:p-6 text-right">
+                              <button onClick={() => editHandler(talent)} className="text-blue-500 p-1 md:p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen text-xs md:text-sm"></i></button>
+                              <button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-1 md:p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash text-xs md:text-sm"></i></button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'leads' && (
+              <div className="bg-white rounded-[2rem] md:rounded-[3rem] border border-gray-100 shadow-sm overflow-x-auto">
+                <div className="p-4 md:p-8 border-b flex justify-between items-center flex-wrap gap-2"><h4 className="font-bold text-[10px] md:text-xs uppercase tracking-widest text-indigo-600">{t.realtimeLogs}</h4><button onClick={clearLeads} className="text-[8px] md:text-[10px] font-bold text-red-500 uppercase hover:underline transition-all">{t.clearLogs}</button></div>
+                <table className="w-full text-left min-w-[400px]">
+                  <thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    <tr><th className="p-4 md:p-8">{t.trafficSource}</th><th className="p-4 md:p-8">{t.actionTaken}</th><th className="p-4 md:p-8 text-right">{t.timeLocal}</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {leads.map((lead) => (<tr key={lead.id}><td className="p-4 md:p-8 text-[10px] md:text-xs font-bold">{lead.source}</td><td className="p-4 md:p-8 text-[10px] md:text-xs text-indigo-600 font-bold">{lead.action}</td><td className="p-4 md:p-8 text-right text-[8px] md:text-[10px] text-gray-400">{lead.time}</td></tr>))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
-
-// ------------------- STYLES -------------------
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f7fa' },
-  darkContainer: { backgroundColor: '#121212' },
-  splashContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  splashLogoWrapper: { width: 140, height: 140, borderRadius: 70, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', marginBottom: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 8 },
-  splashLogo: { width: 110, height: 110, borderRadius: 55 },
-  splashTitle: { fontSize: 28, fontWeight: 'bold', color: '#fff', marginBottom: 5 },
-  splashSubtitle: { fontSize: 14, color: '#fff', opacity: 0.8 },
-  languageContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 },
-  logoWrapper: { marginBottom: 20 },
-  logoGradient: { width: 130, height: 130, borderRadius: 65, alignItems: 'center', justifyContent: 'center' },
-  logo: { width: 110, height: 110, borderRadius: 55 },
-  title: { fontSize: 28, fontWeight: 'bold', color: '#002F66', marginBottom: 5 },
-  tagline: { fontSize: 12, color: '#666', marginBottom: 40 },
-  selectText: { fontSize: 16, color: '#333', marginBottom: 20 },
-  langBtn: { width: '80%', marginVertical: 10, borderRadius: 30, overflow: 'hidden' },
-  langBtnGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 15, gap: 10 },
-  langBtnText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  langFlag: { fontSize: 20 },
-  headerContainer: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, overflow: 'hidden' },
-  headerGradient: { flex: 1, borderBottomLeftRadius: 25, borderBottomRightRadius: 25 },
-  headerContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, flex: 1 },
-  headerLogo: { width: 45, height: 45, borderRadius: 22, borderWidth: 2, borderColor: '#fff' },
-  headerTextContainer: { alignItems: 'center' },
-  headerTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  headerSubtitle: { color: '#fff', fontSize: 10, opacity: 0.8 },
-  headerSettingsBtn: { padding: 8 },
-  headerSettingsIcon: { fontSize: 22, color: '#fff' },
-  scrollView: { flex: 1, marginTop: 110 },
-  statsGrid: { flexDirection: 'row', paddingHorizontal: 15, marginTop: 15 },
-  statCard: { flex: 1, borderRadius: 16, padding: 12, alignItems: 'center', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
-  statCardIcon: { fontSize: 24, color: '#fff', marginBottom: 4 },
-  statCardNumber: { fontSize: 28, fontWeight: 'bold', color: '#fff' },
-  statCardLabel: { fontSize: 10, color: '#fff', opacity: 0.8, marginTop: 2 },
-  searchWrapper: { paddingHorizontal: 15, marginTop: 15 },
-  searchContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 12, borderRadius: 30, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },
-  searchIcon: { fontSize: 16, marginRight: 10, color: '#999' },
-  searchInput: { flex: 1, fontSize: 14 },
-  searchClear: { fontSize: 16, color: '#999', padding: 5 },
-  categoriesScroll: { marginTop: 15 },
-  categoriesScrollContent: { paddingHorizontal: 15, gap: 12 },
-  categoryIconBtn: { alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 25, borderWidth: 1, borderColor: '#e0e0e0' },
-  categoryIconBtnActive: { borderWidth: 0 },
-  categoryIconEmoji: { fontSize: 18, marginBottom: 4 },
-  categoryIconLabel: { fontSize: 11, color: '#666', fontWeight: '500' },
-  categoryIconLabelActive: { color: '#fff' },
-  countriesScroll: { marginTop: 12 },
-  countriesScrollContent: { paddingHorizontal: 15, gap: 8 },
-  countryChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f0f0f0', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, gap: 5 },
-  activeCountryChip: { backgroundColor: '#002F66' },
-  countryFlag: { fontSize: 12 },
-  countryName: { fontSize: 11, color: '#666' },
-  activeCountryName: { color: '#fff' },
-  lastUpdate: { textAlign: 'center', fontSize: 9, color: '#999', marginVertical: 12 },
-  gridContainer: { paddingHorizontal: 10 },
-  gridRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  card: { borderRadius: 20, overflow: 'hidden', elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4 },
-  cardImageWrapper: { position: 'relative' },
-  cardImage: { width: '100%', height: 140 },
-  cardImagePlaceholder: { width: '100%', height: 140, alignItems: 'center', justifyContent: 'center' },
-  cardImagePlaceholderText: { fontSize: 50 },
-  cardBadgeReturned: { position: 'absolute', top: 8, left: 8, backgroundColor: '#ec489a', paddingHorizontal: 6, paddingVertical: 3, borderRadius: 12 },
-  cardBadgeReturnedText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
-  cardBadgeStatus: { position: 'absolute', top: 8, right: 8, backgroundColor: '#10b981', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12 },
-  cardBadgeStatusText: { color: '#fff', fontSize: 9, fontWeight: 'bold' },
-  cardContent: { padding: 12 },
-  cardName: { fontSize: 14, fontWeight: 'bold', marginBottom: 4 },
-  cardCategory: { fontSize: 11, color: '#002F66', fontWeight: '500', marginBottom: 6 },
-  cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  cardCountry: { backgroundColor: '#eef2ff', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12 },
-  cardCountryText: { fontSize: 9, color: '#002F66', fontWeight: '500' },
-  cardSalary: { fontSize: 11, color: '#002F66', fontWeight: 'bold' },
-  buttonContainer: { marginBottom: 8 },
-  hireButtonCard: { borderRadius: 25, overflow: 'hidden', marginTop: 4 },
-  hireButtonGradient: { paddingVertical: 8, alignItems: 'center', borderRadius: 25 },
-  hireButtonText: { fontSize: 12, fontWeight: 'bold', color: '#fff' },
-  downloadButtonsRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 8 },
-  downloadCvBtn: { flex: 1, backgroundColor: '#002F66', paddingVertical: 6, borderRadius: 15, alignItems: 'center' },
-  downloadCvBtnText: { fontSize: 10, color: '#fff', fontWeight: '500' },
-  downloadProfileBtn: { flex: 1, backgroundColor: '#10b981', paddingVertical: 6, borderRadius: 15, alignItems: 'center' },
-  downloadProfileBtnText: { fontSize: 10, color: '#fff', fontWeight: '500' },
-  settingsHeader: { paddingTop: 50, paddingBottom: 30, alignItems: 'center', borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
-  settingsBackBtn: { position: 'absolute', top: 50, left: 20, zIndex: 1 },
-  settingsBackText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  settingsHeaderLogo: { width: 60, height: 60, borderRadius: 30, marginBottom: 10 },
-  settingsHeaderTitle: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
-  settingsHeaderVersion: { color: '#fff', fontSize: 12, opacity: 0.8, marginTop: 4 },
-  settingsContent: { flex: 1, marginTop: -20 },
-  settingsCard: { backgroundColor: '#fff', margin: 15, borderRadius: 20, padding: 20, elevation: 2 },
-  darkCard: { backgroundColor: '#1e1e2e' },
-  settingsSectionTitle: { fontSize: 16, fontWeight: 'bold', color: '#666', marginBottom: 15 },
-  settingItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
-  settingItemLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  settingItemIcon: { fontSize: 18 },
-  settingItemLabel: { fontSize: 15, color: '#333' },
-  settingItemArrow: { fontSize: 16, color: '#ccc' },
-  offlineNote: { fontSize: 11, color: '#666', marginTop: 8, textAlign: 'center' },
-  languageSelector: { flexDirection: 'row', gap: 12, marginTop: 5 },
-  langSelectorBtn: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 12, backgroundColor: '#f0f0f0' },
-  activeLangSelector: { backgroundColor: '#002F66' },
-  langSelectorText: { fontSize: 14, color: '#666' },
-  activeLangSelectorText: { color: '#fff' },
-  detailHeader: { paddingTop: 50, paddingBottom: 20, paddingHorizontal: 20, borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
-  detailBackBtn: { alignSelf: 'flex-start' },
-  detailBackText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  detailCard: { backgroundColor: '#fff', margin: 15, borderRadius: 24, padding: 20, marginTop: -20, elevation: 4 },
-  detailImageWrapper: { alignItems: 'center', marginBottom: 15 },
-  detailImage: { width: '100%', height: 220, borderRadius: 20 },
-  detailImagePlaceholder: { width: '100%', height: 220, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  detailImagePlaceholderText: { fontSize: 70 },
-  detailName: { fontSize: 24, fontWeight: 'bold', color: '#333', textAlign: 'center', marginBottom: 5 },
-  detailCategory: { fontSize: 14, color: '#002F66', fontWeight: 'bold', textAlign: 'center', marginBottom: 15 },
-  detailInfoGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 },
-  detailInfoItem: { width: '50%', flexDirection: 'row', alignItems: 'center', paddingVertical: 8, gap: 8 },
-  detailIcon: { fontSize: 16 },
-  detailValue: { flex: 1, fontSize: 13, color: '#333', fontWeight: '500' },
-  buttonRow: { flexDirection: 'row', gap: 12, marginTop: 20 },
-  viewCVBtn: { flex: 1, backgroundColor: '#e0e0e0', paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
-  viewCVText: { fontWeight: 'bold', color: '#333' },
-  detailHireBtn: { flex: 1, borderRadius: 12, overflow: 'hidden' },
-  hireBtnGradientDetail: { paddingVertical: 14, alignItems: 'center' },
-  hireBtnTextDetail: { fontWeight: 'bold', color: '#fff', fontSize: 14 },
-  detailDownloadRow: { flexDirection: 'row', gap: 12, marginTop: 15 },
-  detailCvBtn: { flex: 1, backgroundColor: '#002F66', paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
-  detailProfileBtn: { flex: 1, backgroundColor: '#10b981', paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
-  detailDownloadText: { fontWeight: 'bold', color: '#fff', fontSize: 13 },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { marginTop: 10, color: '#666' },
-  emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
-  emptyIcon: { fontSize: 50, marginBottom: 10 },
-  emptyText: { fontSize: 16, color: '#999' },
-  darkTitle: { color: '#fff' },
-  darkText: { color: '#ccc' },
-  modalContainer: { flex: 1, backgroundColor: '#f5f7fa' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 50, paddingBottom: 15, paddingHorizontal: 20, borderBottomLeftRadius: 25, borderBottomRightRadius: 25 },
-  modalHeaderTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
-  modalCloseBtn: { padding: 8 },
-  modalCloseText: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
-  emptySavedContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 },
-  emptySavedIcon: { fontSize: 60, marginBottom: 20, opacity: 0.5 },
-  emptySavedText: { fontSize: 18, fontWeight: 'bold', color: '#666', textAlign: 'center', marginBottom: 8 },
-  emptySavedSubText: { fontSize: 14, color: '#999', textAlign: 'center' },
-  savedProfilesList: { padding: 15 },
-  savedProfileItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 16, padding: 12, marginBottom: 12, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2 },
-  savedProfileImage: { width: 50, height: 50, borderRadius: 25 },
-  savedProfileImagePlaceholder: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#e0e0e0', alignItems: 'center', justifyContent: 'center' },
-  savedProfileImagePlaceholderText: { fontSize: 24 },
-  savedProfileInfo: { flex: 1, marginLeft: 12 },
-  savedProfileName: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-  savedProfileCategory: { fontSize: 12, color: '#666', marginTop: 2 },
-  savedProfileDate: { fontSize: 10, color: '#999', marginTop: 2 },
-  savedProfileDelete: { padding: 8 },
-  savedProfileDeleteText: { fontSize: 18 },
-  profileViewer: { flex: 1 },
-  profileViewerBack: { padding: 15, paddingTop: 50 },
-  profileViewerBackText: { fontSize: 16, fontWeight: 'bold', color: '#002F66' },
-  profileViewerHeader: { alignItems: 'center', padding: 20 },
-  profileViewerImage: { width: 100, height: 100, borderRadius: 50, marginBottom: 12 },
-  profileViewerImagePlaceholder: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#e0e0e0', alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  profileViewerImagePlaceholderText: { fontSize: 40 },
-  profileViewerName: { fontSize: 22, fontWeight: 'bold', color: '#333', marginBottom: 4 },
-  profileViewerCategory: { fontSize: 14, color: '#002F66', marginBottom: 8 },
-  profileViewerContent: { backgroundColor: '#fff', margin: 15, borderRadius: 20, padding: 20, elevation: 2 },
-  profileViewerRow: { flexDirection: 'row', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
-  profileViewerLabel: { width: 100, fontSize: 14, fontWeight: '600', color: '#666' },
-  profileViewerValue: { flex: 1, fontSize: 14, color: '#333' },
-  profileViewerDivider: { height: 1, backgroundColor: '#e0e0e0', marginVertical: 12 },
-  profileViewerSavedDate: { fontSize: 11, color: '#999', textAlign: 'center', marginTop: 8 },
-  statusBadge: { color: '#10b981', fontWeight: 'bold' },
-});
