@@ -1346,7 +1346,7 @@ Please provide more details about this candidate.`;
                     <tr><th className="p-4 md:p-8">{t.trafficSource}</th><th className="p-4 md:p-8">{t.actionTaken}</th><th className="p-4 md:p-8 text-right">{t.timeLocal}</th></tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {leads.map((lead) => (<tr key={lead.id}><td className="p-4 md:p-8 text-[10px] md:text-xs font-bold">{lead.source}</td><td className="p-4 md:p-8 text-[10px] md:text-xs text-indigo-600 font-bold">{lead.action}</td><td className="p-4 md:p-8 text-right text-[8px] md:text-[10px] text-gray-400">{lead.time}</td></td>))}
+                    {leads.map((lead) => (<tr key={lead.id}><td className="p-4 md:p-8 text-[10px] md:text-xs font-bold">{lead.source}</td><td className="p-4 md:p-8 text-[10px] md:text-xs text-indigo-600 font-bold">{lead.action}</td><td className="p-4 md:p-8 text-right text-[8px] md:text-[10px] text-gray-400">{lead.time}</td></tr>))}
                   </tbody>
                 </table>
               </div>
