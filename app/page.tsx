@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface Talent {
   id: string;
@@ -19,6 +20,7 @@ interface Talent {
   pic: string;
   cv: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 interface Lead {
@@ -147,6 +149,9 @@ const translations = {
     adminSearch: 'Search Candidates...',
     searchByName: 'Search by name, job, or country',
     workerTypeColumn: 'Worker Type',
+    appComingSoon: '📱 Mobile App Coming Soon!',
+    appStore: 'App Store',
+    playStore: 'Play Store',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
@@ -218,6 +223,9 @@ const translations = {
     adminSearch: 'ابحث عن مرشحين...',
     searchByName: 'ابحث بالاسم أو الوظيفة أو البلد',
     workerTypeColumn: 'نوع العامل',
+    appComingSoon: '📱 قريباً تطبيق الجوال!',
+    appStore: 'متجر آبل',
+    playStore: 'متجر بلاي',
   }
 };
 
@@ -266,6 +274,8 @@ const ToastNotification = ({ toast, onClose }: { toast: Toast; onClose: (id: num
 export default function Home() {
   const [language, setLanguage] = useState<'en' | 'ar'>('en');
   const t = translations[language];
+  // ✅ FIX: Language selection required - start with null, only show after selection
+  const [languageSelected, setLanguageSelected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [talents, setTalents] = useState<Talent[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -349,10 +359,12 @@ export default function Home() {
     }
   }, [t]);
 
-  // ✅ FIX 1: Auto Refresh REMOVED - දැන් පටවන වෙලාවට වරක් විතරයි
+  // ✅ FIX: No auto refresh - only fetch once after language selected
   useEffect(() => {
-    fetchTalents();
-  }, [fetchTalents]);
+    if (languageSelected) {
+      fetchTalents();
+    }
+  }, [languageSelected, fetchTalents]);
 
   const loadLeads = () => {
     const stored = localStorage.getItem('zod_activity_leads');
@@ -380,7 +392,6 @@ export default function Home() {
     addToast('info', `Redirecting to WhatsApp for ${discountText}`, 'Special Offer');
   };
 
-  // ✅ FIX 4: Hire Click with CV Link
   const handleHireClick = (talent: Talent, source: string) => {
     const whatsappNumber = '97455355206';
     const cvLink = `${window.location.origin}/api/cv/${talent.id}`;
@@ -572,9 +583,10 @@ Please provide more details about this candidate.`;
   }, [chatMessages, chatOpen]);
 
   useEffect(() => {
-    const init = async () => { await fetchTalents(); loadLeads(); setTimeout(() => setIsLoading(false), 3000); };
-    init();
-  }, [fetchTalents]);
+    loadLeads();
+    // ✅ FIX: No auto-load, wait for language selection
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     const reveal = () => {
@@ -585,7 +597,7 @@ Please provide more details about this candidate.`;
     };
     window.addEventListener('scroll', reveal); reveal();
     return () => window.removeEventListener('scroll', reveal);
-  }, []);
+  }, [languageSelected]);
 
   const escapeHtml = (str: string) => str.replace(/[&<>]/g, (m) => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'));
 
@@ -595,7 +607,7 @@ Please provide more details about this candidate.`;
     return dateB - dateA;
   });
 
-  // ✅ FIX 2: Featured Talents with Returned Filter
+  // ✅ FIX: Returned filter working properly
   const featuredTalents = React.useMemo(() => {
     const latestTalents = [...sortedTalents].slice(0, 20);
     if (showReturnedOnly) {
@@ -605,7 +617,7 @@ Please provide more details about this candidate.`;
     return latestTalents.slice(0, 6);
   }, [sortedTalents, showReturnedOnly]);
   
-  // Hire Page Filter with Returned option
+  // Hire Page filter with Returned option
   const filteredTalents = talents.filter((tal) => {
     const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
     const matchCountry = !countryFilter || tal.country === countryFilter;
@@ -627,23 +639,40 @@ Please provide more details about this candidate.`;
   const isRTL = language === 'ar';
   const dir = isRTL ? 'rtl' : 'ltr';
 
-  if (isLoading) {
+  // ✅ FIX: Language selection screen (no timeout, user must select)
+  if (!languageSelected) {
     return (
       <div dir={dir} className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">
         <div className="text-center px-4">
-          <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-6 md:mb-8 object-cover shadow-lg animate-pulse" onError={(e) => (e.currentTarget.style.display = 'none')} />
-          <h1 className="text-3xl md:text-5xl font-bold text-[#002F66] mb-3 md:mb-4 animate-bounce">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
+          <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-6 md:mb-8 object-cover shadow-lg" onError={(e) => (e.currentTarget.style.display = 'none')} />
+          <h1 className="text-3xl md:text-5xl font-bold text-[#002F66] mb-3 md:mb-4">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
           <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8">{t.brandLoading}</p>
           <div className="flex gap-3 md:gap-4 justify-center flex-wrap">
-            <button onClick={() => setLanguage('en')} className={`px-4 md:px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${language === 'en' ? 'bg-[#002F66] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>English</button>
-            <button onClick={() => setLanguage('ar')} className={`px-4 md:px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${language === 'ar' ? 'bg-[#002F66] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>العربية</button>
+            <button 
+              onClick={() => {
+                setLanguage('en');
+                setLanguageSelected(true);
+              }} 
+              className="px-4 md:px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 bg-[#002F66] text-white shadow-md"
+            >
+              English
+            </button>
+            <button 
+              onClick={() => {
+                setLanguage('ar');
+                setLanguageSelected(true);
+              }} 
+              className="px-4 md:px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 bg-[#002F66] text-white shadow-md"
+            >
+              العربية
+            </button>
           </div>
-          <div className="mt-8 md:mt-12 w-10 h-10 md:w-12 md:h-12 border-4 border-[#002F66] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     );
   }
 
+  // After language selected, show main content
   return (
     <div dir={dir} className={isRTL ? 'rtl' : 'ltr'}>
       <style>{`
@@ -793,6 +822,32 @@ Please provide more details about this candidate.`;
 
       {!adminActive && (
         <div className="public-section">
+          {/* ✅ App Coming Soon Banner */}
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 px-4 text-center">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <i className="fa-solid fa-mobile-screen-button text-xl animate-pulse"></i>
+                <span className="font-bold text-sm md:text-base">{t.appComingSoon}</span>
+              </div>
+              <div className="flex gap-3">
+                <a 
+                  href="#" 
+                  onClick={(e) => { e.preventDefault(); handleExternalLink('#', 'AppStore'); }}
+                  className="bg-white/20 hover:bg-white/30 px-4 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-2"
+                >
+                  <i className="fa-brands fa-apple"></i> {t.appStore}
+                </a>
+                <a 
+                  href="#" 
+                  onClick={(e) => { e.preventDefault(); handleExternalLink('#', 'PlayStore'); }}
+                  className="bg-white/20 hover:bg-white/30 px-4 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-2"
+                >
+                  <i className="fa-brands fa-android"></i> {t.playStore}
+                </a>
+              </div>
+            </div>
+          </div>
+
           <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-20 md:pt-24 pb-2 md:pb-3 px-4 md:px-6">
             <div className="max-w-7xl mx-auto">
               <div className="overflow-hidden whitespace-nowrap">
@@ -925,7 +980,7 @@ Please provide more details about this candidate.`;
               </div>
             </div>
           ) : showHirePage ? (
-            // ✅ HIRE PAGE WITH RETURNED FILTER
+            // Hire Page with Returned Filter
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowHirePage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
@@ -940,7 +995,6 @@ Please provide more details about this candidate.`;
                       <option value="">{t.allCountries}</option>
                       {countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
-                    {/* ✅ FIX 3: Returned Filter Button on Hire Page */}
                     <label className="flex items-center gap-2 px-3 py-2 bg-white border rounded-xl cursor-pointer hover:bg-gray-50 transition-all">
                       <input 
                         type="checkbox" 
@@ -966,8 +1020,7 @@ Please provide more details about this candidate.`;
                           <span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
                         </div>
                         <div className="flex-grow">
-                          {/* ✅ FIX 5: Clickable Name Link */}
-                          <Link href={`/candidate/${talent.id}`}>
+                          <Link href={`/candidate/${talent.id}`} scroll={false}>
                             <h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight hover:text-[#002F66] cursor-pointer transition-colors">
                               {escapeHtml(talent.name)}
                             </h4>
@@ -1042,7 +1095,7 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
-              {/* ✅ FEATURED CANDIDATES SECTION WITH CLICKABLE NAMES AND RETURNED FILTER */}
+              {/* Featured Candidates Section with Fixed Filter */}
               <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-6 md:mb-8 flex-wrap gap-4">
@@ -1073,8 +1126,7 @@ Please provide more details about this candidate.`;
                             <span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
                           </div>
                           <div className="flex-grow">
-                            {/* ✅ FIX 5: Clickable Name Link */}
-                            <Link href={`/candidate/${talent.id}`}>
+                            <Link href={`/candidate/${talent.id}`} scroll={false}>
                               <h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight hover:text-[#002F66] cursor-pointer transition-colors">
                                 {escapeHtml(talent.name)}
                               </h4>
