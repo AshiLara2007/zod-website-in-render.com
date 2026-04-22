@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 interface Talent {
   id: string;
@@ -145,13 +144,13 @@ const translations = {
     candidateAdded: 'Candidate Added Successfully!', candidateUpdated: 'Candidate Updated Successfully!', candidateDeleted: 'Candidate Deleted Successfully!',
     errorOccurred: 'An error occurred', saving: 'Saving...', deleting: 'Deleting...',
     workerType: 'Worker Type', recruitmentWorkers: 'Recruitment Workers', returnedHousemaidsType: 'Returned Housemaids',
-    showReturnedOnly: 'Show Returned Housemaids Only',
     adminSearch: 'Search Candidates...',
     searchByName: 'Search by name, job, or country',
     workerTypeColumn: 'Worker Type',
-    appComingSoon: '📱 Mobile App Coming Soon!',
+    appComingSoon: 'Mobile App Coming Soon',
+    comingSoonMsg: 'Our mobile app is coming soon! Stay tuned.',
+    playStore: 'Google Play',
     appStore: 'App Store',
-    playStore: 'Play Store',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
@@ -219,13 +218,13 @@ const translations = {
     candidateAdded: 'تم إضافة المرشح بنجاح!', candidateUpdated: 'تم تحديث المرشح بنجاح!', candidateDeleted: 'تم حذف المرشح بنجاح!',
     errorOccurred: 'حدث خطأ', saving: 'جاري الحفظ...', deleting: 'جاري الحذف...',
     workerType: 'نوع العامل', recruitmentWorkers: 'عمال التوظيف', returnedHousemaidsType: 'خادمات عائدات',
-    showReturnedOnly: 'إظهار الخادمات العائدات فقط',
     adminSearch: 'ابحث عن مرشحين...',
     searchByName: 'ابحث بالاسم أو الوظيفة أو البلد',
     workerTypeColumn: 'نوع العامل',
-    appComingSoon: '📱 قريباً تطبيق الجوال!',
-    appStore: 'متجر آبل',
+    appComingSoon: 'تطبيق الجوال قريباً',
+    comingSoonMsg: 'تطبيقنا للجوال قادم قريباً! ترقبوا.',
     playStore: 'متجر بلاي',
+    appStore: 'متجر آبل',
   }
 };
 
@@ -274,7 +273,6 @@ const ToastNotification = ({ toast, onClose }: { toast: Toast; onClose: (id: num
 export default function Home() {
   const [language, setLanguage] = useState<'en' | 'ar'>('en');
   const t = translations[language];
-  // ✅ FIX: Language selection required - start with null, only show after selection
   const [languageSelected, setLanguageSelected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [talents, setTalents] = useState<Talent[]>([]);
@@ -297,7 +295,6 @@ export default function Home() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showReturnedOnly, setShowReturnedOnly] = useState(false);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -359,7 +356,6 @@ export default function Home() {
     }
   }, [t]);
 
-  // ✅ FIX: No auto refresh - only fetch once after language selected
   useEffect(() => {
     if (languageSelected) {
       fetchTalents();
@@ -584,7 +580,6 @@ Please provide more details about this candidate.`;
 
   useEffect(() => {
     loadLeads();
-    // ✅ FIX: No auto-load, wait for language selection
     setIsLoading(false);
   }, []);
 
@@ -607,22 +602,14 @@ Please provide more details about this candidate.`;
     return dateB - dateA;
   });
 
-  // ✅ FIX: Returned filter working properly
-  const featuredTalents = React.useMemo(() => {
-    const latestTalents = [...sortedTalents].slice(0, 20);
-    if (showReturnedOnly) {
-      const returnedOnly = latestTalents.filter(t => t.workerType === 'Returned Housemaids');
-      return returnedOnly.slice(0, 6);
-    }
-    return latestTalents.slice(0, 6);
-  }, [sortedTalents, showReturnedOnly]);
+  // ✅ Removed Returned filter - now showing all candidates
+  const featuredTalents = sortedTalents.slice(0, 6);
   
-  // Hire Page filter with Returned option
+  // Hire Page filter - without returned filter
   const filteredTalents = talents.filter((tal) => {
     const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
     const matchCountry = !countryFilter || tal.country === countryFilter;
-    const matchReturned = !showReturnedOnly || tal.workerType === 'Returned Housemaids';
-    return matchSearch && matchCountry && matchReturned;
+    return matchSearch && matchCountry;
   });
 
   const adminFilteredTalents = talents.filter((tal) => {
@@ -639,7 +626,7 @@ Please provide more details about this candidate.`;
   const isRTL = language === 'ar';
   const dir = isRTL ? 'rtl' : 'ltr';
 
-  // ✅ FIX: Language selection screen (no timeout, user must select)
+  // Language selection screen
   if (!languageSelected) {
     return (
       <div dir={dir} className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">
@@ -672,7 +659,7 @@ Please provide more details about this candidate.`;
     );
   }
 
-  // After language selected, show main content
+  // Main content after language selection
   return (
     <div dir={dir} className={isRTL ? 'rtl' : 'ltr'}>
       <style>{`
@@ -710,18 +697,25 @@ Please provide more details about this candidate.`;
         .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
         .faq-item.active .fa-plus { transform: rotate(45deg); }
         
-        @media (max-width: 768px) {
+        /* Responsive improvements */
+        @media (max-width: 640px) {
           .container-padding { padding-left: 1rem; padding-right: 1rem; }
-          .text-responsive-hero { font-size: 2rem !important; }
-          .text-responsive-title { font-size: 1.5rem !important; }
+          .text-responsive-hero { font-size: 1.8rem !important; }
+          .text-responsive-title { font-size: 1.3rem !important; }
           .grid-responsive { grid-template-columns: 1fr !important; gap: 1rem !important; }
-          .nav-text { font-size: 0.7rem !important; }
-          .discount-text { font-size: 0.75rem !important; }
-          .discount-padding { padding: 0.5rem 1rem !important; }
+          .nav-text { font-size: 0.65rem !important; }
+          .discount-text { font-size: 0.7rem !important; }
+          .discount-padding { padding: 0.4rem 0.8rem !important; }
+          .app-buttons { flex-direction: column; width: 100%; }
+          .app-buttons a { width: 100%; justify-content: center; }
         }
         
-        @media (max-width: 1024px) and (min-width: 769px) {
+        @media (min-width: 641px) and (max-width: 1024px) {
           .grid-responsive-tablet { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        
+        @media (min-width: 1025px) {
+          .grid-responsive-desktop { grid-template-columns: repeat(3, 1fr) !important; }
         }
       `}</style>
 
@@ -822,32 +816,7 @@ Please provide more details about this candidate.`;
 
       {!adminActive && (
         <div className="public-section">
-          {/* ✅ App Coming Soon Banner */}
-          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 px-4 text-center">
-            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <i className="fa-solid fa-mobile-screen-button text-xl animate-pulse"></i>
-                <span className="font-bold text-sm md:text-base">{t.appComingSoon}</span>
-              </div>
-              <div className="flex gap-3">
-                <a 
-                  href="#" 
-                  onClick={(e) => { e.preventDefault(); handleExternalLink('#', 'AppStore'); }}
-                  className="bg-white/20 hover:bg-white/30 px-4 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-2"
-                >
-                  <i className="fa-brands fa-apple"></i> {t.appStore}
-                </a>
-                <a 
-                  href="#" 
-                  onClick={(e) => { e.preventDefault(); handleExternalLink('#', 'PlayStore'); }}
-                  className="bg-white/20 hover:bg-white/30 px-4 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-2"
-                >
-                  <i className="fa-brands fa-android"></i> {t.playStore}
-                </a>
-              </div>
-            </div>
-          </div>
-
+          {/* Discount Marquee */}
           <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-20 md:pt-24 pb-2 md:pb-3 px-4 md:px-6">
             <div className="max-w-7xl mx-auto">
               <div className="overflow-hidden whitespace-nowrap">
@@ -878,6 +847,7 @@ Please provide more details about this candidate.`;
             </div>
           </div>
 
+          {/* Navigation */}
           <nav className="fixed w-full z-50 glass-nav" style={{ top: '0' }}>
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
               <div className="flex items-center space-x-2 md:space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); window.scrollTo(0, 0); }}>
@@ -897,6 +867,7 @@ Please provide more details about this candidate.`;
             </div>
           </nav>
 
+          {/* Mobile Sidebar */}
           <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
             <div className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fa-solid fa-xmark text-[#002F66]"></i></div>
             <div className="sidebar-nav mt-8">
@@ -912,6 +883,7 @@ Please provide more details about this candidate.`;
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
           {showOurTeamPage ? (
+            // Our Team Page (same as before, omitted for brevity - keep existing)
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowOurTeamPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
@@ -960,6 +932,7 @@ Please provide more details about this candidate.`;
               </div>
             </div>
           ) : showAboutPage ? (
+            // About Page (same as before)
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowAboutPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
@@ -980,7 +953,7 @@ Please provide more details about this candidate.`;
               </div>
             </div>
           ) : showHirePage ? (
-            // Hire Page with Returned Filter
+            // Hire Page - without returned filter button
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowHirePage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
@@ -995,15 +968,6 @@ Please provide more details about this candidate.`;
                       <option value="">{t.allCountries}</option>
                       {countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
-                    <label className="flex items-center gap-2 px-3 py-2 bg-white border rounded-xl cursor-pointer hover:bg-gray-50 transition-all">
-                      <input 
-                        type="checkbox" 
-                        checked={showReturnedOnly} 
-                        onChange={(e) => setShowReturnedOnly(e.target.checked)}
-                        className="w-4 h-4 text-[#002F66] rounded"
-                      />
-                      <span className="text-xs font-medium text-gray-700 whitespace-nowrap">{t.showReturnedOnly}</span>
-                    </label>
                     <button onClick={fetchTalents} className="px-4 md:px-5 py-3 md:py-4 bg-gray-200 rounded-xl md:rounded-2xl hover:bg-gray-300 transition-all hover:scale-105" title={t.refresh}><i className="fa-solid fa-rotate-right text-xs md:text-sm"></i></button>
                   </div>
                 </div>
@@ -1046,7 +1010,9 @@ Please provide more details about this candidate.`;
               </div>
             </div>
           ) : (
+            // Home Page Content
             <>
+              {/* Hero Section */}
               <section id="home" className="relative pt-24 md:pt-32 pb-16 md:pb-32 px-4 md:px-6 qatar-gradient text-white overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[20rem] md:text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center relative z-10">
@@ -1084,6 +1050,7 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
+              {/* Stats Section */}
               <section className="py-12 md:py-16 bg-white border-b reveal">
                 <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
                   {[{ num: '9.2K', label: t.successfulPlacements }, { num: '1.8K+', label: t.corporateClients }, { num: '24h', label: t.responseTime }, { num: '98.2%', label: t.complianceRate }].map((s, i) => (
@@ -1095,23 +1062,14 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
-              {/* Featured Candidates Section with Fixed Filter */}
+              {/* Featured Candidates Section - WITHOUT Returned Filter Button */}
               <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-6 md:mb-8 flex-wrap gap-4">
                     <h3 className="text-xl md:text-2xl font-bold text-slate-900">{t.featuredCandidates}</h3>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input 
-                          type="checkbox" 
-                          checked={showReturnedOnly} 
-                          onChange={(e) => setShowReturnedOnly(e.target.checked)}
-                          className="w-4 h-4 text-[#002F66] rounded border-gray-300 focus:ring-[#002F66]"
-                        />
-                        <span className="text-xs md:text-sm font-medium text-gray-700">{t.showReturnedOnly}</span>
-                      </label>
-                      <button onClick={() => setShowHirePage(true)} className="text-[#002F66] font-bold text-xs md:text-sm hover:underline transition-all flex items-center gap-1">{t.viewAllCandidates}</button>
-                    </div>
+                    <button onClick={() => setShowHirePage(true)} className="text-[#002F66] font-bold text-xs md:text-sm hover:underline transition-all flex items-center gap-1">
+                      {t.viewAllCandidates} <i className="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
                   </div>
                   {loading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>
@@ -1151,6 +1109,7 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
+              {/* About Section */}
               <section id="about" className="py-16 md:py-24 px-4 md:px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center">
                   <div className="relative group">
@@ -1169,6 +1128,7 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
+              {/* Services Section */}
               <section id="services" className="py-16 md:py-24 px-4 md:px-6 bg-gray-50 reveal">
                 <div className="max-w-7xl mx-auto text-center mb-12 md:mb-20"><h2 className="text-sm font-bold text-red-800 uppercase tracking-[0.3em] mb-4">{t.ourExpertise}</h2><h3 className="text-2xl md:text-4xl font-bold text-slate-900">{t.comprehensiveSolutions}</h3></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6 md:gap-8">
@@ -1182,6 +1142,7 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
+              {/* Location Section */}
               <section className="py-12 md:py-16 px-4 md:px-6 bg-white reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="text-center mb-6 md:mb-8">
@@ -1203,6 +1164,7 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
+              {/* Testimonials */}
               <section className="py-16 md:py-20 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">{t.whatClientsSay}</h3>
@@ -1218,6 +1180,7 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
+              {/* FAQ */}
               <section className="py-16 md:py-20 bg-white px-4 md:px-6 reveal">
                 <div className="max-w-5xl mx-auto">
                   <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">{t.faqTitle}</h3>
@@ -1232,6 +1195,36 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
+              {/* ✅ NEW: App Coming Soon Banner with Store Icons */}
+              <section className="py-10 md:py-12 bg-gradient-to-r from-purple-600 to-indigo-600 text-white reveal">
+                <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <i className="fa-solid fa-mobile-screen-button text-2xl md:text-3xl animate-pulse"></i>
+                      <h3 className="text-xl md:text-2xl font-bold">{t.appComingSoon}</h3>
+                    </div>
+                    <p className="text-purple-100 text-sm md:text-base">{t.comingSoonMsg}</p>
+                    <div className="flex flex-wrap gap-4 justify-center app-buttons">
+                      <button 
+                        onClick={() => addToast('info', 'App coming soon! Will be available on Play Store.', 'Coming Soon')}
+                        className="flex items-center gap-2 bg-black/30 hover:bg-black/40 px-5 py-2.5 rounded-full transition-all duration-300 hover:scale-105"
+                      >
+                        <i className="fa-brands fa-android text-lg"></i>
+                        <span className="font-semibold text-sm">{t.playStore}</span>
+                      </button>
+                      <button 
+                        onClick={() => addToast('info', 'App coming soon! Will be available on App Store.', 'Coming Soon')}
+                        className="flex items-center gap-2 bg-black/30 hover:bg-black/40 px-5 py-2.5 rounded-full transition-all duration-300 hover:scale-105"
+                      >
+                        <i className="fa-brands fa-apple text-lg"></i>
+                        <span className="font-semibold text-sm">{t.appStore}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Footer */}
               <footer className="py-16 md:py-20 bg-slate-900 text-white px-4 md:px-6">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 md:gap-12 border-b border-white/5 pb-12 md:pb-16">
                   <div className="col-span-2">
@@ -1353,7 +1346,7 @@ Please provide more details about this candidate.`;
                     <tr><th className="p-4 md:p-8">{t.trafficSource}</th><th className="p-4 md:p-8">{t.actionTaken}</th><th className="p-4 md:p-8 text-right">{t.timeLocal}</th></tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {leads.map((lead) => (<tr key={lead.id}><td className="p-4 md:p-8 text-[10px] md:text-xs font-bold">{lead.source}</td><td className="p-4 md:p-8 text-[10px] md:text-xs text-indigo-600 font-bold">{lead.action}</td><td className="p-4 md:p-8 text-right text-[8px] md:text-[10px] text-gray-400">{lead.time}</td></tr>))}
+                    {leads.map((lead) => (<tr key={lead.id}><td className="p-4 md:p-8 text-[10px] md:text-xs font-bold">{lead.source}</td><td className="p-4 md:p-8 text-[10px] md:text-xs text-indigo-600 font-bold">{lead.action}</td><td className="p-4 md:p-8 text-right text-[8px] md:text-[10px] text-gray-400">{lead.time}</td></td>))}
                   </tbody>
                 </table>
               </div>
