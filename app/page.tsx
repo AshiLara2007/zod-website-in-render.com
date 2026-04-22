@@ -348,11 +348,10 @@ export default function Home() {
     }
   }, [t]);
 
-  useEffect(() => {
-    if (!adminActive && !showHirePage) return;
-    const interval = setInterval(() => { fetchTalents(); }, 5000);
-    return () => clearInterval(interval);
-  }, [adminActive, showHirePage, fetchTalents]);
+// NEW CODE - මේක දාන්න (Auto Refresh නැතුව)
+useEffect(() => {
+  fetchTalents();
+}, []); // මේක පටවන වෙලාවට වරක් විතරයි fetch වෙන්නේ
 
   const loadLeads = () => {
     const stored = localStorage.getItem('zod_activity_leads');
@@ -1186,6 +1185,16 @@ export default function Home() {
                   placeholder={t.adminSearch}
                   className="w-full p-4 pl-12 bg-white border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-sm"
                 />
+                // Search bar buttons තියෙන div එක ඇතුලට මේක දාන්න (country filter button එකට පස්සේ)
+<label className="flex items-center gap-2 px-3 py-2 bg-white border rounded-xl cursor-pointer hover:bg-gray-50 transition-all">
+  <input 
+    type="checkbox" 
+    checked={showReturnedOnly} 
+    onChange={(e) => setShowReturnedOnly(e.target.checked)}
+    className="w-4 h-4 text-[#002F66] rounded"
+  />
+  <span className="text-xs font-medium text-gray-700 whitespace-nowrap">{t.showReturnedOnly}</span>
+</label>
               </div>
               <p className="text-xs text-gray-400 mt-2 ml-2">{t.searchByName}</p>
             </div>
