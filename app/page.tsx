@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface Talent {
   id: string;
@@ -277,6 +278,7 @@ const ToastNotification = ({ toast, onClose }: { toast: Toast; onClose: (id: num
 };
 
 export default function Home() {
+  const router = useRouter();
   const [language, setLanguage] = useState<'en' | 'ar'>('en');
   const t = translations[language];
   const [languageSelected, setLanguageSelected] = useState(false);
@@ -301,7 +303,7 @@ export default function Home() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showReturnedOnly, setShowReturnedOnly] = useState(false); // Only used in Hire page
+  const [showReturnedOnly, setShowReturnedOnly] = useState(false);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -387,7 +389,6 @@ export default function Home() {
     if (confirm(t.clearLogs)) { setLeads([]); localStorage.setItem('zod_activity_leads', '[]'); addToast('info', 'Logs cleared successfully'); }
   };
 
-  // Admin function: Clear all CVs
   const clearAllCVs = async () => {
     if (!confirm(t.confirmClearCVs)) return;
     try {
@@ -625,10 +626,8 @@ Please provide more details about this candidate.`;
     return dateB - dateA;
   });
 
-  // Featured candidates (no filter)
   const featuredTalents = sortedTalents.slice(0, 6);
   
-  // Hire Page filter with Returned filter option
   const filteredTalents = talents.filter((tal) => {
     const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
     const matchCountry = !countryFilter || tal.country === countryFilter;
@@ -650,21 +649,23 @@ Please provide more details about this candidate.`;
   const isRTL = language === 'ar';
   const dir = isRTL ? 'rtl' : 'ltr';
 
-  // Language selection screen
   if (!languageSelected) {
     return (
-      <div dir={dir} className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">
-        <div className="text-center px-4">
-          <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-6 md:mb-8 object-cover shadow-lg animate-pulse" onError={(e) => (e.currentTarget.style.display = 'none')} />
-          <h1 className="text-3xl md:text-5xl font-bold text-[#002F66] mb-3 md:mb-4 animate-bounce">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
-          <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8">{t.brandLoading}</p>
+      <div dir={dir} className="fixed inset-0 bg-gradient-to-br from-[#002F66] to-[#001a3a] z-[200] flex flex-col items-center justify-center">
+        <div className="text-center px-4 animate-fade-in-up">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full bg-white/20 blur-xl animate-pulse"></div>
+            <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-6 md:mb-8 object-cover shadow-2xl relative z-10 animate-float" onError={(e) => (e.currentTarget.style.display = 'none')} />
+          </div>
+          <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 md:mb-4 animate-bounce">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
+          <p className="text-lg md:text-2xl text-white/80 mb-6 md:mb-8">{t.brandLoading}</p>
           <div className="flex gap-3 md:gap-4 justify-center flex-wrap">
             <button 
               onClick={() => {
                 setLanguage('en');
                 setLanguageSelected(true);
               }} 
-              className="px-4 md:px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 bg-[#002F66] text-white shadow-md"
+              className="px-6 md:px-8 py-2.5 md:py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-110 bg-white text-[#002F66] shadow-xl hover:shadow-2xl"
             >
               English
             </button>
@@ -673,7 +674,7 @@ Please provide more details about this candidate.`;
                 setLanguage('ar');
                 setLanguageSelected(true);
               }} 
-              className="px-4 md:px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 bg-[#002F66] text-white shadow-md"
+              className="px-6 md:px-8 py-2.5 md:py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-110 bg-white text-[#002F66] shadow-xl hover:shadow-2xl"
             >
               العربية
             </button>
@@ -683,7 +684,6 @@ Please provide more details about this candidate.`;
     );
   }
 
-  // Main content after language selection
   return (
     <div dir={dir} className={isRTL ? 'rtl' : 'ltr'}>
       <style>{`
@@ -697,12 +697,18 @@ Please provide more details about this candidate.`;
         .animate-spin-slow { animation: spin-slow 20s linear infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         .animate-float { animation: float 3s ease-in-out infinite; }
+        @keyframes float-slow { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
         @keyframes shimmer { 0% { transform: translateX(-100%) skewX(-12deg); } 100% { transform: translateX(200%) skewX(-12deg); } }
         .animate-shimmer { animation: shimmer 2s infinite; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .animate-slide-in-right { animation: slideInRight 0.3s ease-out; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
         .animate-shake { animation: shake 0.3s ease-in-out; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
+        @keyframes glowPulse { 0%, 100% { box-shadow: 0 0 5px rgba(0,47,102,0.3); } 50% { box-shadow: 0 0 20px rgba(0,47,102,0.6); } }
+        .glow-pulse { animation: glowPulse 2s infinite; }
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
         .reveal.active { opacity: 1; transform: translateY(0); }
         .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05); }
@@ -720,8 +726,11 @@ Please provide more details about this candidate.`;
         .sidebar-overlay.active { opacity: 1; visibility: visible; }
         .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
         .faq-item.active .fa-plus { transform: rotate(45deg); }
+        .web3-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
+        .web3-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(0,47,102,0.5); transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .gradient-border { position: relative; background: linear-gradient(135deg, #002F66, #0040aa, #002F66); background-size: 200% 200%; animation: gradientShift 3s ease infinite; }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         
-        /* Responsive improvements */
         @media (max-width: 640px) {
           .container-padding { padding-left: 1rem; padding-right: 1rem; }
           .text-responsive-hero { font-size: 1.8rem !important; }
@@ -751,8 +760,8 @@ Please provide more details about this candidate.`;
 
       <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[100] flex flex-col items-end gap-3">
         {chatOpen && (
-          <div className="w-72 sm:w-80 md:w-96 bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '480px' }}>
-            <div className="bg-[#002F66] px-4 py-3 md:px-5 md:py-4 flex items-center justify-between">
+          <div className="w-72 sm:w-80 md:w-96 bg-white/90 backdrop-blur-xl rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-fade-in-up">
+            <div className="bg-gradient-to-r from-[#002F66] to-[#0040aa] px-4 py-3 md:px-5 md:py-4 flex items-center justify-between">
               <div className="flex items-center gap-2 md:gap-3">
                 <div className="w-8 h-8 md:w-9 md:h-9 bg-white/20 rounded-full flex items-center justify-center"><i className="fa-solid fa-robot text-white text-xs md:text-sm"></i></div>
                 <div><div className="text-white font-bold text-xs md:text-sm">ZOD AI Assistant</div></div>
@@ -796,13 +805,13 @@ Please provide more details about this candidate.`;
             )}
           </div>
         )}
-        <button onClick={() => setChatOpen(!chatOpen)} className="w-12 h-12 md:w-14 md:h-14 bg-[#002F66] text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-[#002060] active:scale-95">
+        <button onClick={() => setChatOpen(!chatOpen)} className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-r from-[#002F66] to-[#0040aa] text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,47,102,0.5)] active:scale-95">
           {chatOpen ? <i className="fa-solid fa-xmark text-lg md:text-xl"></i> : <i className="fa-regular fa-message text-lg md:text-xl"></i>}
         </button>
       </div>
 
       {loginModalOpen && (
-        <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center backdrop-blur-sm p-4">
+        <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center backdrop-blur-sm p-4 animate-fade-in-up">
           <div className="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] w-full max-w-md shadow-2xl relative border border-gray-100">
             <button onClick={() => setLoginModalOpen(false)} className="absolute top-4 right-4 md:top-6 md:right-6 text-gray-400 hover:text-black transition-transform hover:rotate-90"><i className="fa-solid fa-circle-xmark text-xl md:text-2xl"></i></button>
             <div className="text-center mb-6 md:mb-8">
@@ -820,7 +829,7 @@ Please provide more details about this candidate.`;
       )}
 
       {deleteModalOpen && (
-        <div className="fixed inset-0 bg-black/70 z-[150] flex items-center justify-center backdrop-blur-sm p-4">
+        <div className="fixed inset-0 bg-black/70 z-[150] flex items-center justify-center backdrop-blur-sm p-4 animate-fade-in-up">
           <div className="bg-white p-6 md:p-8 rounded-xl md:rounded-2xl max-w-md w-full shadow-2xl">
             <div className="text-center">
               <div className="mx-auto flex items-center justify-center h-10 w-10 md:h-12 md:w-12 rounded-full bg-red-100 mb-3 md:mb-4 animate-pulse"><i className="fa-solid fa-trash-can text-red-600 text-lg md:text-xl"></i></div>
@@ -840,20 +849,11 @@ Please provide more details about this candidate.`;
 
       {!adminActive && (
         <div className="public-section">
-          {/* Discount Marquee */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-20 md:pt-24 pb-2 md:pb-3 px-4 md:px-6">
+          {/* Discount Marquee with Web3 style */}
+          <div className="relative overflow-hidden bg-gradient-to-r from-red-600 via-amber-500 to-red-600 pt-20 md:pt-24 pb-2 md:pb-3 px-4 md:px-6 gradient-border">
             <div className="max-w-7xl mx-auto">
               <div className="overflow-hidden whitespace-nowrap">
                 <div className={`inline-flex gap-4 md:gap-8 ${isRTL ? 'animate-marquee-rtl' : 'animate-marquee'}`}>
-                  <div onClick={() => handleDiscountClick('Welcome To ZOD MANPOWER')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
-                    <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount1}</span>
-                  </div>
-                  <div onClick={() => handleDiscountClick('Offers Will Be Coming Soon')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
-                    <span className="text-white font-bold text-xs md:text-base discount-text">🎉 {t.discount2}</span>
-                  </div>
-                  <div onClick={() => handleDiscountClick('Contact Us For Get More Informations')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
-                    <span className="text-white font-bold text-xs md:text-base discount-text">💎 {t.discount3}</span>
-                  </div>
                   <div onClick={() => handleDiscountClick('Welcome To ZOD MANPOWER')} className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 rounded-full cursor-pointer hover:bg-white/30 transition-all duration-300 mx-1 md:mx-2">
                     <span className="text-white font-bold text-xs md:text-base discount-text">✨ {t.discount1}</span>
                   </div>
@@ -876,7 +876,7 @@ Please provide more details about this candidate.`;
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
               <div className="flex items-center space-x-2 md:space-x-3 cursor-pointer group" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); window.scrollTo(0, 0); }}>
                 <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT Logo" className="w-8 h-8 md:w-12 md:h-12 rounded-xl object-cover shadow-lg transition-transform duration-300 group-hover:scale-110" />
-                <div className="text-sm md:text-2xl font-extrabold tracking-tighter uppercase">{t.brandName}</div>
+                <div className="text-sm md:text-2xl font-extrabold tracking-tighter uppercase bg-gradient-to-r from-[#002F66] to-[#0040aa] bg-clip-text text-transparent">{t.brandName}</div>
               </div>
               <div className="hidden lg:flex items-center space-x-4 md:space-x-8 font-semibold text-[10px] md:text-xs uppercase tracking-widest">
                 <a href="#home" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.home}</a>
@@ -884,14 +884,13 @@ Please provide more details about this candidate.`;
                 <a href="#services" onClick={() => { setShowHirePage(false); setShowOurTeamPage(false); setShowAboutPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.services}</a>
                 <button onClick={() => { setShowOurTeamPage(true); setShowHirePage(false); setShowAboutPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.ourTeam}</button>
                 <button onClick={() => { setShowHirePage(true); setShowOurTeamPage(false); setShowAboutPage(false); }} className="nav-link hover:text-[#002F66] transition-all duration-300">{t.hireNav}</button>
-                <a href="https://wa.me/97455355206" onClick={() => trackLead('Nav Apply', 'Global Apply')} target="_blank" className="bg-[#002F66] text-white px-4 md:px-6 py-2 md:py-2.5 rounded-full shadow-md hover:bg-[#002060] transition-all hover:scale-105 active:scale-95 text-[10px] md:text-xs">{t.contactUs}</a>
+                <a href="https://wa.me/97455355206" onClick={() => trackLead('Nav Apply', 'Global Apply')} target="_blank" className="bg-gradient-to-r from-[#002F66] to-[#0040aa] text-white px-4 md:px-6 py-2 md:py-2.5 rounded-full shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95 text-[10px] md:text-xs">{t.contactUs}</a>
                 <button onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')} className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-[#002F66] hover:bg-gray-200 transition-all"><i className="fa-solid fa-globe text-[8px] md:text-[10px]"></i><span>{language === 'en' ? 'العربية' : 'English'}</span></button>
               </div>
               <button className="lg:hidden text-xl md:text-2xl text-[#002F66]" onClick={() => setSidebarOpen(true)}><i className="fa-solid fa-bars-staggered"></i></button>
             </div>
           </nav>
 
-          {/* Mobile Sidebar */}
           <div className={`mobile-sidebar ${sidebarOpen ? 'active' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
             <div className="sidebar-close" onClick={() => setSidebarOpen(false)}><i className="fa-solid fa-xmark text-[#002F66]"></i></div>
             <div className="sidebar-nav mt-8">
@@ -975,10 +974,11 @@ Please provide more details about this candidate.`;
               </div>
             </div>
           ) : showHirePage ? (
-            // Hire Page with Returned Filter checkbox (only here)
+            // Hire Page with Returned Filter
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
-                <button onClick={() => setShowHirePage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
+                {/* Fixed back button - uses router.back() to preserve state */}
+                <button onClick={() => router.back()} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
                 <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-10 gap-4 md:gap-6">
                   <div><h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-2">{t.hireTitle}</h3><p className="text-gray-500 text-sm md:text-base">{t.hireDesc}</p></div>
                   <div className="flex gap-2 md:gap-3 w-full md:w-auto flex-wrap">
@@ -990,7 +990,6 @@ Please provide more details about this candidate.`;
                       <option value="">{t.allCountries}</option>
                       {countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
-                    {/* ✅ Returned filter checkbox - only on Hire page */}
                     <label className="flex items-center gap-2 px-3 py-2 bg-white border rounded-xl cursor-pointer hover:bg-gray-50 transition-all">
                       <input 
                         type="checkbox" 
@@ -1010,7 +1009,7 @@ Please provide more details about this candidate.`;
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                     {filteredTalents.map((talent) => (
-                      <div key={talent.id} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
+                      <div key={talent.id} className="web3-card bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
                         <div className="flex justify-between items-start mb-4 md:mb-6">
                           <img src={talent.pic} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
                           <span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
@@ -1042,15 +1041,18 @@ Please provide more details about this candidate.`;
               </div>
             </div>
           ) : (
-            // Home Page Content (Featured section - NO returned filter)
+            // Home Page Content (Web3 style)
             <>
-              {/* Hero Section */}
+              {/* Hero Section with 3D effect */}
               <section id="home" className="relative pt-24 md:pt-32 pb-16 md:pb-32 px-4 md:px-6 qatar-gradient text-white overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[20rem] md:text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
+                <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+                  <i className="fa-solid fa-globe text-[20rem] md:text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i>
+                </div>
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-16 items-center relative z-10">
-                  <div className="space-y-6 md:space-y-8 fade-in">
+                  <div className="space-y-6 md:space-y-8 animate-fade-in-up">
                     <span className="inline-block px-3 md:px-4 py-1 md:py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-widest border border-white/20 animate-pulse">{t.certified}</span>
-                    <h1 className="text-3xl md:text-7xl font-bold leading-[1.1] animate-slide-up">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
+                    <h1 className="text-3xl md:text-7xl font-bold leading-[1.1]">{t.heroTitle} <span className="text-amber-400">{t.heroTitleSpan}</span> {t.heroTitleEnd}</h1>
                     <p className="text-sm md:text-lg opacity-80 leading-relaxed max-w-lg">{t.heroDesc}</p>
                     <div className="flex flex-wrap gap-3 md:gap-4 justify-center md:justify-start">
                       <button onClick={() => handleQuickHire('House Maid')} className="group relative overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-white shadow-lg hover:scale-105 transition-all duration-300 hover:bg-white hover:text-[#002F66]">
@@ -1094,13 +1096,13 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
-              {/* Featured Candidates Section - WITHOUT Returned Filter */}
+              {/* Featured Candidates Section - Web3 Cards */}
               <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-6 md:mb-8 flex-wrap gap-4">
                     <h3 className="text-xl md:text-2xl font-bold text-slate-900">{t.featuredCandidates}</h3>
-                    <button onClick={() => setShowHirePage(true)} className="text-[#002F66] font-bold text-xs md:text-sm hover:underline transition-all flex items-center gap-1">
-                      {t.viewAllCandidates} <i className="fa-solid fa-arrow-right text-[10px]"></i>
+                    <button onClick={() => setShowHirePage(true)} className="text-[#002F66] font-bold text-xs md:text-sm hover:underline transition-all flex items-center gap-1 group">
+                      {t.viewAllCandidates} <i className="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
                     </button>
                   </div>
                   {loading ? (
@@ -1110,7 +1112,7 @@ Please provide more details about this candidate.`;
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                       {featuredTalents.map((talent) => (
-                        <div key={talent.id} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
+                        <div key={talent.id} className="web3-card bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full">
                           <div className="flex justify-between items-start mb-4 md:mb-6">
                             <img src={talent.pic} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} />
                             <span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
@@ -1227,8 +1229,8 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
-              {/* App Coming Soon Banner */}
-              <section className="py-10 md:py-12 bg-gradient-to-r from-purple-600 to-indigo-600 text-white reveal">
+              {/* App Coming Soon Banner with Web3 style */}
+              <section className="py-10 md:py-12 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 text-white reveal animate-gradient">
                 <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
                   <div className="flex flex-col items-center gap-4">
                     <div className="flex items-center gap-3">
