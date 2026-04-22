@@ -144,6 +144,7 @@ const translations = {
     candidateAdded: 'Candidate Added Successfully!', candidateUpdated: 'Candidate Updated Successfully!', candidateDeleted: 'Candidate Deleted Successfully!',
     errorOccurred: 'An error occurred', saving: 'Saving...', deleting: 'Deleting...',
     workerType: 'Worker Type', recruitmentWorkers: 'Recruitment Workers', returnedHousemaidsType: 'Returned Housemaids',
+    showReturnedOnly: 'Show Returned Housemaids Only',
     adminSearch: 'Search Candidates...',
     searchByName: 'Search by name, job, or country',
     workerTypeColumn: 'Worker Type',
@@ -151,6 +152,8 @@ const translations = {
     comingSoonMsg: 'Our mobile app is coming soon! Stay tuned.',
     playStore: 'Google Play',
     appStore: 'App Store',
+    clearAllCVs: 'Clear All CVs',
+    confirmClearCVs: 'Are you sure? This will remove all CV links from all candidates.',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
@@ -218,6 +221,7 @@ const translations = {
     candidateAdded: 'تم إضافة المرشح بنجاح!', candidateUpdated: 'تم تحديث المرشح بنجاح!', candidateDeleted: 'تم حذف المرشح بنجاح!',
     errorOccurred: 'حدث خطأ', saving: 'جاري الحفظ...', deleting: 'جاري الحذف...',
     workerType: 'نوع العامل', recruitmentWorkers: 'عمال التوظيف', returnedHousemaidsType: 'خادمات عائدات',
+    showReturnedOnly: 'إظهار الخادمات العائدات فقط',
     adminSearch: 'ابحث عن مرشحين...',
     searchByName: 'ابحث بالاسم أو الوظيفة أو البلد',
     workerTypeColumn: 'نوع العامل',
@@ -225,6 +229,8 @@ const translations = {
     comingSoonMsg: 'تطبيقنا للجوال قادم قريباً! ترقبوا.',
     playStore: 'متجر بلاي',
     appStore: 'متجر آبل',
+    clearAllCVs: 'مسح جميع السير الذاتية',
+    confirmClearCVs: 'هل أنت متأكد؟ سيؤدي هذا إلى إزالة جميع روابط السيرة الذاتية من جميع المرشحين.',
   }
 };
 
@@ -295,6 +301,7 @@ export default function Home() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showReturnedOnly, setShowReturnedOnly] = useState(false); // Only used in Hire page
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -378,6 +385,22 @@ export default function Home() {
 
   const clearLeads = () => {
     if (confirm(t.clearLogs)) { setLeads([]); localStorage.setItem('zod_activity_leads', '[]'); addToast('info', 'Logs cleared successfully'); }
+  };
+
+  // Admin function: Clear all CVs
+  const clearAllCVs = async () => {
+    if (!confirm(t.confirmClearCVs)) return;
+    try {
+      const res = await fetch('/api/talents/clear-cvs', { method: 'POST' });
+      if (res.ok) {
+        await fetchTalents();
+        addToast('success', 'All CVs cleared successfully!', 'CV Clear');
+      } else {
+        addToast('error', 'Failed to clear CVs', 'Error');
+      }
+    } catch {
+      addToast('error', 'Network error', 'Error');
+    }
   };
 
   const handleDiscountClick = (discountText: string) => {
@@ -602,14 +625,15 @@ Please provide more details about this candidate.`;
     return dateB - dateA;
   });
 
-  // ✅ Removed Returned filter - now showing all candidates
+  // Featured candidates (no filter)
   const featuredTalents = sortedTalents.slice(0, 6);
   
-  // Hire Page filter - without returned filter
+  // Hire Page filter with Returned filter option
   const filteredTalents = talents.filter((tal) => {
     const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
     const matchCountry = !countryFilter || tal.country === countryFilter;
-    return matchSearch && matchCountry;
+    const matchReturned = !showReturnedOnly || tal.workerType === 'Returned Housemaids';
+    return matchSearch && matchCountry && matchReturned;
   });
 
   const adminFilteredTalents = talents.filter((tal) => {
@@ -631,8 +655,8 @@ Please provide more details about this candidate.`;
     return (
       <div dir={dir} className="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">
         <div className="text-center px-4">
-          <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-6 md:mb-8 object-cover shadow-lg" onError={(e) => (e.currentTarget.style.display = 'none')} />
-          <h1 className="text-3xl md:text-5xl font-bold text-[#002F66] mb-3 md:mb-4">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
+          <img src="/logo/logo.jpeg" alt="ZOD MANPOWER RECRUITMENT" className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-6 md:mb-8 object-cover shadow-lg animate-pulse" onError={(e) => (e.currentTarget.style.display = 'none')} />
+          <h1 className="text-3xl md:text-5xl font-bold text-[#002F66] mb-3 md:mb-4 animate-bounce">{language === 'en' ? 'Welcome To Doha' : 'مرحباً بكم في الدوحة'}</h1>
           <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8">{t.brandLoading}</p>
           <div className="flex gap-3 md:gap-4 justify-center flex-wrap">
             <button 
@@ -883,7 +907,6 @@ Please provide more details about this candidate.`;
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
 
           {showOurTeamPage ? (
-            // Our Team Page (same as before, omitted for brevity - keep existing)
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowOurTeamPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
@@ -932,7 +955,6 @@ Please provide more details about this candidate.`;
               </div>
             </div>
           ) : showAboutPage ? (
-            // About Page (same as before)
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowAboutPage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
@@ -953,7 +975,7 @@ Please provide more details about this candidate.`;
               </div>
             </div>
           ) : showHirePage ? (
-            // Hire Page - without returned filter button
+            // Hire Page with Returned Filter checkbox (only here)
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowHirePage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
@@ -968,6 +990,16 @@ Please provide more details about this candidate.`;
                       <option value="">{t.allCountries}</option>
                       {countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
+                    {/* ✅ Returned filter checkbox - only on Hire page */}
+                    <label className="flex items-center gap-2 px-3 py-2 bg-white border rounded-xl cursor-pointer hover:bg-gray-50 transition-all">
+                      <input 
+                        type="checkbox" 
+                        checked={showReturnedOnly} 
+                        onChange={(e) => setShowReturnedOnly(e.target.checked)}
+                        className="w-4 h-4 text-[#002F66] rounded"
+                      />
+                      <span className="text-xs font-medium text-gray-700 whitespace-nowrap">{t.showReturnedOnly}</span>
+                    </label>
                     <button onClick={fetchTalents} className="px-4 md:px-5 py-3 md:py-4 bg-gray-200 rounded-xl md:rounded-2xl hover:bg-gray-300 transition-all hover:scale-105" title={t.refresh}><i className="fa-solid fa-rotate-right text-xs md:text-sm"></i></button>
                   </div>
                 </div>
@@ -1010,7 +1042,7 @@ Please provide more details about this candidate.`;
               </div>
             </div>
           ) : (
-            // Home Page Content
+            // Home Page Content (Featured section - NO returned filter)
             <>
               {/* Hero Section */}
               <section id="home" className="relative pt-24 md:pt-32 pb-16 md:pb-32 px-4 md:px-6 qatar-gradient text-white overflow-hidden">
@@ -1062,7 +1094,7 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
-              {/* Featured Candidates Section - WITHOUT Returned Filter Button */}
+              {/* Featured Candidates Section - WITHOUT Returned Filter */}
               <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-6 md:mb-8 flex-wrap gap-4">
@@ -1195,7 +1227,7 @@ Please provide more details about this candidate.`;
                 </div>
               </section>
 
-              {/* ✅ NEW: App Coming Soon Banner with Store Icons */}
+              {/* App Coming Soon Banner */}
               <section className="py-10 md:py-12 bg-gradient-to-r from-purple-600 to-indigo-600 text-white reveal">
                 <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
                   <div className="flex flex-col items-center gap-4">
@@ -1250,7 +1282,12 @@ Please provide more details about this candidate.`;
           <nav className="bg-white border-b px-4 md:px-6 py-3 md:py-4 mb-6 md:mb-10 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
               <div className="flex items-center space-x-2 md:space-x-3"><div className="w-6 h-6 md:w-8 md:h-8 bg-[#002F66] rounded-lg flex items-center justify-center text-white"><i className="fa-solid fa-gears text-[8px] md:text-[10px]"></i></div><span className="font-bold text-xs md:text-sm tracking-widest uppercase text-slate-900">{t.staffPortal}</span></div>
-              <button onClick={() => setAdminActive(false)} className="bg-red-600 text-white px-4 md:px-6 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[8px] md:text-[10px] font-bold uppercase tracking-widest shadow-lg hover:bg-red-700 transition-all duration-300 hover:scale-105">{t.logout}</button>
+              <div className="flex gap-2">
+                <button onClick={clearAllCVs} className="bg-orange-600 hover:bg-orange-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-300 hover:scale-105">
+                  <i className="fa-solid fa-trash-alt mr-1"></i> {t.clearAllCVs}
+                </button>
+                <button onClick={() => setAdminActive(false)} className="bg-red-600 text-white px-4 md:px-6 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[8px] md:text-[10px] font-bold uppercase tracking-widest shadow-lg hover:bg-red-700 transition-all duration-300 hover:scale-105">{t.logout}</button>
+              </div>
             </div>
           </nav>
           <div className="max-w-7xl mx-auto px-4 md:px-6">
