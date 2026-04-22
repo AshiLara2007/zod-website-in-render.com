@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import Link from 'next/link';
 
 interface Talent {
   id: string;
@@ -348,10 +349,10 @@ export default function Home() {
     }
   }, [t]);
 
-// NEW CODE - මේක දාන්න (Auto Refresh නැතුව)
-useEffect(() => {
-  fetchTalents();
-}, []); // මේක පටවන වෙලාවට වරක් විතරයි fetch වෙන්නේ
+  // ✅ FIX 1: Auto Refresh REMOVED - දැන් පටවන වෙලාවට වරක් විතරයි
+  useEffect(() => {
+    fetchTalents();
+  }, [fetchTalents]);
 
   const loadLeads = () => {
     const stored = localStorage.getItem('zod_activity_leads');
@@ -379,12 +380,24 @@ useEffect(() => {
     addToast('info', `Redirecting to WhatsApp for ${discountText}`, 'Special Offer');
   };
 
-  const handleHireClick = (talentName: string, source: string) => {
+  // ✅ FIX 4: Hire Click with CV Link
+  const handleHireClick = (talent: Talent, source: string) => {
     const whatsappNumber = '97455355206';
-    const message = `Hi! I'm interested in hiring ${talentName}. Can you please provide more details?`;
+    const cvLink = `${window.location.origin}/api/cv/${talent.id}`;
+    const message = `Hi! I'm interested in hiring ${talent.name} (${talent.job}).
+
+📄 CV Link: ${cvLink}
+🌍 Country: ${talent.country}
+💰 Salary: ${talent.salary} QAR
+⭐ Experience: ${talent.experience}
+👤 Gender: ${talent.gender}, Age: ${talent.age}
+💍 Marital Status: ${talent.maritalStatus}
+
+Please provide more details about this candidate.`;
+    
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-    trackLead(source, `Hire: ${talentName}`);
-    addToast('success', `Inquiry sent for ${talentName}`, 'Application Started');
+    trackLead(source, `Hire: ${talent.name}`);
+    addToast('success', `Inquiry sent for ${talent.name} with CV link`, 'Application Started');
   };
 
   const handleExternalLink = (url: string, source: string) => {
@@ -582,15 +595,22 @@ useEffect(() => {
     return dateB - dateA;
   });
 
-  const featuredTalentsBase = sortedTalents.slice(0, 6);
-  const featuredTalents = showReturnedOnly 
-    ? featuredTalentsBase.filter((tal) => tal.workerType === 'Returned Housemaids')
-    : featuredTalentsBase;
+  // ✅ FIX 2: Featured Talents with Returned Filter
+  const featuredTalents = React.useMemo(() => {
+    const latestTalents = [...sortedTalents].slice(0, 20);
+    if (showReturnedOnly) {
+      const returnedOnly = latestTalents.filter(t => t.workerType === 'Returned Housemaids');
+      return returnedOnly.slice(0, 6);
+    }
+    return latestTalents.slice(0, 6);
+  }, [sortedTalents, showReturnedOnly]);
   
+  // Hire Page Filter with Returned option
   const filteredTalents = talents.filter((tal) => {
     const matchSearch = searchQuery === '' || tal.name.toLowerCase().includes(searchQuery.toLowerCase()) || tal.job.toLowerCase().includes(searchQuery.toLowerCase());
     const matchCountry = !countryFilter || tal.country === countryFilter;
-    return matchSearch && matchCountry;
+    const matchReturned = !showReturnedOnly || tal.workerType === 'Returned Housemaids';
+    return matchSearch && matchCountry && matchReturned;
   });
 
   const adminFilteredTalents = talents.filter((tal) => {
@@ -905,6 +925,7 @@ useEffect(() => {
               </div>
             </div>
           ) : showHirePage ? (
+            // ✅ HIRE PAGE WITH RETURNED FILTER
             <div className="min-h-screen pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto">
                 <button onClick={() => setShowHirePage(false)} className="flex items-center gap-2 text-[#002F66] font-bold text-xs md:text-sm mb-6 md:mb-8 hover:underline transition-all"><i className="fa-solid fa-arrow-left"></i> {t.backToHome}</button>
@@ -919,6 +940,16 @@ useEffect(() => {
                       <option value="">{t.allCountries}</option>
                       {countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
+                    {/* ✅ FIX 3: Returned Filter Button on Hire Page */}
+                    <label className="flex items-center gap-2 px-3 py-2 bg-white border rounded-xl cursor-pointer hover:bg-gray-50 transition-all">
+                      <input 
+                        type="checkbox" 
+                        checked={showReturnedOnly} 
+                        onChange={(e) => setShowReturnedOnly(e.target.checked)}
+                        className="w-4 h-4 text-[#002F66] rounded"
+                      />
+                      <span className="text-xs font-medium text-gray-700 whitespace-nowrap">{t.showReturnedOnly}</span>
+                    </label>
                     <button onClick={fetchTalents} className="px-4 md:px-5 py-3 md:py-4 bg-gray-200 rounded-xl md:rounded-2xl hover:bg-gray-300 transition-all hover:scale-105" title={t.refresh}><i className="fa-solid fa-rotate-right text-xs md:text-sm"></i></button>
                   </div>
                 </div>
@@ -935,7 +966,12 @@ useEffect(() => {
                           <span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
                         </div>
                         <div className="flex-grow">
-                          <h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight">{escapeHtml(talent.name)}</h4>
+                          {/* ✅ FIX 5: Clickable Name Link */}
+                          <Link href={`/candidate/${talent.id}`}>
+                            <h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight hover:text-[#002F66] cursor-pointer transition-colors">
+                              {escapeHtml(talent.name)}
+                            </h4>
+                          </Link>
                           <p className="text-[#002F66] font-bold text-[10px] md:text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
                           <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-100 space-y-2 md:space-y-3 mb-6 md:mb-8">
                             <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-4 md:w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
@@ -948,7 +984,7 @@ useEffect(() => {
                         </div>
                         <div className="flex gap-2 md:gap-3 mt-auto">
                           <a href={talent.cv} target="_blank" onClick={() => trackLead('Public CV', talent.name)} className="flex-1 py-2 md:py-4 bg-gray-100 text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
-                          <button onClick={() => handleHireClick(talent.name, 'Hire Talent')} className="flex-1 py-2 md:py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
+                          <button onClick={() => handleHireClick(talent, 'Hire Talent')} className="flex-1 py-2 md:py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
                         </div>
                       </div>
                     ))}
@@ -1006,6 +1042,7 @@ useEffect(() => {
                 </div>
               </section>
 
+              {/* ✅ FEATURED CANDIDATES SECTION WITH CLICKABLE NAMES AND RETURNED FILTER */}
               <section className="py-12 md:py-16 bg-gray-50 px-4 md:px-6 reveal">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex justify-between items-center mb-6 md:mb-8 flex-wrap gap-4">
@@ -1036,7 +1073,12 @@ useEffect(() => {
                             <span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span>
                           </div>
                           <div className="flex-grow">
-                            <h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight">{escapeHtml(talent.name)}</h4>
+                            {/* ✅ FIX 5: Clickable Name Link */}
+                            <Link href={`/candidate/${talent.id}`}>
+                              <h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight hover:text-[#002F66] cursor-pointer transition-colors">
+                                {escapeHtml(talent.name)}
+                              </h4>
+                            </Link>
                             <p className="text-[#002F66] font-bold text-[10px] md:text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p>
                             <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-100 space-y-2 md:space-y-3 mb-6 md:mb-8">
                               <div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-4 md:w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div>
@@ -1048,7 +1090,7 @@ useEffect(() => {
                           </div>
                           <div className="flex gap-2 md:gap-3 mt-auto">
                             <a href={talent.cv} target="_blank" onClick={() => trackLead('Featured CV', talent.name)} className="flex-1 py-2 md:py-4 bg-gray-100 text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase hover:bg-gray-200 transition-all">{t.viewCV}</a>
-                            <button onClick={() => handleHireClick(talent.name, 'Featured Hire')} className="flex-1 py-2 md:py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
+                            <button onClick={() => handleHireClick(talent, 'Featured Hire')} className="flex-1 py-2 md:py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase shadow-lg hover:bg-[#002060] transition-all">{t.hireBtn}</button>
                           </div>
                         </div>
                       ))}
@@ -1174,7 +1216,6 @@ useEffect(() => {
               <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center justify-center"><button onClick={fetchTalents} className="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold uppercase transition-all duration-300 hover:scale-105"><i className="fa-solid fa-rotate-right mr-1 md:mr-2"></i> {t.refresh}</button></div>
             </div>
 
-            {/* Admin Search Bar */}
             <div className="mb-6 md:mb-8">
               <div className="relative max-w-md">
                 <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
@@ -1185,16 +1226,6 @@ useEffect(() => {
                   placeholder={t.adminSearch}
                   className="w-full p-4 pl-12 bg-white border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-sm"
                 />
-                // Search bar buttons තියෙන div එක ඇතුලට මේක දාන්න (country filter button එකට පස්සේ)
-<label className="flex items-center gap-2 px-3 py-2 bg-white border rounded-xl cursor-pointer hover:bg-gray-50 transition-all">
-  <input 
-    type="checkbox" 
-    checked={showReturnedOnly} 
-    onChange={(e) => setShowReturnedOnly(e.target.checked)}
-    className="w-4 h-4 text-[#002F66] rounded"
-  />
-  <span className="text-xs font-medium text-gray-700 whitespace-nowrap">{t.showReturnedOnly}</span>
-</label>
               </div>
               <p className="text-xs text-gray-400 mt-2 ml-2">{t.searchByName}</p>
             </div>
