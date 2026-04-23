@@ -591,11 +591,13 @@ Please provide more details about this candidate.`;
     addToast('info', `Browsing ${category} candidates`, 'Category Selected');
   };
 
-  // Go back to previous page without reload
-  const handleGoBack = () => {
-    router.back();
-  };
-
+  // Go back to home page
+const handleGoBack = () => {
+  setShowHirePage(false);
+  setShowOurTeamPage(false);
+  setShowAboutPage(false);
+  window.scrollTo(0, 0);
+};
   const startChat = (lang: 'en' | 'ar') => {
     setChatLanguageSelected(lang);
     const welcomeMsg = lang === 'en'
