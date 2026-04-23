@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import JSZip from 'jszip';
 
 interface Talent {
   id: string;
@@ -155,6 +156,19 @@ const translations = {
     appStore: 'App Store',
     clearAllCVs: 'Clear All CVs',
     confirmClearCVs: 'Are you sure? This will remove all CV links from all candidates.',
+    downloadCVs: 'Download CVs (ZIP)',
+    selectCountry: 'Select Country',
+    selectJob: 'Select Job Title',
+    filterResults: 'Filter Results',
+    downloading: 'Downloading...',
+    noCandidatesFound: 'No candidates found for selected filters',
+    adminDashboard: 'Admin Dashboard',
+    totalCountries: 'Total Countries',
+    totalJobs: 'Total Jobs',
+    recentActivity: 'Recent Activity',
+    filterAndDownload: 'Filter & Download CVs',
+    downloadSelected: 'Download Selected CVs as ZIP',
+    backToPrevious: 'Back',
   },
   ar: {
     welcome: 'مرحباً بكم في الدوحة', brandLoading: 'زود مان باور للتوظيف',
@@ -232,6 +246,19 @@ const translations = {
     appStore: 'متجر آبل',
     clearAllCVs: 'مسح جميع السير الذاتية',
     confirmClearCVs: 'هل أنت متأكد؟ سيؤدي هذا إلى إزالة جميع روابط السيرة الذاتية من جميع المرشحين.',
+    downloadCVs: 'تحميل السير الذاتية (ZIP)',
+    selectCountry: 'اختر الدولة',
+    selectJob: 'اختر المسمى الوظيفي',
+    filterResults: 'تصفية النتائج',
+    downloading: 'جاري التحميل...',
+    noCandidatesFound: 'لم يتم العثور على مرشحين',
+    adminDashboard: 'لوحة تحكم المشرف',
+    totalCountries: 'إجمالي الدول',
+    totalJobs: 'إجمالي الوظائف',
+    recentActivity: 'النشاط الأخير',
+    filterAndDownload: 'تصفية وتحميل السير الذاتية',
+    downloadSelected: 'تحميل السير الذاتية المحددة كملف ZIP',
+    backToPrevious: 'رجوع',
   }
 };
 
@@ -287,7 +314,7 @@ export default function Home() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [adminActive, setAdminActive] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'candidates' | 'leads'>('candidates');
+  const [activeTab, setActiveTab] = useState<'candidates' | 'leads' | 'download'>('candidates');
   const [editTalent, setEditTalent] = useState<Talent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
@@ -304,6 +331,13 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showReturnedOnly, setShowReturnedOnly] = useState(false);
+
+  // Download filter states
+  const [downloadCountry, setDownloadCountry] = useState<string>('');
+  const [downloadJob, setDownloadJob] = useState<string>('');
+  const [filteredDownloadResults, setFilteredDownloadResults] = useState<Talent[]>([]);
+  const [showFilterResults, setShowFilterResults] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -643,6 +677,72 @@ Please provide more details about this candidate.`;
     return matchSearch;
   });
 
+  // Filter for download
+  const handleApplyFilter = () => {
+    let filtered = [...talents];
+    if (downloadCountry) {
+      filtered = filtered.filter(t => t.country === downloadCountry);
+    }
+    if (downloadJob) {
+      filtered = filtered.filter(t => t.job === downloadJob);
+    }
+    setFilteredDownloadResults(filtered);
+    setShowFilterResults(true);
+    if (filtered.length === 0) {
+      addToast('warning', t.noCandidatesFound, 'Filter Results');
+    } else {
+      addToast('success', `Found ${filtered.length} candidate(s)`, 'Filter Applied');
+    }
+  };
+
+  const handleDownloadZIP = async () => {
+    if (filteredDownloadResults.length === 0) {
+      addToast('error', t.noCandidatesFound, 'Download Failed');
+      return;
+    }
+
+    setIsDownloading(true);
+    const zip = new JSZip();
+
+    try {
+      for (const candidate of filteredDownloadResults) {
+        if (candidate.cv) {
+          try {
+            const response = await fetch(candidate.cv);
+            const blob = await response.blob();
+            const extension = candidate.cv.split('.').pop() || 'pdf';
+            const fileName = `${candidate.name.replace(/[^a-zA-Z0-9]/g, '_')}_${candidate.country}_${candidate.job}.${extension}`;
+            zip.file(fileName, blob);
+          } catch (err) {
+            console.error(`Failed to download CV for ${candidate.name}:`, err);
+          }
+        }
+      }
+
+      const date = new Date();
+      const formattedDate = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
+      const zipFileName = `${downloadCountry || 'AllCountries'}_${downloadJob || 'AllJobs'}_${formattedDate}.zip`;
+      
+      const content = await zip.generateAsync({ type: 'blob' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(content);
+      link.href = url;
+      link.download = zipFileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      addToast('success', `Downloaded ${filteredDownloadResults.length} CV(s) as ZIP`, 'Download Complete');
+      trackLead('Admin', `Downloaded ZIP: ${zipFileName}`);
+    } catch (error) {
+      console.error('ZIP creation failed:', error);
+      addToast('error', 'Failed to create ZIP file', 'Download Failed');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const topManagementTeam = teamMembers.filter(member => member.isTopManagement);
   const regularTeam = teamMembers.filter(member => !member.isTopManagement);
 
@@ -858,7 +958,7 @@ Please provide more details about this candidate.`;
                 <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-10 gap-4 md:gap-6"><div><h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-2">{t.hireTitle}</h3><p className="text-gray-500 text-sm md:text-base">{t.hireDesc}</p></div><div className="flex gap-2 md:gap-3 w-full md:w-auto flex-wrap"><div className="relative flex-1 min-w-[150px] md:min-w-[180px]"><input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t.searchPlaceholder} className="w-full p-3 md:p-4 pl-8 md:pl-12 bg-white border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] text-sm md:text-base" /><i className="fa-solid fa-magnifying-glass absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-sm"></i></div><select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="p-3 md:p-4 bg-white border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] text-xs md:text-sm font-bold text-gray-700"><option value="">{t.allCountries}</option>{countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}</select><label className="flex items-center gap-2 px-3 py-2 bg-white border rounded-xl cursor-pointer hover:bg-gray-50 transition"><input type="checkbox" checked={showReturnedOnly} onChange={(e) => setShowReturnedOnly(e.target.checked)} className="w-4 h-4 text-[#002F66] rounded" /><span className="text-xs font-medium text-gray-700 whitespace-nowrap">{t.showReturnedOnly}</span></label><button onClick={fetchTalents} className="px-4 md:px-5 py-3 md:py-4 bg-gray-200 rounded-xl md:rounded-2xl hover:bg-gray-300 transition hover:scale-105" title={t.refresh}><i className="fa-solid fa-rotate-right text-xs md:text-sm"></i></button></div></div>
                 {loading ? (<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>) : filteredTalents.length === 0 ? (<div className="text-center py-16 md:py-24 text-gray-400"><i className="fa-solid fa-user-slash text-4xl md:text-5xl mb-4 block"></i><p className="font-bold text-sm md:text-base">No candidates found. Try a different search or country filter.</p></div>) : (<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{filteredTalents.map((talent) => (<div key={talent.id} className="web3-card bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full"><div className="flex justify-between items-start mb-4 md:mb-6"><img src={talent.pic} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} /><span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span></div><div className="flex-grow"><Link href={`/candidate/${talent.id}`}><h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight hover:text-[#002F66] cursor-pointer transition-colors">{escapeHtml(talent.name)}</h4></Link><p className="text-[#002F66] font-bold text-[10px] md:text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p><div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t space-y-2 md:space-y-3 mb-6 md:mb-8"><div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-4 md:w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div><div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-4 md:w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div><div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-4 md:w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div><div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-4 md:w-5 text-[#002F66]"></i><span>{talent.experience || '2-5 Years'} Exp</span></div><div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-heart w-4 md:w-5 text-[#002F66]"></i><span>{talent.maritalStatus || 'Single'}</span></div><div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-tag w-4 md:w-5 text-[#002F66]"></i><span>{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</span></div></div></div><div className="flex gap-2 md:gap-3 mt-auto"><a href={talent.cv} target="_blank" onClick={() => trackLead('Public CV', talent.name)} className="flex-1 py-2 md:py-4 bg-gray-100 text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase hover:bg-gray-200 transition">{t.viewCV}</a><button onClick={() => handleHireClick(talent, 'Hire Talent')} className="flex-1 py-2 md:py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase shadow-lg hover:bg-[#002060] transition">{t.hireBtn}</button></div></div>))}</div>)}</div></div>
           ) : (
-            // HOME PAGE - Web3 Style
+            // HOME PAGE
             <>
               <section id="home" className="relative pt-24 md:pt-32 pb-16 md:pb-32 px-4 md:px-6 qatar-gradient text-white overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[20rem] md:text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
@@ -889,12 +989,115 @@ Please provide more details about this candidate.`;
           )}
         </div>
       ) : (
-        // Admin Panel (unchanged functionality)
+        // Admin Panel with NEW Download Tab and Top Stats Page
         <div className="admin-section min-h-screen bg-gray-50 pb-16 md:pb-20">
-          <nav className="bg-white border-b px-4 md:px-6 py-3 md:py-4 mb-6 md:mb-10 sticky top-0 z-50"><div className="max-w-7xl mx-auto flex justify-between items-center"><div className="flex items-center space-x-2 md:space-x-3"><div className="w-6 h-6 md:w-8 md:h-8 bg-[#002F66] rounded-lg flex items-center justify-center text-white"><i className="fa-solid fa-gears text-[8px] md:text-[10px]"></i></div><span className="font-bold text-xs md:text-sm tracking-widest uppercase text-slate-900">{t.staffPortal}</span></div><div className="flex gap-2"><button onClick={clearAllCVs} className="bg-orange-600 hover:bg-orange-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-300 hover:scale-105"><i className="fa-solid fa-trash-alt mr-1"></i> {t.clearAllCVs}</button><button onClick={() => setAdminActive(false)} className="bg-red-600 text-white px-4 md:px-6 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[8px] md:text-[10px] font-bold uppercase tracking-widest shadow-lg hover:bg-red-700 transition-all duration-300 hover:scale-105">{t.logout}</button></div></div></nav>
-          <div className="max-w-7xl mx-auto px-4 md:px-6"><div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-10"><div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border shadow-sm hover:shadow-md transition"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.totalCandidates}</p><div className="text-2xl md:text-4xl font-bold text-slate-800">{talents.length}</div></div><div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border shadow-sm hover:shadow-md transition"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.webLeads}</p><div className="text-2xl md:text-4xl font-bold text-indigo-600">{leads.length}</div></div><div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border shadow-sm hover:shadow-md transition"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.activeVacancies}</p><div className="text-2xl md:text-4xl font-bold text-[#002F66]">0</div></div><div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border shadow-sm flex items-center justify-center"><button onClick={fetchTalents} className="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold uppercase transition-all duration-300 hover:scale-105"><i className="fa-solid fa-rotate-right mr-1 md:mr-2"></i> {t.refresh}</button></div></div><div className="mb-6 md:mb-8"><div className="relative max-w-md"><i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" value={adminSearchQuery} onChange={(e) => setAdminSearchQuery(e.target.value)} placeholder={t.adminSearch} className="w-full p-4 pl-12 bg-white border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] transition-all text-sm" /></div><p className="text-xs text-gray-400 mt-2 ml-2">{t.searchByName}</p></div><div className="flex space-x-4 md:space-x-6 mb-6 md:mb-8 border-b"><button onClick={() => setActiveTab('candidates')} className={`pb-3 md:pb-4 border-b-2 font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === 'candidates' ? 'border-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{t.inventoryManagement}</button><button onClick={() => setActiveTab('leads')} className={`pb-3 md:pb-4 border-b-2 font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 ${activeTab === 'leads' ? 'border-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{t.visitorLogs}</button></div>
-            {activeTab === 'candidates' && (<div className="grid lg:grid-cols-3 gap-6 md:gap-8"><div className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] border shadow-sm h-fit"><div className="flex justify-between items-center mb-6 md:mb-8 border-b pb-3 md:pb-4"><h4 className="font-bold uppercase text-[10px] md:text-xs text-[#002F66] tracking-widest">{editTalent ? `${t.editCandidate} ${editTalent.name}` : t.newCandidate}</h4><button onClick={resetForm} className="text-[8px] md:text-[10px] text-gray-400 hover:text-red-600 transition hover:rotate-12"><i className="fa-solid fa-rotate-left"></i></button></div><form onSubmit={handleSubmit} className="space-y-3 md:space-y-4"><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.fullName}</label><input ref={nameRef} type="text" className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition" required /></div><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.dob}</label><input ref={dobRef} type="date" onChange={handleDobChange} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition" required /></div>{calculatedAge !== null && (<div className="bg-blue-50 p-2 md:p-3 rounded-lg"><span className="text-[10px] md:text-xs font-bold text-blue-600">Age: {calculatedAge} years</span></div>)}<div className="grid grid-cols-2 gap-3 md:gap-4"><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.gender}</label><select ref={genderRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition"><option>Male</option><option>Female</option></select></div><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.maritalStatus}</label><select ref={maritalStatusRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition">{maritalStatusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div></div><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition">{jobOptions.map(job => <option key={job} value={job}>{job}</option>)}</select></div><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.country}</label><select ref={countryRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition">{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition"><option value="Muslim">Muslim</option><option value="Christian">Christian</option><option value="Hindu">Hindu</option><option value="Buddhist">Buddhist</option></select></div><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition" required /></div><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.experience}</label><select ref={experienceRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition">{experienceOptions.map(exp => <option key={exp} value={exp}>{exp}</option>)}</select></div><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.workerType}</label><select ref={workerTypeRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition">{workerTypeOptions.map(opt => <option key={opt} value={opt}>{opt === 'Recruitment Workers' ? t.recruitmentWorkers : t.returnedHousemaidsType}</option>)}</select></div><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.photo}</label><input ref={picRef} type="file" accept="image/*" className="text-[10px] md:text-xs" /></div><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.cvUpload}</label><input ref={cvRef} type="file" accept=".pdf,image/*" className="text-[10px] md:text-xs" /></div><button type="submit" disabled={isSubmitting} className="w-full py-3 md:py-4 bg-[#002F66] text-white rounded-lg md:rounded-xl font-bold uppercase text-[8px] md:text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105 disabled:opacity-50">{isSubmitting ? <i className="fa-solid fa-spinner fa-spin mr-2"></i> : null}{t.saveRecord}</button></form></div><div className="lg:col-span-2 bg-white rounded-[2rem] md:rounded-[3rem] border shadow-sm overflow-x-auto"><div className="overflow-x-auto"><table className="w-full text-left min-w-[800px]"><thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b"><tr><th className="p-4 md:p-6">{t.candidateDetails}</th><th className="p-4 md:p-6">{t.position}</th><th className="p-4 md:p-6">{t.salary}</th><th className="p-4 md:p-6">{t.workerTypeColumn}</th><th className="p-4 md:p-6 text-right">{t.actions}</th></tr></thead><tbody className="divide-y divide-gray-100">{adminFilteredTalents.map((talent) => (<tr key={talent.id} className="hover:bg-gray-50 transition-all duration-200"><td className="p-4 md:p-6"><div className="flex items-center space-x-2 md:space-x-3"><img src={talent.pic} className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-xs md:text-sm">{escapeHtml(talent.name)}</div><div className="text-[8px] md:text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div></div></div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</div></td><td className="p-4 md:p-6 text-right"><button onClick={() => editHandler(talent)} className="text-blue-500 p-1 md:p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen text-xs md:text-sm"></i></button><button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-1 md:p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash text-xs md:text-sm"></i></button></td></tr>))}</tbody></table></div></div></div>)}
-            {activeTab === 'leads' && (<div className="bg-white rounded-[2rem] md:rounded-[3rem] border shadow-sm overflow-x-auto"><div className="p-4 md:p-8 border-b flex justify-between items-center flex-wrap gap-2"><h4 className="font-bold text-[10px] md:text-xs uppercase tracking-widest text-indigo-600">{t.realtimeLogs}</h4><button onClick={clearLeads} className="text-[8px] md:text-[10px] font-bold text-red-500 uppercase hover:underline">{t.clearLogs}</button></div><table className="w-full text-left min-w-[400px]"><thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest"><tr><th className="p-4 md:p-8">{t.trafficSource}</th><th className="p-4 md:p-8">{t.actionTaken}</th><th className="p-4 md:p-8 text-right">{t.timeLocal}</th></tr></thead><tbody className="divide-y divide-gray-100">{leads.map((lead) => (<tr key={lead.id}><td className="p-4 md:p-8 text-[10px] md:text-xs font-bold">{lead.source}</td><td className="p-4 md:p-8 text-[10px] md:text-xs text-indigo-600 font-bold">{lead.action}</td><td className="p-4 md:p-8 text-right text-[8px] md:text-[10px] text-gray-400">{lead.time}</td></tr>))}</tbody></table></div>)}
+          {/* Admin Top Stats Dashboard */}
+          <div className="bg-gradient-to-r from-[#002F66] to-[#0040aa] text-white py-8 md:py-12 px-4 md:px-6 mb-6 md:mb-8">
+            <div className="max-w-7xl mx-auto">
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">{t.adminDashboard}</h2>
+              <p className="text-white/70 text-sm">Welcome back, Admin. Here's your recruitment overview.</p>
+            </div>
+          </div>
+
+          <nav className="bg-white border-b px-4 md:px-6 py-3 md:py-4 mb-6 md:mb-10 sticky top-0 z-50">
+            <div className="max-w-7xl mx-auto flex justify-between items-center flex-wrap gap-3">
+              <div className="flex items-center space-x-2 md:space-x-3">
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-[#002F66] rounded-lg flex items-center justify-center text-white"><i className="fa-solid fa-gears text-[8px] md:text-[10px]"></i></div>
+                <span className="font-bold text-xs md:text-sm tracking-widest uppercase text-slate-900">{t.staffPortal}</span>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <button onClick={() => setActiveTab('candidates')} className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-300 ${activeTab === 'candidates' ? 'bg-[#002F66] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><i className="fa-solid fa-users mr-1"></i> Candidates</button>
+                <button onClick={() => setActiveTab('download')} className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-300 ${activeTab === 'download' ? 'bg-[#002F66] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><i className="fa-solid fa-download mr-1"></i> {t.downloadCVs}</button>
+                <button onClick={() => setActiveTab('leads')} className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-300 ${activeTab === 'leads' ? 'bg-[#002F66] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}><i className="fa-solid fa-chart-line mr-1"></i> {t.visitorLogs}</button>
+                <button onClick={clearAllCVs} className="bg-orange-600 hover:bg-orange-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-300 hover:scale-105"><i className="fa-solid fa-trash-alt mr-1"></i> {t.clearAllCVs}</button>
+                <button onClick={() => setAdminActive(false)} className="bg-red-600 text-white px-4 md:px-6 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[8px] md:text-[10px] font-bold uppercase tracking-widest shadow-lg hover:bg-red-700 transition-all duration-300 hover:scale-105">{t.logout}</button>
+              </div>
+            </div>
+          </nav>
+
+          <div className="max-w-7xl mx-auto px-4 md:px-6">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-10">
+              <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border shadow-sm hover:shadow-md transition"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.totalCandidates}</p><div className="text-2xl md:text-4xl font-bold text-slate-800">{talents.length}</div></div>
+              <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border shadow-sm hover:shadow-md transition"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.webLeads}</p><div className="text-2xl md:text-4xl font-bold text-indigo-600">{leads.length}</div></div>
+              <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border shadow-sm hover:shadow-md transition"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.totalCountries}</p><div className="text-2xl md:text-4xl font-bold text-[#002F66]">{new Set(talents.map(t => t.country)).size}</div></div>
+              <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border shadow-sm hover:shadow-md transition"><p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 md:mb-2">{t.totalJobs}</p><div className="text-2xl md:text-4xl font-bold text-[#002F66]">{new Set(talents.map(t => t.job)).size}</div></div>
+            </div>
+
+            {activeTab === 'candidates' && (
+              <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
+                <div className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] border shadow-sm h-fit">
+                  <div className="flex justify-between items-center mb-6 md:mb-8 border-b pb-3 md:pb-4"><h4 className="font-bold uppercase text-[10px] md:text-xs text-[#002F66] tracking-widest">{editTalent ? `${t.editCandidate} ${editTalent.name}` : t.newCandidate}</h4><button onClick={resetForm} className="text-[8px] md:text-[10px] text-gray-400 hover:text-red-600 transition hover:rotate-12"><i className="fa-solid fa-rotate-left"></i></button></div>
+                  <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.fullName}</label><input ref={nameRef} type="text" className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition" required /></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.dob}</label><input ref={dobRef} type="date" onChange={handleDobChange} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition" required /></div>
+                    {calculatedAge !== null && (<div className="bg-blue-50 p-2 md:p-3 rounded-lg"><span className="text-[10px] md:text-xs font-bold text-blue-600">Age: {calculatedAge} years</span></div>)}
+                    <div className="grid grid-cols-2 gap-3 md:gap-4"><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.gender}</label><select ref={genderRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition"><option>Male</option><option>Female</option></select></div><div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.maritalStatus}</label><select ref={maritalStatusRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition">{maritalStatusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.jobDesignation}</label><select ref={jobRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition">{jobOptions.map(job => <option key={job} value={job}>{job}</option>)}</select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.country}</label><select ref={countryRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition">{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.religion}</label><select ref={religionRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition"><option value="Muslim">Muslim</option><option value="Christian">Christian</option><option value="Hindu">Hindu</option><option value="Buddhist">Buddhist</option></select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.salaryQAR}</label><input ref={salaryRef} type="number" defaultValue="0" step="100" className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition" required /></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.experience}</label><select ref={experienceRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition">{experienceOptions.map(exp => <option key={exp} value={exp}>{exp}</option>)}</select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1">{t.workerType}</label><select ref={workerTypeRef} className="w-full p-3 md:p-4 bg-gray-50 border rounded-lg md:rounded-xl outline-none focus:bg-white focus:border-[#002F66] transition">{workerTypeOptions.map(opt => <option key={opt} value={opt}>{opt === 'Recruitment Workers' ? t.recruitmentWorkers : t.returnedHousemaidsType}</option>)}</select></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.photo}</label><input ref={picRef} type="file" accept="image/*" className="text-[10px] md:text-xs" /></div>
+                    <div><label className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1 md:mb-2">{t.cvUpload}</label><input ref={cvRef} type="file" accept=".pdf,image/*" className="text-[10px] md:text-xs" /></div>
+                    <button type="submit" disabled={isSubmitting} className="w-full py-3 md:py-4 bg-[#002F66] text-white rounded-lg md:rounded-xl font-bold uppercase text-[8px] md:text-[10px] tracking-widest shadow-lg hover:bg-[#002060] transition-all duration-300 hover:scale-105 disabled:opacity-50">{isSubmitting ? <i className="fa-solid fa-spinner fa-spin mr-2"></i> : null}{t.saveRecord}</button>
+                  </form>
+                </div>
+                <div className="lg:col-span-2 bg-white rounded-[2rem] md:rounded-[3rem] border shadow-sm overflow-x-auto">
+                  <div className="p-4 md:p-6 border-b"><div className="relative max-w-md"><i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" value={adminSearchQuery} onChange={(e) => setAdminSearchQuery(e.target.value)} placeholder={t.adminSearch} className="w-full p-3 pl-12 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-[#002F66] text-sm" /></div></div>
+                  <div className="overflow-x-auto"><table className="w-full text-left min-w-[800px]"><thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b"><tr><th className="p-4 md:p-6">{t.candidateDetails}</th><th className="p-4 md:p-6">{t.position}</th><th className="p-4 md:p-6">{t.salary}</th><th className="p-4 md:p-6">{t.workerTypeColumn}</th><th className="p-4 md:p-6 text-right">{t.actions}</th></tr></thead><tbody className="divide-y divide-gray-100">{adminFilteredTalents.map((talent) => (<tr key={talent.id} className="hover:bg-gray-50 transition-all duration-200"><td className="p-4 md:p-6"><div className="flex items-center space-x-2 md:space-x-3"><img src={talent.pic} className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-xs md:text-sm">{escapeHtml(talent.name)}</div><div className="text-[8px] md:text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div></div></div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</div></td><td className="p-4 md:p-6 text-right"><button onClick={() => editHandler(talent)} className="text-blue-500 p-1 md:p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen text-xs md:text-sm"></i></button><button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-1 md:p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash text-xs md:text-sm"></i></button></td></tr>))}</tbody></table></div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'download' && (
+              <div className="bg-white rounded-[2rem] md:rounded-[3rem] border shadow-sm p-6 md:p-10">
+                <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-6">{t.filterAndDownload}</h3>
+                <div className="grid md:grid-cols-2 gap-6 mb-8">
+                  <div>
+                    <label className="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-2">{t.selectCountry}</label>
+                    <select value={downloadCountry} onChange={(e) => setDownloadCountry(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-[#002F66]">
+                      <option value="">All Countries</option>
+                      {countryOptions.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-2">{t.selectJob}</label>
+                    <select value={downloadJob} onChange={(e) => setDownloadJob(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-[#002F66]">
+                      <option value="">All Jobs</option>
+                      {jobOptions.map(j => <option key={j} value={j}>{j}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="flex gap-4 mb-8">
+                  <button onClick={handleApplyFilter} className="bg-[#002F66] text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-[#002060] transition-all hover:scale-105"><i className="fa-solid fa-filter mr-2"></i> {t.filterResults}</button>
+                  {showFilterResults && filteredDownloadResults.length > 0 && (
+                    <button onClick={handleDownloadZIP} disabled={isDownloading} className="bg-green-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-green-700 transition-all hover:scale-105 disabled:opacity-50"><i className={`fa-solid ${isDownloading ? 'fa-spinner fa-spin' : 'fa-download'} mr-2`}></i> {isDownloading ? t.downloading : t.downloadSelected} ({filteredDownloadResults.length})</button>
+                  )}
+                </div>
+                {showFilterResults && (
+                  <div className="border-t pt-6">
+                    <h4 className="font-bold text-slate-700 mb-4">Results ({filteredDownloadResults.length} candidates):</h4>
+                    <div className="max-h-96 overflow-y-auto space-y-2">
+                      {filteredDownloadResults.map(candidate => (
+                        <div key={candidate.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                          <div><span className="font-bold text-sm">{candidate.name}</span><span className="text-xs text-gray-500 ml-3">{candidate.country} - {candidate.job}</span></div>
+                          <a href={candidate.cv} target="_blank" className="text-[#002F66] text-sm hover:underline"><i className="fa-regular fa-file-pdf"></i> CV</a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'leads' && (
+              <div className="bg-white rounded-[2rem] md:rounded-[3rem] border shadow-sm overflow-x-auto">
+                <div className="p-4 md:p-8 border-b flex justify-between items-center flex-wrap gap-2"><h4 className="font-bold text-[10px] md:text-xs uppercase tracking-widest text-indigo-600">{t.realtimeLogs}</h4><button onClick={clearLeads} className="text-[8px] md:text-[10px] font-bold text-red-500 uppercase hover:underline">{t.clearLogs}</button></div>
+                <table className="w-full text-left min-w-[400px]"><thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest"><tr><th className="p-4 md:p-8">{t.trafficSource}</th><th className="p-4 md:p-8">{t.actionTaken}</th><th className="p-4 md:p-8 text-right">{t.timeLocal}</th></tr></thead><tbody className="divide-y divide-gray-100">{leads.map((lead) => (<tr key={lead.id}><td className="p-4 md:p-8 text-[10px] md:text-xs font-bold">{lead.source}</td><td className="p-4 md:p-8 text-[10px] md:text-xs text-indigo-600 font-bold">{lead.action}</td><td className="p-4 md:p-8 text-right text-[8px] md:text-[10px] text-gray-400">{lead.time}</td></tr>))}</tbody></table>
+              </div>
+            )}
           </div>
         </div>
       )}
