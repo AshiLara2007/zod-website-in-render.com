@@ -457,24 +457,55 @@ export default function Home() {
     addToast('info', `Redirecting to WhatsApp for ${discountText}`, 'Special Offer');
   };
 
+  // ========== MODIFIED HANDLE HIRE CLICK FUNCTION ==========
   const handleHireClick = (talent: Talent, source: string) => {
     const whatsappNumber = '97455355206';
-    const cvLink = `${window.location.origin}/api/cv/${talent.id}`;
-    const message = `Hi! I'm interested in hiring ${talent.name} (${talent.job}).
-
-📄 CV Link: ${cvLink}
-🌍 Country: ${talent.country}
-💰 Salary: ${talent.salary} QAR
-⭐ Experience: ${talent.experience}
-👤 Gender: ${talent.gender}, Age: ${talent.age}
-💍 Marital Status: ${talent.maritalStatus}
-
-Please provide more details about this candidate.`;
     
+    // Get CV URL (from Supabase storage - talent.cv contains the full URL)
+    const cvUrl = talent.cv || `${window.location.origin}/api/cv/${talent.id}`;
+    
+    // Website link
+    const websiteUrl = 'https://zodmanpower.info';
+    
+    // Build complete WhatsApp message with ALL candidate data
+    const message = `🏢 *ZOD MANPOWER RECRUITMENT - DOHA, QATAR*
+    
+👤 *CANDIDATE DETAILS:*
+─────────────────
+*Name:* ${talent.name}
+*Age:* ${talent.age} years
+*Gender:* ${talent.gender}
+*Marital Status:* ${talent.maritalStatus || 'Not specified'}
+*Religion:* ${talent.religion || 'Not specified'}
+
+💼 *JOB INFORMATION:*
+─────────────────
+*Position:* ${talent.job}
+*Country:* ${talent.country}
+*Experience:* ${talent.experience || 'Not specified'}
+*Salary:* ${talent.salary || 0} QAR
+*Worker Type:* ${talent.workerType || 'Recruitment Workers'}
+
+📄 *DOCUMENTS:*
+─────────────────
+*CV Link:* ${cvUrl}
+
+🌐 *WEBSITE:* ${websiteUrl}
+
+─────────────────
+📞 *Contact us:*
+*WhatsApp:* +974 5535 5206
+*Email:* info@zodmanpower.info
+
+✅ *Reply "HIRE ${talent.name.toUpperCase()}" to proceed*`;
+
+    // Open WhatsApp with formatted message
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-    trackLead(source, `Hire: ${talent.name}`);
-    addToast('success', `Inquiry sent for ${talent.name} with CV link`, 'Application Started');
+    
+    trackLead(source, `Hire: ${talent.name} (Full Details Sent)`);
+    addToast('success', `Complete details for ${talent.name} sent to WhatsApp`, 'Application Started');
   };
+  // ========== END OF MODIFIED FUNCTION ==========
 
   const handleExternalLink = (url: string, source: string) => {
     trackLead('External Link', source);
@@ -1110,7 +1141,7 @@ const handleGoBack = () => {
                 </div>
                 <div className="lg:col-span-2 bg-white rounded-[2rem] md:rounded-[3rem] border shadow-sm overflow-x-auto">
                   <div className="p-4 md:p-6 border-b"><div className="relative max-w-md"><i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" value={adminSearchQuery} onChange={(e) => setAdminSearchQuery(e.target.value)} placeholder={t.adminSearch} className="w-full p-3 pl-12 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-[#002F66] text-sm" /></div></div>
-                  <div className="overflow-x-auto"><table className="w-full text-left min-w-[800px]"><thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b"><tr><th className="p-4 md:p-6">{t.candidateDetails}</th><th className="p-4 md:p-6">{t.position}</th><th className="p-4 md:p-6">{t.salary}</th><th className="p-4 md:p-6">{t.workerTypeColumn}</th><th className="p-4 md:p-6 text-right">{t.actions}</th></tr></thead><tbody className="divide-y divide-gray-100">{adminFilteredTalents.map((talent) => (<tr key={talent.id} className="hover:bg-gray-50 transition-all duration-200"><td className="p-4 md:p-6"><div className="flex items-center space-x-2 md:space-x-3"><img src={talent.pic} className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-xs md:text-sm">{escapeHtml(talent.name)}</div><div className="text-[8px] md:text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div></div></div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</div></td><td className="p-4 md:p-6 text-right"><button onClick={() => editHandler(talent)} className="text-blue-500 p-1 md:p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen text-xs md:text-sm"></i></button><button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-1 md:p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash text-xs md:text-sm"></i></button></td></tr>))}</tbody></table></div>
+                  <div className="overflow-x-auto"><table className="w-full text-left min-w-[800px]"><thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b"><tr><th className="p-4 md:p-6">{t.candidateDetails}</th><th className="p-4 md:p-6">{t.position}</th><th className="p-4 md:p-6">{t.salary}</th><th className="p-4 md:p-6">{t.workerTypeColumn}</th><th className="p-4 md:p-6 text-right">{t.actions}</th></tr></thead><tbody className="divide-y divide-gray-100">{adminFilteredTalents.map((talent) => (<tr key={talent.id} className="hover:bg-gray-50 transition-all duration-200"><td className="p-4 md:p-6"><div className="flex items-center space-x-2 md:space-x-3"><img src={talent.pic} className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-xs md:text-sm">{escapeHtml(talent.name)}</div><div className="text-[8px] md:text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div></div></div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</div></td><td className="p-4 md:p-6 text-right"><button onClick={() => editHandler(talent)} className="text-blue-500 p-1 md:p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen text-xs md:text-sm"></i></button><button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-1 md:p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash text-xs md:text-sm"></i></button></td></tr>))}</tbody></tr></div>
                 </div>
               </div>
             )}
@@ -1166,7 +1197,7 @@ const handleGoBack = () => {
             {activeTab === 'leads' && (
               <div className="bg-white rounded-[2rem] md:rounded-[3rem] border shadow-sm overflow-x-auto">
                 <div className="p-4 md:p-8 border-b flex justify-between items-center flex-wrap gap-2"><h4 className="font-bold text-[10px] md:text-xs uppercase tracking-widest text-indigo-600">{t.realtimeLogs}</h4><button onClick={clearLeads} className="text-[8px] md:text-[10px] font-bold text-red-500 uppercase hover:underline">{t.clearLogs}</button></div>
-                <table className="w-full text-left min-w-[400px]"><thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest"><tr><th className="p-4 md:p-8">{t.trafficSource}</th><th className="p-4 md:p-8">{t.actionTaken}</th><th className="p-4 md:p-8 text-right">{t.timeLocal}</th></tr></thead><tbody className="divide-y divide-gray-100">{leads.map((lead) => (<tr key={lead.id}><td className="p-4 md:p-8 text-[10px] md:text-xs font-bold">{lead.source}</td><td className="p-4 md:p-8 text-[10px] md:text-xs text-indigo-600 font-bold">{lead.action}</td><td className="p-4 md:p-8 text-right text-[8px] md:text-[10px] text-gray-400">{lead.time}</td></tr>))}</tbody></table>
+                <table className="w-full text-left min-w-[400px]"><thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest"><table><th className="p-4 md:p-8">{t.trafficSource}</th><th className="p-4 md:p-8">{t.actionTaken}</th><th className="p-4 md:p-8 text-right">{t.timeLocal}</th></tr></thead><tbody className="divide-y divide-gray-100">{leads.map((lead) => (<tr key={lead.id}><td className="p-4 md:p-8 text-[10px] md:text-xs font-bold">{lead.source}</td><td className="p-4 md:p-8 text-[10px] md:text-xs text-indigo-600 font-bold">{lead.action}</td><td className="p-4 md:p-8 text-right text-[8px] md:text-[10px] text-gray-400">{lead.time}</td></tr>))}</tbody><td>
               </div>
             )}
           </div>
