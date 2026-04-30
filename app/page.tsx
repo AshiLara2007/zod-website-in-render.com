@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import JSZip from 'jszip';
 
+// ... (Your existing interfaces remain EXACTLY the same) ...
 interface Talent {
   id: string;
   name: string;
@@ -457,17 +458,12 @@ export default function Home() {
     addToast('info', `Redirecting to WhatsApp for ${discountText}`, 'Special Offer');
   };
 
-  // ========== MODIFIED HANDLE HIRE CLICK FUNCTION ==========
   const handleHireClick = (talent: Talent, source: string) => {
     const whatsappNumber = '97455355206';
     
-    // Get CV URL (from Supabase storage - talent.cv contains the full URL)
     const cvUrl = talent.cv || `${window.location.origin}/api/cv/${talent.id}`;
-    
-    // Website link
     const websiteUrl = 'https://zodmanpower.info';
     
-    // Build complete WhatsApp message with ALL candidate data
     const message = `🏢 *ZOD MANPOWER RECRUITMENT - DOHA, QATAR*
     
 👤 *CANDIDATE DETAILS:*
@@ -499,19 +495,43 @@ export default function Home() {
 
 ✅ *Reply "HIRE ${talent.name.toUpperCase()}" to proceed*`;
 
-    // Open WhatsApp with formatted message
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
     
     trackLead(source, `Hire: ${talent.name} (Full Details Sent)`);
     addToast('success', `Complete details for ${talent.name} sent to WhatsApp`, 'Application Started');
   };
-  // ========== END OF MODIFIED FUNCTION ==========
 
   const handleExternalLink = (url: string, source: string) => {
     trackLead('External Link', source);
     window.open(url, '_blank');
     addToast('info', `Redirecting to ${source}`, 'External Link');
   };
+
+  // ========== NEW: Send Push Notification to Mobile App ==========
+  const sendMobileNotification = async (candidateName: string, candidateJob: string, candidateCountry: string, candidateId: string) => {
+    try {
+      const response = await fetch('/api/send-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: '✨ New Candidate Available! ✨',
+          body: `${candidateName} (${candidateJob}) from ${candidateCountry} is now available for hiring!`,
+          candidate_name: candidateName,
+          candidate_id: candidateId
+        })
+      });
+      
+      if (response.ok) {
+        console.log('✅ Push notification sent to mobile app users');
+        addToast('success', `📱 Push notification sent to all app users!`, 'Notification Sent');
+      } else {
+        console.log('⚠️ Notification failed but candidate saved');
+      }
+    } catch (error) {
+      console.error('❌ Notification error:', error);
+    }
+  };
+  // ========== END OF NOTIFICATION FUNCTION ==========
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -531,9 +551,20 @@ export default function Home() {
     formData.append('workerType', workerTypeRef.current!.value);
     if (picRef.current?.files?.[0]) formData.append('tPic', picRef.current.files[0]);
     if (cvRef.current?.files?.[0]) formData.append('tCv', cvRef.current.files[0]);
+    
     try {
       const res = await fetch('/api/talents', { method: 'POST', body: formData });
       if (res.ok) { 
+        const data = await res.json();
+        const candidateId = data.id;
+        const candidateName = nameRef.current!.value;
+        const candidateJob = jobRef.current!.value;
+        const candidateCountry = countryRef.current!.value;
+        
+        // ========== SEND PUSH NOTIFICATION TO MOBILE APP ==========
+        await sendMobileNotification(candidateName, candidateJob, candidateCountry, candidateId);
+        // ========== END OF NOTIFICATION ==========
+        
         resetForm(); 
         await fetchTalents(); 
         addToast('success', editTalent ? t.candidateUpdated : t.candidateAdded, 'Success');
@@ -622,7 +653,6 @@ export default function Home() {
     addToast('info', `Browsing ${category} candidates`, 'Category Selected');
   };
 
-  // Go back to home page
   const handleGoBack = () => {
     setShowHirePage(false);
     setShowOurTeamPage(false);
@@ -727,25 +757,15 @@ export default function Home() {
     return matchSearch;
   });
 
-  // Filter for download with worker type
   const handleApplyFilter = () => {
     let filtered = [...talents];
-    if (downloadCountry) {
-      filtered = filtered.filter(t => t.country === downloadCountry);
-    }
-    if (downloadJob) {
-      filtered = filtered.filter(t => t.job === downloadJob);
-    }
-    if (downloadWorkerType) {
-      filtered = filtered.filter(t => t.workerType === downloadWorkerType);
-    }
+    if (downloadCountry) filtered = filtered.filter(t => t.country === downloadCountry);
+    if (downloadJob) filtered = filtered.filter(t => t.job === downloadJob);
+    if (downloadWorkerType) filtered = filtered.filter(t => t.workerType === downloadWorkerType);
     setFilteredDownloadResults(filtered);
     setShowFilterResults(true);
-    if (filtered.length === 0) {
-      addToast('warning', t.noCandidatesFound, 'Filter Results');
-    } else {
-      addToast('success', `Found ${filtered.length} candidate(s)`, 'Filter Applied');
-    }
+    if (filtered.length === 0) addToast('warning', t.noCandidatesFound, 'Filter Results');
+    else addToast('success', `Found ${filtered.length} candidate(s)`, 'Filter Applied');
   };
 
   const handleDownloadZIP = async () => {
@@ -1012,7 +1032,7 @@ export default function Home() {
                 <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-10 gap-4 md:gap-6"><div><h3 className="text-2xl md:text-4xl font-bold text-slate-900 mb-2">{t.hireTitle}</h3><p className="text-gray-500 text-sm md:text-base">{t.hireDesc}</p></div><div className="flex gap-2 md:gap-3 w-full md:w-auto flex-wrap"><div className="relative flex-1 min-w-[150px] md:min-w-[180px]"><input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t.searchPlaceholder} className="w-full p-3 md:p-4 pl-8 md:pl-12 bg-white border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] text-sm md:text-base" /><i className="fa-solid fa-magnifying-glass absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-sm"></i></div><select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="p-3 md:p-4 bg-white border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-[#002F66] text-xs md:text-sm font-bold text-gray-700"><option value="">{t.allCountries}</option>{countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}</select><label className="flex items-center gap-2 px-3 py-2 bg-white border rounded-xl cursor-pointer hover:bg-gray-50 transition"><input type="checkbox" checked={showReturnedOnly} onChange={(e) => setShowReturnedOnly(e.target.checked)} className="w-4 h-4 text-[#002F66] rounded" /><span className="text-xs font-medium text-gray-700 whitespace-nowrap">{t.showReturnedOnly}</span></label><button onClick={fetchTalents} className="px-4 md:px-5 py-3 md:py-4 bg-gray-200 rounded-xl md:rounded-2xl hover:bg-gray-300 transition hover:scale-105" title={t.refresh}><i className="fa-solid fa-rotate-right text-xs md:text-sm"></i></button></div></div>
                 {loading ? (<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{[...Array(6)].map((_, i) => <div key={i} className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border animate-pulse"><div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-2xl mb-4"></div><div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div><div className="h-4 bg-gray-200 rounded w-1/2"></div></div>)}</div>) : filteredTalents.length === 0 ? (<div className="text-center py-16 md:py-24 text-gray-400"><i className="fa-solid fa-user-slash text-4xl md:text-5xl mb-4 block"></i><p className="font-bold text-sm md:text-base">No candidates found. Try a different search or country filter.</p></div>) : (<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">{filteredTalents.map((talent) => (<div key={talent.id} className="web3-card bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col h-full"><div className="flex justify-between items-start mb-4 md:mb-6"><img src={talent.pic} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-[#002F66]/10 shadow-sm" onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=User')} alt={talent.name} /><span className="bg-emerald-50 text-emerald-600 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{t.ready}</span></div><div className="flex-grow"><Link href={`/candidate/${talent.id}`}><h4 className="font-bold text-slate-800 text-lg md:text-xl leading-tight hover:text-[#002F66] cursor-pointer transition-colors">{escapeHtml(talent.name)}</h4></Link><p className="text-[#002F66] font-bold text-[10px] md:text-[11px] uppercase tracking-widest mt-1">{escapeHtml(talent.job)}</p><div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t space-y-2 md:space-y-3 mb-6 md:mb-8"><div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-earth-asia w-4 md:w-5 text-[#002F66]"></i><span>{escapeHtml(talent.country)}</span></div><div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-user w-4 md:w-5 text-[#002F66]"></i><span>{talent.gender}, {talent.age} Years</span></div><div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-money-bill-wave w-4 md:w-5 text-[#002F66]"></i><span>{talent.salary || 0} QAR</span></div><div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-calendar-alt w-4 md:w-5 text-[#002F66]"></i><span>{talent.experience || '2-5 Years'} Exp</span></div><div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-heart w-4 md:w-5 text-[#002F66]"></i><span>{talent.maritalStatus || 'Single'}</span></div><div className="flex items-center text-xs text-gray-500"><i className="fa-solid fa-tag w-4 md:w-5 text-[#002F66]"></i><span>{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</span></div></div></div><div className="flex gap-2 md:gap-3 mt-auto"><a href={talent.cv} target="_blank" onClick={() => trackLead('Public CV', talent.name)} className="flex-1 py-2 md:py-4 bg-gray-100 text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase hover:bg-gray-200 transition">{t.viewCV}</a><button onClick={() => handleHireClick(talent, 'Hire Talent')} className="flex-1 py-2 md:py-4 bg-[#002F66] text-white text-center rounded-xl font-bold text-[8px] md:text-[10px] uppercase shadow-lg hover:bg-[#002060] transition">{t.hireBtn}</button></div></div>))}</div>)}</div></div>
           ) : (
-            // HOME PAGE
+            // HOME PAGE - Same as your original
             <>
               <section id="home" className="relative pt-24 md:pt-32 pb-16 md:pb-32 px-4 md:px-6 qatar-gradient text-white overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none"><i className="fa-solid fa-globe text-[20rem] md:text-[40rem] absolute -top-20 -right-40 animate-spin-slow"></i></div>
@@ -1087,7 +1107,7 @@ export default function Home() {
           )}
         </div>
       ) : (
-        // Admin Panel
+        // Admin Panel - Same as your original
         <div className="admin-section min-h-screen bg-gray-50 pb-16 md:pb-20">
           <div className="bg-gradient-to-r from-[#002F66] to-[#0040aa] text-white py-8 md:py-12 px-4 md:px-6 mb-6 md:mb-8">
             <div className="max-w-7xl mx-auto">
@@ -1142,7 +1162,7 @@ export default function Home() {
                 </div>
                 <div className="lg:col-span-2 bg-white rounded-[2rem] md:rounded-[3rem] border shadow-sm overflow-x-auto">
                   <div className="p-4 md:p-6 border-b"><div className="relative max-w-md"><i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" value={adminSearchQuery} onChange={(e) => setAdminSearchQuery(e.target.value)} placeholder={t.adminSearch} className="w-full p-3 pl-12 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-[#002F66] text-sm" /></div></div>
-                  <div className="overflow-x-auto"><table className="w-full text-left min-w-[800px]"><thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b"><tr><th className="p-4 md:p-6">{t.candidateDetails}</th><th className="p-4 md:p-6">{t.position}</th><th className="p-4 md:p-6">{t.salary}</th><th className="p-4 md:p-6">{t.workerTypeColumn}</th><th className="p-4 md:p-6 text-right">{t.actions}</th></tr></thead><tbody className="divide-y divide-gray-100">{adminFilteredTalents.map((talent) => (<tr key={talent.id} className="hover:bg-gray-50 transition-all duration-200"><td className="p-4 md:p-6"><div className="flex items-center space-x-2 md:space-x-3"><img src={talent.pic} className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-xs md:text-sm">{escapeHtml(talent.name)}</div><div className="text-[8px] md:text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div></div></div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</div></td><td className="p-4 md:p-6 text-right"><button onClick={() => editHandler(talent)} className="text-blue-500 p-1 md:p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen text-xs md:text-sm"></i></button><button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-1 md:p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash text-xs md:text-sm"></i></button></td></tr>))}</tbody></table></div>
+                  <div className="overflow-x-auto"><table className="w-full text-left min-w-[800px]"><thead className="bg-gray-50 text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b"><tr><th className="p-4 md:p-6">{t.candidateDetails}</th><th className="p-4 md:p-6">{t.position}</th><th className="p-4 md:p-6">{t.salary}</th><th className="p-4 md:p-6">{t.workerTypeColumn}</th><th className="p-4 md:p-6 text-right">{t.actions}</th></table></thead><tbody className="divide-y divide-gray-100">{adminFilteredTalents.map((talent) => (<tr key={talent.id} className="hover:bg-gray-50 transition-all duration-200"><td className="p-4 md:p-6"><div className="flex items-center space-x-2 md:space-x-3"><img src={talent.pic} className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover" onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x50')} alt={talent.name} /><div><div className="font-bold text-slate-800 text-xs md:text-sm">{escapeHtml(talent.name)}</div><div className="text-[8px] md:text-[9px] text-gray-400 uppercase">{escapeHtml(talent.country)}</div></div></div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{escapeHtml(talent.job)}</div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.salary || 0} QAR</div></td><td className="p-4 md:p-6"><div className="text-[10px] md:text-xs font-bold text-gray-600">{talent.workerType === 'Returned Housemaids' ? '🔄 Returned Housemaid' : '📋 Recruitment Worker'}</div></td><td className="p-4 md:p-6 text-right"><button onClick={() => editHandler(talent)} className="text-blue-500 p-1 md:p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-pen text-xs md:text-sm"></i></button><button onClick={() => confirmDelete(talent.id)} className="text-red-500 p-1 md:p-2 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"><i className="fa-solid fa-trash text-xs md:text-sm"></i></button></td></tr>))}</tbody></table></div>
                 </div>
               </div>
             )}
@@ -1151,47 +1171,15 @@ export default function Home() {
               <div className="bg-white rounded-[2rem] md:rounded-[3rem] border shadow-sm p-6 md:p-10">
                 <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-6">{t.filterAndDownload}</h3>
                 <div className="grid md:grid-cols-3 gap-6 mb-8">
-                  <div>
-                    <label className="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-2">{t.selectCountry}</label>
-                    <select value={downloadCountry} onChange={(e) => setDownloadCountry(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-[#002F66]">
-                      <option value="">All Countries</option>
-                      {countryOptions.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-2">{t.selectJob}</label>
-                    <select value={downloadJob} onChange={(e) => setDownloadJob(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-[#002F66]">
-                      <option value="">All Jobs</option>
-                      {jobOptions.map(j => <option key={j} value={j}>{j}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-2">{t.selectWorkerType}</label>
-                    <select value={downloadWorkerType} onChange={(e) => setDownloadWorkerType(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-[#002F66]">
-                      <option value="">{t.allWorkerTypes}</option>
-                      {workerTypeOptions.map(w => <option key={w} value={w}>{w === 'Recruitment Workers' ? t.recruitmentWorkers : t.returnedHousemaidsType}</option>)}
-                    </select>
-                  </div>
+                  <div><label className="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-2">{t.selectCountry}</label><select value={downloadCountry} onChange={(e) => setDownloadCountry(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-[#002F66]"><option value="">All Countries</option>{countryOptions.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+                  <div><label className="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-2">{t.selectJob}</label><select value={downloadJob} onChange={(e) => setDownloadJob(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-[#002F66]"><option value="">All Jobs</option>{jobOptions.map(j => <option key={j} value={j}>{j}</option>)}</select></div>
+                  <div><label className="block text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-2">{t.selectWorkerType}</label><select value={downloadWorkerType} onChange={(e) => setDownloadWorkerType(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-[#002F66]"><option value="">{t.allWorkerTypes}</option>{workerTypeOptions.map(w => <option key={w} value={w}>{w === 'Recruitment Workers' ? t.recruitmentWorkers : t.returnedHousemaidsType}</option>)}</select></div>
                 </div>
                 <div className="flex gap-4 mb-8">
                   <button onClick={handleApplyFilter} className="bg-[#002F66] text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-[#002060] transition-all hover:scale-105"><i className="fa-solid fa-filter mr-2"></i> {t.filterResults}</button>
-                  {showFilterResults && filteredDownloadResults.length > 0 && (
-                    <button onClick={handleDownloadZIP} disabled={isDownloading} className="bg-green-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-green-700 transition-all hover:scale-105 disabled:opacity-50"><i className={`fa-solid ${isDownloading ? 'fa-spinner fa-spin' : 'fa-download'} mr-2`}></i> {isDownloading ? t.downloading : t.downloadSelected} ({filteredDownloadResults.length})</button>
-                  )}
+                  {showFilterResults && filteredDownloadResults.length > 0 && (<button onClick={handleDownloadZIP} disabled={isDownloading} className="bg-green-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-green-700 transition-all hover:scale-105 disabled:opacity-50"><i className={`fa-solid ${isDownloading ? 'fa-spinner fa-spin' : 'fa-download'} mr-2`}></i> {isDownloading ? t.downloading : t.downloadSelected} ({filteredDownloadResults.length})</button>)}
                 </div>
-                {showFilterResults && (
-                  <div className="border-t pt-6">
-                    <h4 className="font-bold text-slate-700 mb-4">Results ({filteredDownloadResults.length} candidates):</h4>
-                    <div className="max-h-96 overflow-y-auto space-y-2">
-                      {filteredDownloadResults.map(candidate => (
-                        <div key={candidate.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                          <div><span className="font-bold text-sm">{candidate.name}</span><span className="text-xs text-gray-500 ml-3">{candidate.country} - {candidate.job} - {candidate.workerType === 'Returned Housemaids' ? '🔄 Returned' : '📋 Recruitment'}</span></div>
-                          <a href={candidate.cv} target="_blank" className="text-[#002F66] text-sm hover:underline"><i className="fa-regular fa-file-pdf"></i> CV</a>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                {showFilterResults && (<div className="border-t pt-6"><h4 className="font-bold text-slate-700 mb-4">Results ({filteredDownloadResults.length} candidates):</h4><div className="max-h-96 overflow-y-auto space-y-2">{filteredDownloadResults.map(candidate => (<div key={candidate.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition"><div><span className="font-bold text-sm">{candidate.name}</span><span className="text-xs text-gray-500 ml-3">{candidate.country} - {candidate.job} - {candidate.workerType === 'Returned Housemaids' ? '🔄 Returned' : '📋 Recruitment'}</span></div><a href={candidate.cv} target="_blank" className="text-[#002F66] text-sm hover:underline"><i className="fa-regular fa-file-pdf"></i> CV</a></div>))}</div></div>)}
               </div>
             )}
 
